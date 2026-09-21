@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="SkiCenter SYSDEV/SkiCenter SYSDEV.csproj" />
+  <Project Path="BusinessLayer/BusinessLayer.csproj" />
+  <Project Path="DataLayer/DataLayer.csproj" />
+  <Project Path="EntityLayer/EntityLayer.csproj" />
+  <Project Path="PresentationLayer/PresentationLayer.csproj" />
 </Solution>
