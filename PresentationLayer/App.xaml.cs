@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace SkiCenter_SYSDEV
+namespace PresentationLayer
 {
     /// <summary>
     /// Interaction logic for App.xaml

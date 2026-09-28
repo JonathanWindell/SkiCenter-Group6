@@ -1,7 +1,7 @@
-﻿<Application x:Class="SkiCenter_SYSDEV.App"
+﻿<Application x:Class="PresentationLayer.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:SkiCenter_SYSDEV"
+             xmlns:local="clr-namespace:PresentationLayer"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

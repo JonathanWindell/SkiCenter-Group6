@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
-    public class BookingAccomodation
+    public class BookingAccomodation 
     {
         [Key]
         public int BookingAccommodationID { get; set; }
