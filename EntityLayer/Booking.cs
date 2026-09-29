@@ -33,7 +33,7 @@ namespace EntityLayer
 
         public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
-        public virtual ICollection<Rental> Rental { get; set; } = new List<Invoice>();
+        public virtual ICollection<Rental> Rental { get; set; } = new List<Rental>();
 
 
         // Relation to Customer. Foreign Key
