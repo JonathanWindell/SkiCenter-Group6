@@ -24,6 +24,14 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public Booking() { }
 
+        public Booking(DateTime bookingDate, string status, bool hasCancellationInsurance, decimal totalAmount)
+        {
+            BookingDate = bookingDate;
+            Status = status;
+            HasCancellationInsurance = hasCancellationInsurance;
+            TotalAmount = totalAmount;
+        }
+
         /// <summary>
         /// Given booking is central with Many to Many relations collections are used to create necessary connection.
         /// </summary>

@@ -32,5 +32,12 @@ namespace EntityLayer
 
         // Parameterless constructor for EF 
         public SkiLessonSession() { }
+
+        public SkiLessonSession(int weekNumber, string days, string timeSlot)
+        {
+            WeekNumber = weekNumber;
+            Days = days;
+            TimeSlot = timeSlot;
+        }
     }
 }

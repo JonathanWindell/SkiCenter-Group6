@@ -9,25 +9,34 @@ namespace EntityLayer
     {
         // Primary key for Meeting room
         [Key]
-        public int SeasonPriceID { get; set; }
+        public int MeetingRoomID { get; set; }
 
         [Required]
-        public string AccommodationType { get; set; }
+        public int Capacity { get; set; }
 
         [Required]
-        public int WeekNumber { get; set; }
+        public string WeekDay { get; set; }
+
+        [Required]
+        public string Description { get; set; }
 
         [Required]
         public decimal Price { get; set; }
 
+        [Required]
+        public string Status { get; set; }
+
         // Parameterless constructor for EF 
         public MeetingRoom() { }
 
-        public MeetingRoom(string accomodationType, int weekNumber, decimal price)
+        public MeetingRoom(int capacity, string weekDay, string description, decimal price, string status)
         {
-            AccommodationType = accomodationType;
-            WeekNumber = weekNumber;
+            Capacity = capacity;
+            WeekDay = weekDay;
+            Description = description;
             Price = price;
+            Status = status;
+            Status = status;
         }
     }
 }
