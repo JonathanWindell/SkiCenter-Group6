@@ -1,10 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace EntityLayer
 {
-    internal class EquipmentItem
+    public class EquipmentItem
     {
+        [Key]
+        public int EquipmentItemID { get; set; }
+
+        // Status for item, ex. Available, Broken, etc. 
+        [Required]
+        public string Status { get; set; }
+
+        // Describes current condition of item.
+        [Required]
+        public string Condition { get; set; }
+
+        // Price per day for item.
+        [Required]
+        public decimal PricePerDay { get; set; }
+
+        // Size of item.
+        [Required]
+        public string Size { get; set; }
+
+        // Parameterless constructor for EF 
+        public EquipmentItem() { }
+
+        public EquipmentItem(string status, string condition, decimal pricePerDay, string size)
+        {
+            Status = status;
+            Condition = condition;
+            PricePerDay = pricePerDay;
+            Size = size;
+        }
     }
 }

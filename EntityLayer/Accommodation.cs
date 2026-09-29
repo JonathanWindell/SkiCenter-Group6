@@ -5,7 +5,7 @@ using System.Text;
 
 namespace EntityLayer
 {
-    public class Accomodation
+    public class Accommodation
     {
         [Key]
         public int AccommodationID { get; set; }
@@ -27,6 +27,6 @@ namespace EntityLayer
         public int SizeM2 { get; set; }
 
         // Parameterless constructor for EF 
-        public Accomodation() { }
+        public Accommodation() { }
     }
 }

@@ -10,13 +10,16 @@ namespace EntityLayer
     {
         [Required]
         public string PersonalNumber { get; set; }
+       
+        [Required]
+        public decimal CreditLimit { get; set; }
 
         // Parameterless constructor for EF 
         public PrivateCustomer() { }
 
-        public PrivateCustomer(string firstName, string lastName, string address, string email, string phoneNumber, string personalNumber) : base(firstName, lastName, address, email, phoneNumber)
+        public PrivateCustomer(string firstName, string lastName, string address, string email, string phoneNumber, decimal creditLimit) : base(firstName, lastName, address, email, phoneNumber)
         {
-            PersonalNumber = personalNumber;
+            CreditLimit = creditLimit;
         }
     }
 }

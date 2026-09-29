@@ -17,6 +17,9 @@ namespace EntityLayer
         public decimal DiscountRate { get; set; }
         public bool IsApproved { get; set; } // Decided by marketing manager
 
+        // Parameterless constructor for EF 
+        public CorporateCustomer() { }
+
         public CorporateCustomer(string firstName, string lastName, string address, string email, string phoneNumber, string orgNumber, string contactPerson) : base(firstName, lastName, address, email, phoneNumber)
         {
             OrganisationNumber = orgNumber;

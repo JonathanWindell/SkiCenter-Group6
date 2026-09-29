@@ -27,9 +27,14 @@ namespace DataLayer.Interfaces
         IBookingRepository Booking { get; }
 
         /// <summary>
+        /// Repository for managing instances of bookings.
+        /// </summary>
+        IBookingAccommodationRepository BookingAccommodation { get; }
+
+        /// <summary>
         /// Repository for managing accomodation resources available for booking.
         /// </summary>
-        IAccomodationRepository Accomodation { get; }
+        IAccommodationRepository Accommodation { get; }
 
         /// <summary>
         /// Repository for managing equipment such as skis, boots, scooter rental.
@@ -37,14 +42,29 @@ namespace DataLayer.Interfaces
         IEquipmentRepository Equipment { get; }
 
         /// <summary>
-        /// Repository for .
+        /// Repository for handling skilessons.
         /// </summary>
-        ISkiLessionSessionRepository SkiLessionSession { get; }
+        ISkiLessonRepository SkiLesson { get; }
 
         /// <summary>
-        /// Repository for managing inventory and hardware associated with resources.
+        /// Repository for managing rentals.
+        /// </summary>
+        IRentalRepository Rental { get; }
+
+        /// <summary>
+        /// Repository for managing invoices and its data.
         /// </summary>
         IInvoiceRepository Invoice { get; }
+
+        /// <summary>
+        /// Repository for managing meetingrooms and its properties.
+        /// </summary>
+        IMeetingRoomRepository MeetingRoom { get; }
+
+        /// <summary>
+        /// Repository for managing season prices of accommodation and equipment?.
+        /// </summary>
+        ISeasonPriceRepository SeasonPrice { get; }
 
         /// <summary>
         /// Persists all changes tracked by the repositories to the underlying database.

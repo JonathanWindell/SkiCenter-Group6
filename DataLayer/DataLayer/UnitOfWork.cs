@@ -1,4 +1,5 @@
 ﻿using DataLayer.Interfaces;
+using EntityLayer;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -18,11 +19,14 @@ namespace DataLayer
         public ICustomerRepository Customer { get; private set; }
         public IStaffRepository Staff { get; private set; }
         public IBookingRepository Booking { get; private set; }
-        public IAccomodationRepository Accomodation { get; private set; }
+        public IBookingAccommodationRepository BookingAccommodation {  get; private set; }
+        public IAccommodationRepository Accommodation { get; private set; }
         public IEquipmentRepository Equipment { get; private set; }
-        public ISkiLessionSessionRepository SkiLessionSession { get; private set; }
-        public IInvoiceRepository SkiLessionSession { get; private set; }
-
+        public ISkiLessonRepository SkiLesson { get; private set; }
+        public IRentalRepository Rental { get; private set; }
+        public IInvoiceRepository Invoice { get; private set; }
+        public IMeetingRoomRepository MeetingRoom { get; private set; }
+        public ISeasonPriceRepository SeasonPrice { get; private set; }
 
         public UnitOfWork(SkiCenterDbContext context)
         {
@@ -31,10 +35,14 @@ namespace DataLayer
             Customer = new CustomerRepository(_context);
             Staff = new StaffRepository(_context);
             Booking = new BookingRepository(_context);
-            Accomodation = new AccomodationRepository(_context);
+            BookingAccommodation = new BookingAccommodationRepository(_context);
+            Accommodation = new AccommodationRepository(_context);
             Equipment = new EquipmentRepository(_context);
-            SkiLessionSession = new SkiLessionSessionRepository(_context);
-            IInvoice = new EquipmentRepository(_context);
+            SkiLesson = new SkiLessonRepository(_context);
+            Rental = new RentalRepository(_context);
+            Invoice = new InvoiceRepository(_context);
+            MeetingRoom = new MeetingRoomRepository(_context);
+            SeasonPrice = new SeasonPriceRepository(_context);
         }
 
 
