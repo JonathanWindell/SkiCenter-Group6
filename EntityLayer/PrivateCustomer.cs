@@ -9,9 +9,6 @@ namespace EntityLayer
     public class PrivateCustomer : Customer
     {
         [Required]
-        public string PersonalNumber { get; set; }
-       
-        [Required]
         public decimal CreditLimit { get; set; }
 
         // Parameterless constructor for EF 

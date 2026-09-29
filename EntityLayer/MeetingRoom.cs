@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace EntityLayer
@@ -29,6 +30,9 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public MeetingRoom() { }
 
+        // Relation to Booking. Many to Many Relation. 
+        public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
         public MeetingRoom(int capacity, string weekDay, string description, decimal price, string status)
         {
             Capacity = capacity;
@@ -38,5 +42,6 @@ namespace EntityLayer
             Status = status;
             Status = status;
         }
+
     }
 }

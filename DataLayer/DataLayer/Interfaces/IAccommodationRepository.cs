@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataLayer
+namespace DataLayer.Interfaces
 {
-    public class IAccommodationRepository
+    public interface IAccommodationRepository
     {
     }
 }
