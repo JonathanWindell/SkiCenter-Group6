@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/Solution Items/" />
+  <Project Path="BusinessLayer/BusinessLayer.csproj" Id="286c178d-b74e-4e6a-bbea-528e69d290da" />
   <Project Path="DataLayer/DataLayer.csproj" Id="0005a190-58cb-4087-bc86-088ea5393b79" />
   <Project Path="EntityLayer/EntityLayer.csproj" Id="455a0783-378d-4fda-b103-d352aed8cc74" />
   <Project Path="PresentationLayer/PresentationLayer.csproj" />
