@@ -24,13 +24,13 @@ namespace DataLayer
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Staff> StaffMembers { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<BookingAccomodation> BookingAccomodations { get; set; }
+        public DbSet<BookingAccommodation> BookingAccommodations { get; set; }
         public DbSet<Accommodation> Accommodations { get; set; }
         public DbSet<SeasonPrice> SeasonPrices { get; set; }
         public DbSet<MeetingRoom> MeetingRooms { get; set; }
         public DbSet<Equipment> Equipment { get; set; }
         public DbSet<EquipmentItem> EquipmentItems { get; set; }
-        public DbSet<Rental> Rental { get; set; }
+        public DbSet<Rental> Rentals { get; set; }
         public DbSet<SkiLesson> SkiLessons { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
     }

@@ -24,5 +24,13 @@ namespace EntityLayer
 
         // Parameterless constructor for EF 
         public SkiLesson() { }
+
+        public SkiLesson(string level, int maxParticipants, int durationHours, decimal price)
+        {
+            Level = level;
+            MaxParticipants = maxParticipants;
+            DurationHours = durationHours;
+            Price = price;
+        }
     }
 }

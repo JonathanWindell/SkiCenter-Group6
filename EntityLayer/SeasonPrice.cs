@@ -24,5 +24,12 @@ namespace EntityLayer
 
         // Parameterless constructor for EF 
         public SeasonPrice() { }
+
+        public SeasonPrice(string accommodationType, int weekNumber, decimal price)
+        {
+            AccommodationType = accommodationType;
+            WeekNumber = weekNumber;
+            Price = price;
+        }
     }
 }

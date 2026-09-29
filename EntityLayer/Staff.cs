@@ -17,34 +17,35 @@ namespace EntityLayer
     {
         // Primary key for Staff
         [Key]
-        public int staffID { get; set; }
+        public int StaffID { get; set; }
 
         [Required]
-        public string firstName { get; set; }
+        public string FirstName { get; set; }
 
         [Required]
-        public string lastName { get; set; }
+        public string LastName { get; set; }
 
         [Required]
-        public string email { get; set; }
+        public string Email { get; set; }
 
         [Required]
         [MinLength(10)]
-        public string password { get; set; }
+        public string Password { get; set; }
 
-        public staffRole role { get; set; }
+        public staffRole Role { get; set; }
 
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
         // Parameterless constructor for EF
         public Staff() { }
 
-        public Staff(string firstName, string lastName, string email, string password)
+        public Staff(string firstName, string lastName, string email, string password, staffRole role)
         {
-            firstName = firstName;
-            lastName = lastName;
-            email = email;
-            password = password;
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Password = password;
+            Role = role;
         }
     }
 }
