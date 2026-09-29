@@ -1,4 +1,5 @@
 ﻿using DataLayer.Interfaces;
+using DataLayer.Repositories;
 using EntityLayer;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,6 @@ namespace DataLayer
         // Instansiate readonly of database connection
         private readonly SkiCenterDbContext _context;
 
-
-        // 
         public ICustomerRepository Customer { get; private set; }
         public IStaffRepository Staff { get; private set; }
         public IBookingRepository Booking { get; private set; }

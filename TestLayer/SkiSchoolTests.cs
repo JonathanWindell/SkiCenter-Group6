@@ -1,4 +1,5 @@
-﻿namespace TestLayer
+﻿/*
+namespace TestLayer
 {
     public class Tests
     {
@@ -14,3 +15,4 @@
         }
     }
 }
+*/

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace DataLayer
 {
-    public class IStaffRepository
+    public interface IStaffRepository
     {
     }
 }
