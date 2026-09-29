@@ -26,6 +26,9 @@ namespace EntityLayer
         [Required]
         public string Size { get; set; }
 
+        // Relation to Rental. Many to Many relation
+        public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+
         // Parameterless constructor for EF 
         public EquipmentItem() { }
 

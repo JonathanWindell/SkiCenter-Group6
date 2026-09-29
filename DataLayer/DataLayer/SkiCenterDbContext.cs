@@ -14,7 +14,7 @@ namespace DataLayer
         */
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=sqlutb4-db.hb.se,56077;Database=oosu2614;User ID=suht2606;Password=LWB842;TrustServerCertificate=True;");
+            optionsBuilder.UseSqlServer(@"Server=sqlutb4-db.hb.se,56077;Database=suht2606;User ID=suht2606;Password=LWB842;TrustServerCertificate=True;");
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -22,6 +22,8 @@ namespace DataLayer
         /// Create DbSet for every entity
         /// </summary>
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<PrivateCustomer> PrivateCustomers { get; set; }
+        public DbSet<CorporateCustomer> CorporateCustomers { get; set; }
         public DbSet<Staff> StaffMembers { get; set; }
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingAccommodation> BookingAccommodations { get; set; }

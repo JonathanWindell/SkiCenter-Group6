@@ -10,7 +10,6 @@ namespace EntityLayer
     {
         [Required]
         public string OrganisationNumber { get; set; }
-
         [Required]
         public string ContactPerson { get; set; }
         public decimal CreditLimit { get; set; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace EntityLayer
@@ -26,6 +27,9 @@ namespace EntityLayer
 
         // Parameterless constructor for EF 
         public Rental() { }
+
+        // Relation to EquipmentItems. Many to Many relation
+        public virtual ICollection<EquipmentItem> EquipmentItems { get; set; } = new List<EquipmentItem>();
 
         public Rental(DateOnly startDate, DateOnly endDate, DateOnly returnDate, string status, decimal sum)
         {
