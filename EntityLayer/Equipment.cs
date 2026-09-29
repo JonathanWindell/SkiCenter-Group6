@@ -19,9 +19,9 @@ namespace EntityLayer
         public string Category { get; set; }
 
         // Parameterless constructor for EF 
-        public Equipment () { }
+        public Equipment() { }
 
-        public Equipment (string description, string category)
+        public Equipment(string description, string category)
         {
             Description = description;
             Category = category;

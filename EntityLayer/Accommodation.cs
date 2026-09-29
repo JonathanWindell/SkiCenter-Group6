@@ -10,13 +10,17 @@ namespace EntityLayer
         [Key]
         public int AccommodationID { get; set; }
 
+        // Specific number of unit. Apartment 101 etc. 
+        [Required]
+        public string UnitName{ get; set; }
+
         // Describes type of apartments, lodges etc. 
         [Required]
         public string Category { get; set; }
 
-        // Specific number of unit. Apartment 101 etc. 
+        // Specific description of the accommodation. 
         [Required]
-        public string UnitNumber { get; set; }
+        public string Description { get; set; }
 
         // Number of beds per apartment
         [Required]
@@ -24,9 +28,18 @@ namespace EntityLayer
 
         // Size of apartment
         [Required]
-        public int SizeM2 { get; set; }
+        public string Status { get; set; }
 
         // Parameterless constructor for EF 
         public Accommodation() { }
+
+        public Accommodation(string unitName, string category, string description, int numberOfBeds, string status)
+        {
+            UnitName = unitName;
+            Category = category;
+            Description = description;
+            NumberOfBeds = numberOfBeds;
+            Status = status;
+        }
     }
 }
