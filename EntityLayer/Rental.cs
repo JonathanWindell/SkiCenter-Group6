@@ -13,13 +13,13 @@ namespace EntityLayer
         public int RentalID { get; set; }
 
         [Required]
-        public DateOnly StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [Required]
-        public DateOnly EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         [Required]
-        public DateOnly ReturnDate { get; set; }
+        public DateTime ReturnDate { get; set; }
 
         public string Status { get; set; }
 
@@ -31,7 +31,7 @@ namespace EntityLayer
         // Relation to EquipmentItems. Many to Many relation
         public virtual ICollection<EquipmentItem> EquipmentItems { get; set; } = new List<EquipmentItem>();
 
-        public Rental(DateOnly startDate, DateOnly endDate, DateOnly returnDate, string status, decimal sum)
+        public Rental(DateTime startDate, DateTime endDate, DateTime returnDate, string status, decimal sum)
         {
             StartDate = startDate;
             EndDate = endDate;

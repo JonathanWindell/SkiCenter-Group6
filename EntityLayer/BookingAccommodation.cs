@@ -23,7 +23,7 @@ namespace EntityLayer
         public virtual Booking Booking { get; set; }
 
         // Relation to Customer. Foreign Key
-        [ForeignKey("Accomodaton")]
+        [ForeignKey("Accommodation")]
         public int AccommodationID { get; set; }
         public virtual Accommodation Accommodation { get; set; }
 

@@ -13,11 +13,11 @@ namespace EntityLayer
 
         // Date for creation of invoice.
         [Required]
-        public DateOnly Date { get; set; }
+        public DateTime Date { get; set; }
 
         // Last day for invoice payment.
         [Required]
-        public DateOnly DueDate { get; set; }
+        public DateTime DueDate { get; set; }
 
         // Invoice amount excluding moms.
         [Required]
@@ -38,7 +38,7 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public Invoice() { }
 
-        public Invoice(DateOnly date, DateOnly dueDate, decimal amountExcl, decimal moms, decimal amountIncl, string status)
+        public Invoice(DateTime date, DateTime dueDate, decimal amountExcl, decimal moms, decimal amountIncl, string status)
         {
             Date = date;
             DueDate = dueDate;

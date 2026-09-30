@@ -24,7 +24,16 @@ namespace DataLayer.Repositories
         {
             return _context.Set<Booking>()
                 .Include(b => b.Customer)
-                .AsNoTracking()
+                .Include(b => b.Accommodations)
+                    .ThenInclude(ba => ba.Accommodation)
+                .Include(b => b.MeetingRooms)
+                .Include(b => b.SkiLessons)
+                    .ThenInclude(sl => sl.SkiLessonSession)
+                .Include(b => b.Rentals)
+                    .ThenInclude(r => r.EquipmentItems)
+                        .ThenInclude(ei => ei.Equipment)
+                .Include(b => b.Invoices)
+                .AsSplitQuery()
                 .ToList();
         }
 
@@ -36,15 +45,14 @@ namespace DataLayer.Repositories
         {
             return _context.Set<Booking>()
                 .Include(b => b.Customer)
-                .Include(b => b.BookingAccommodations)
+                .Include(b => b.Accommodations)
                     .ThenInclude(ba => ba.Accommodation)
-                .Include(b => b.BookingMeetingRooms)
-                    .ThenInclude(bm => bm.MeetingRoom)
-                .Include(b => b.SkiLessonBookings)
+                .Include(b => b.MeetingRooms)
+                .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
                 .Include(b => b.Rentals)
-                    .ThenInclude(r => r.RentalItems)
-                        .ThenInclude(ri => ri.EquipmentItem)
+                    .ThenInclude(r => r.EquipmentItems)
+                        .ThenInclude(ri => ri.Equipment)
                 .Include(b => b.Invoices)
                 .AsSplitQuery()
                 .FirstOrDefault(b => b.BookingID == bookingID);
@@ -55,20 +63,20 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
-        public IEnumerable<Booking> GetBookingsInRange(DateOnly startDate, DateOnly endDate)
+        public IEnumerable<Booking> GetBookingsInRange(DateTime startDate, DateTime endDate)
         {
             return _context.Set<Booking>()
                 .Include(b => b.Customer)
-                .Include(b => b.BookingAccommodations)
+                .Include(b => b.Accommodations)
                     .ThenInclude(ba => ba.Accommodation)
-                .Where(b => b.BookingAccommodations.Any(ba =>
+                .Where(b => b.Accommodations.Any(ba =>
                     ba.StartDate < endDate && ba.EndDate > startDate))
                 .AsNoTracking()
                 .ToList();
         }
 
         /// <summary>
-        /// 
+        /// Gets booking by a specific status.
         /// </summary>
         /// <param name="status"></param>
         public IEnumerable<Booking> GetBookingsByStatus(string status)
@@ -80,15 +88,24 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        /// <summary>
+        /// Gets bookings by a specific customerID.
+        /// </summary>
+        /// <param name="customerID"></param>
         public IEnumerable<Booking> GetBookingsByCustomer(int customerID)
         {
             return _context.Set<Booking>()
-                .Include(b => b.BookingAccommodations)
+                .Include(b => b.Accommodations)
                 .Where(b => b.CustomerID == customerID)
                 .AsNoTracking()
                 .ToList();
         }
 
+        /// <summary>
+        /// Updates a specific booking with a new status. 
+        /// </summary>
+        /// <param name="bookingID"></param>
+        /// <param name="status"></param>
         public void UpdateBookingStatus(int bookingID, string status)
         {
             var booking = _context.Set<Booking>().Find(bookingID);

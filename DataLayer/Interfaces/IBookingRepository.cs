@@ -11,7 +11,7 @@ namespace DataLayer.Interfaces
 
         Booking GetSpecificBooking(int bookingID);
 
-        IEnumerable<Booking> GetBookingsInRange(DateOnly startDate, DateOnly endDate);
+        IEnumerable<Booking> GetBookingsInRange(DateTime startDate, DateTime endDate);
 
         IEnumerable<Booking> GetBookingsByStatus(string status);
 
