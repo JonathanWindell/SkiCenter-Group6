@@ -19,7 +19,7 @@ namespace BusinessLayer.Controllers
                 return true; // Tillåt åtkomst
             }
 
-            return false; Deny Access;
+            return false; //Deny Access;
         }
     }
 }

@@ -33,6 +33,12 @@ namespace DataLayer
             base.OnConfiguring(optionsBuilder);
         }
 
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            // Ensures standard value for decimals. 
+            configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
+        }
+
         /// <summary>
         /// Create DbSet for every entity
         /// </summary>
