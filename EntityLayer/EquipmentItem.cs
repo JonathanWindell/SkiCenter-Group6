@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace EntityLayer
@@ -28,6 +29,11 @@ namespace EntityLayer
 
         // Relation to Rental. Many to Many relation
         public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+
+        // Relation to Equipment. Foreign Key
+        [ForeignKey("Equipment")]
+        public int EquipmentID { get; set; }
+        public virtual Equipment Equipment { get; set; }
 
         // Parameterless constructor for EF 
         public EquipmentItem() { }

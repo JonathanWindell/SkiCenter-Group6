@@ -10,15 +10,21 @@ namespace EntityLayer
     {
         [Key]
         public int BookingID { get; set; }
-        
+
         //Date when booking was made. 
+        [Required]
         public DateTime BookingDate { get; set; }
 
         // Sets standard status to preliminary
-        public string Status { get; private set; } // "Preliminary", "Confirmed", "Cancelled"
+        [Required]
+        public string Status { get; set; } // "Preliminary", "Confirmed", "Cancelled"
+
+        // Check if CancellationInsurance is Active
+        [Required]
         public bool HasCancellationInsurance { get; set; }
 
         // How calculated?
+        [Required]
         public decimal TotalAmount { get; set; }
 
         // Parameterless constructor for EF 
@@ -41,7 +47,9 @@ namespace EntityLayer
 
         public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
-        public virtual ICollection<Rental> Rental { get; set; } = new List<Rental>();
+        public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
+
+        public virtual ICollection<SkiLessonBooking> SkiLessons { get; set; } = new List<SkiLessonBooking>();
 
 
         // Relation to Customer. Foreign Key
