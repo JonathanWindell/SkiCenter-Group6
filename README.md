@@ -18,6 +18,7 @@
 - `NUnit` (Should only be installed in `TestLayer`)
 - `NUnit.Analyzers` (Should only be installed in `TestLayer`)
 - `NUnit3TestAdapter` (Should only be installed in `TestLayer`)
+- `Microsoft.Extensions.Configuration.UserSecrets`(Should only be installed in `DataLayer`. Transitive in `BusinessLayer`, `PresentationLayer`, `TestLayer`)
 
 #### 1.1.1 How to Check NuGet Packages
 1. Open the solution in Visual Studio.
