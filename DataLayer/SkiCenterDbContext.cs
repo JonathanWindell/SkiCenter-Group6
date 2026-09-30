@@ -1,8 +1,9 @@
-﻿using System;
+﻿using EntityLayer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using EntityLayer;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer
 {
@@ -14,7 +15,21 @@ namespace DataLayer
         */
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=sqlutb4-db.hb.se,56077;Database=suht2606;User ID=suht2606;Password=LWB842;TrustServerCertificate=True;");
+            if (!optionsBuilder.IsConfigured)
+            {
+                // Creates config and poins to appsettings.json 
+                IConfigurationRoot configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .Build();
+
+                // Fetch string with name "DefaultConnection". 
+                string connectionString = configuration.GetConnectionString("DefaultConnection");
+
+                // Connect to database.
+                optionsBuilder.UseSqlServer(connectionString);
+            }
+
             base.OnConfiguring(optionsBuilder);
         }
 
