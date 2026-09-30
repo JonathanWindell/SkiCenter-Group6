@@ -14,5 +14,13 @@ namespace DataLayer.Repositories
         {
             _context = context;
         }
+
+        /// <summary>
+        /// Fetches staff by email and password to validate login information. 
+        /// </summary>
+        public Staff GetStaffByEmailAndPassword(string email, string password)
+        {
+            return _context.StaffMembers.FirstOrDefault(s => s.Email == email && s.Password == password);
+        }
     }
 }
