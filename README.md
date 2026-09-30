@@ -18,6 +18,7 @@
 - `NUnit` (Should only be installed in `TestLayer`)
 - `NUnit.Analyzers` (Should only be installed in `TestLayer`)
 - `NUnit3TestAdapter` (Should only be installed in `TestLayer`)
+- `Microsoft.Extensions.Configuration.Json`(Should only be installed in `DataLayer`. Transitive in `BusinessLayer`, `PresentationLayer`, `TestLayer`)
 
 #### 1.1.1 How to Check NuGet Packages
 1. Open the solution in Visual Studio.
@@ -90,3 +91,23 @@ Creating a pull request is the next step to ensure that what you have worked on 
 3. Navigate to the "Pull Requests" section and click on "New Pull Request".
 4. Select your newly pushed branch as the source and the `main` branch (or designated development branch) as the target.
 5. Provide a clear title and a detailed description explaining what your changes do, assign reviewers, and submit the PR.
+
+## 4.0 Handling Project Secrets
+
+Due to Github not allowing a private repository to contain rulesets and wiki secrets such as `DbContext` string has to be hidden as to not be uploaded to Github. Therefore the usage of `Appsettings.json` has been created.
+
+> Note: Required NuGet Package is `Microsoft.Extensions.Configuration.Json`.
+
+Since .gitignore has `appsettings.json` implemented this file will not be uploaded to github due to it containing the database login information. You will therefore have to create this file. 
+
+**Appsettings.json File Structure**
+
+> Note: This file should be created in `DataLayer`
+```
+// Change placeholder information to correct information found in Canvas group. 
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=[ServerName];Database=[Port];User ID=[Change];Password=[Change];TrustServerCertificate=True;"
+  }
+}
+```
