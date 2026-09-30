@@ -9,6 +9,7 @@ namespace EntityLayer
     public class CorporateCustomer : Customer
     {
         [Required]
+        public string CompanyName { get; set; }
         public string OrganisationNumber { get; set; }
         [Required]
         public string ContactPerson { get; set; }

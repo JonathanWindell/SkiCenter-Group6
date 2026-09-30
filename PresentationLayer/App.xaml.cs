@@ -45,6 +45,8 @@ namespace PresentationLayer
             // 1. Register Views (Windows)
             services.AddTransient<LoginView>();
 
+            services.AddTransient<CustomerRegistrationView>();
+
             // 2. Register Controllers
             services.AddTransient<LoginController>();
 
