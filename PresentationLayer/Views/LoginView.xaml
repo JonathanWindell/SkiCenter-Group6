@@ -50,9 +50,9 @@
                         <!--<RadioButton x:Name="rbMember" Content="Medlem" 
                                      Foreground="{StaticResource PrimaryText}" Margin="0,0,20,0"
                                      GroupName="UserRole"/>-->
-                        <RadioButton x:Name="rbStaff" Content="Personal" IsChecked="True" 
+                        <!--<RadioButton x:Name="rbStaff" Content="Personal" IsChecked="True" 
                                      Foreground="{StaticResource PrimaryText}"
-                                     GroupName="UserRole"/>
+                                     GroupName="UserRole"/>-->
                     </StackPanel>
 
                     <Button Content="Logga in" Height="45" 
