@@ -75,6 +75,11 @@ namespace DataLayer.Repositories
                 );
         }
 
+        /// <summary>
+        /// Checks if there is already a registered customer with email and phonenumber. 
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="phoneNumber"></param>
         public bool CustomerExists(string email, string phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(email) && string.IsNullOrWhiteSpace(phoneNumber))
@@ -86,7 +91,9 @@ namespace DataLayer.Repositories
                 (!string.IsNullOrEmpty(email) && c.Email == email) ||
                 (!string.IsNullOrEmpty(phoneNumber) && c.PhoneNumber == phoneNumber));
         }
-
+        /// <summary>
+        /// Gets all corporate customers that has not yet been approved by marketing manager. 
+        /// </summary>
         public IEnumerable<CorporateCustomer> GetPendingCorporateCustomer()
         {
             return _context.Set<CorporateCustomer>()
