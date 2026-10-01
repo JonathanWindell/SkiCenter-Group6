@@ -4,6 +4,9 @@ using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
 using BusinessLayer.Controllers;
+using Microsoft.EntityFrameworkCore;
+using DataLayer;
+using DataLayer.Interfaces;
 
 
 namespace PresentationLayer
@@ -17,6 +20,12 @@ namespace PresentationLayer
     {
 
         private readonly ServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// Provides access to the application's built service provider so that objects
+        /// constructed by WPF (via XAML) can still resolve services from the DI container.
+        /// </summary>
+        public IServiceProvider Services => _serviceProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="App"/> class.
@@ -44,21 +53,33 @@ namespace PresentationLayer
         {
             // 1. Register Views (Windows)
             services.AddTransient<LoginView>();
-
+            services.AddTransient<DashboardView>();
             services.AddTransient<CustomerRegistrationView>();
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
 
             // 3. Register Repositories
-           // services.AddTransient<IStaffRepository, StaffRepository>();
-           // services.AddTransient<IResourceRepository, ResourceRepository>();
 
             // 4. Register and initialize DbContext
-          //  services.AddDbContext<LabDbContext>();
+            services.AddDbContext<SkiCenterDbContext>();
 
-            // Register UnitOfWork so IUnitOfWork can be resolved
-           // services.AddScoped<IUnitOfWork, UnitOfWork>();
+            // Register UnitOfWork so IUnitOfWork can be resolved by controllers and views.
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+        }
+
+        /// <summary>
+        /// Create the initial window using the DI container instead of letting WPF
+        /// instantiate it via StartupUri. This preserves constructor injection.
+        /// </summary>
+        /// <param name="e">Startup event args.</param>
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            // Resolve the main window (LoginView) from the service provider and show it
+            var loginWindow = Services.GetRequiredService<LoginView>();
+            loginWindow.Show();
         }
 
     }
