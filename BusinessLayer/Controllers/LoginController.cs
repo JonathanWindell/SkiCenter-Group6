@@ -29,14 +29,14 @@ namespace BusinessLayer.Controllers
         /// <param name="email">The email to search for.</param>
         /// <param name="plainTextPassword">The plain-text password to hash and compare.</param>
         /// <returns>The found <see cref="CurrentLoggedInUser"/> object if credentials match; otherwise, null.</returns>
-        public bool Login(string email, string plainTextPassword)
+        public (Staff? staff, string statusMsg) Login(string email, string plainTextPassword)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(plainTextPassword))
             {
-                return false;
+                return (false, "Email and password are required.");
             }
 
-            string hashedPassword = SecurityHelper.HashPassword(plainTextPassword);
+            string hashedPassword = HashingService.HashPassword(plainTextPassword);
 
             Staff foundStaff = _unitOfWork.Staff.GetStaffByEmailAndPassword(email, hashedPassword);
 
@@ -49,6 +49,8 @@ namespace BusinessLayer.Controllers
             return false;
 
         }
+
+
 
 
         // Sets current user to null to remove session

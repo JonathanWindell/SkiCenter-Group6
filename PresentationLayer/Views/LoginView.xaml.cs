@@ -65,7 +65,7 @@ namespace PresentationLayer.Views
             await ElementAnimations.ToggleLoadingAnimationAsync(true, LoginControls, LoadingVisual, SpinnerRotate);
 
             // Run on a background thread to keep the UI responsive during the network/DB call
-            var loginResult = await Task.Run(() => _loginController.Login(username, password, userType));
+            var loginResult = await Task.Run(() => _loginController.Login(email, password));
 
             await Task.Delay(1000);
 
