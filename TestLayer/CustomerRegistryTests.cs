@@ -1,5 +1,4 @@
-﻿/*
-using DataLayer;
+﻿using DataLayer;
 using EntityLayer;
 
 namespace TestLayer
@@ -16,7 +15,7 @@ namespace TestLayer
         public void SearchExistingCustomer_ShouldFindExistingCustomer()
         {
             //Arrange
-            var Customer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10,2m);
+            var Customer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10.2m);
 
             // Act
             var foundCustomer = Customer.Email == "anna@test.se";
@@ -34,7 +33,7 @@ namespace TestLayer
         {
             // Arrange 
             string existingEmail = "anna@test.se";
-            var existingCustomer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", existingEmail, "0701234567", 10,2m);
+            var Customer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", existingEmail, "0701234567", 10.2m);
 
             // Act
             string newEmailToRegister = "anna@test.se";
@@ -45,4 +44,4 @@ namespace TestLayer
         }
     }
 }
-*/
+

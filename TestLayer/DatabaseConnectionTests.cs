@@ -16,7 +16,7 @@ namespace TestLayer
             using var context = new SkiCenterDbContext();
 
             // Act
-            // CanConnect() opens a connectiona and tries to connect. 
+            // CanConnect() opens a connection and tries to connect. 
             // Returns true if connectionstring is valid.
             bool isConnected = context.Database.CanConnect();
 

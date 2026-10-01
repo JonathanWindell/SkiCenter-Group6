@@ -36,7 +36,7 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            string hashedPassword = SecurityHelper.HashPassword(plainTextPassword);
+            string hashedPassword = HashingPassword.HashPassword(plainTextPassword);
 
             Staff foundStaff = _unitOfWork.Staff.GetStaffByEmailAndPassword(email, hashedPassword);
 

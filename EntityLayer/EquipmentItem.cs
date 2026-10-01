@@ -6,6 +6,14 @@ using System.Text;
 
 namespace EntityLayer
 {
+    public enum equipmentStatus
+    {
+        Available,
+        Rented,
+        Damaged,
+        Maintenance
+    }
+
     public class EquipmentItem
     {
         [Key]
@@ -13,7 +21,8 @@ namespace EntityLayer
 
         // Status for item, ex. Available, Broken, etc. 
         [Required]
-        public string Status { get; set; }
+        [AllowedValues("Available", "Rented", "Damaged", "Maintenance", ErrorMessage = "Not allowed value")]
+        public equipmentStatus Status { get; set; }
 
         // Describes current condition of item.
         [Required]
@@ -38,7 +47,7 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public EquipmentItem() { }
 
-        public EquipmentItem(string status, string condition, decimal pricePerDay, string size)
+        public EquipmentItem(equipmentStatus status, string condition, decimal pricePerDay, string size)
         {
             Status = status;
             Condition = condition;

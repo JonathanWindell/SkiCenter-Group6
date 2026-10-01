@@ -7,7 +7,14 @@ namespace BusinessLayer.Controllers
 {
     public class StaffController
     {
-
+        public static bool CheckAccessToSeasonPrices(staffRole currentRole)
+        {
+            if (currentRole == staffRole.SystemAdmin)
+            {
+                return true;
+            }
+            return false;
+        }
 
         public bool CanChangeSeasonPrices()
         {
@@ -16,11 +23,12 @@ namespace BusinessLayer.Controllers
             // Security Check: Is someone logged in and is it the correct role?
             if (user != null && user.Role == staffRole.SystemAdmin)
             {
-                return true; // Tillåt åtkomst
+                return true; // Allow Access
             }
 
             return false; //Deny Access;
         }
+
     }
 }
  
