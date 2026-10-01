@@ -13,12 +13,14 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using PresentationLayer.Resources.Animations;
+using EntityLayer;
 
 namespace PresentationLayer.Views
 {
     /// <summary>
     /// Interaction logic for LoginView.xaml
     /// </summary>
+    /// 
     public partial class LoginView : Window
     {
         private readonly LoginController _loginController;
@@ -47,10 +49,12 @@ namespace PresentationLayer.Views
             if (e.ChangedButton == MouseButton.Left) this.DragMove();
         }
 
+        /*
         private void btnGoToRegister_Click(object sender, RoutedEventArgs e)
         {
             StartSignUpTransition();
         }
+        */
 
         /// <summary>
         /// Validates credentials against the controller and transitions to the main menu on success,
@@ -60,7 +64,6 @@ namespace PresentationLayer.Views
         {
             string email = txtEmail.Text;
             string password = txtPassword.Password;
-            string userType = (rbStaff.IsChecked == true) ? "Staff" : "Member";
 
             await ElementAnimations.ToggleLoadingAnimationAsync(true, LoginControls, LoadingVisual, SpinnerRotate);
 
@@ -71,7 +74,7 @@ namespace PresentationLayer.Views
 
             (Staff? staff, string statusMsg) = loginResult;
 
-            if (user == null)
+            if (staff == null)
             {
                 await ElementAnimations.ToggleLoadingAnimationAsync(false, LoginControls, LoadingVisual, SpinnerRotate);
                 MessageBox.Show(statusMsg);
@@ -85,6 +88,7 @@ namespace PresentationLayer.Views
         /// Fades out the login UI, expands the window canvas, then opens the sign-up window
         /// at the same screen position before closing this one.
         /// </summary>
+        /*
         private async void StartSignUpTransition()
         {
             double targetWidth = 380;
@@ -113,6 +117,7 @@ namespace PresentationLayer.Views
             signUpWindow.Show();
             this.Close();
         }
+        */
 
         /// <summary>
         /// Expands the window canvas and opens the main menu at the same screen position
@@ -125,14 +130,14 @@ namespace PresentationLayer.Views
 
             await WindowAnimations.ExpandWindowAsync(MainBorder, targetWidth, targetHeight);
 
-            MainMenuWindow mainWindow = _serviceProvider.GetRequiredService<MainMenuWindow>();
-            mainWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            DashboardView dashboard = _serviceProvider.GetRequiredService<DashboardView>();
+            dashboard.WindowStartupLocation = WindowStartupLocation.Manual;
 
             // Match position so the transition appears seamless
-            mainWindow.Left = this.Left;
-            mainWindow.Top = this.Top;
+            dashboard.Left = this.Left;
+            dashboard.Top = this.Top;
 
-            mainWindow.Show();
+            dashboard.Show();
             this.Close();
         }
 
