@@ -1,12 +1,87 @@
 ﻿<Window x:Class="PresentationLayer.Views.LoginView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PresentationLayer.Views"
-        mc:Ignorable="d"
-        Title="LoginView" Height="450" Width="800">
-    <Grid>
-        
+        Title="LoginWindow" Height="700" Width="900"
+        WindowStyle= "None" 
+        AllowsTransparency="True" 
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Background="Transparent" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        <Border x:Name="MainBorder" Width="380" Height="460" 
+                VerticalAlignment="Center" HorizontalAlignment="Center" 
+                Background="{StaticResource WindowBg}" CornerRadius="20" Padding="40">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="25" ShadowDepth="2" Opacity="0.15" Color="#1E1B4B"/>
+            </Border.Effect>
+
+            <Grid>
+                <StackPanel x:Name="LoginControls" Opacity="1">
+                    <Grid Margin="0,-30,-20,10">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="−" Click="btnMinimize_Click" Width="30" 
+                                    Background="Transparent" BorderThickness="0" 
+                                    Foreground="{StaticResource SecondaryText}" FontSize="18"/>
+                            <Button Content="✕" Click="btnClose_Click" Width="30" 
+                                    Background="Transparent" BorderThickness="0" 
+                                    Foreground="#FF5F57" FontSize="14" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock FontSize="28" FontWeight="ExtraBold" 
+                               HorizontalAlignment="Center" Margin="0,0,0,20" 
+                               Foreground="{StaticResource PrimaryText}">
+                        <Run Language="sv-se" Text="Logga in"/>
+                    </TextBlock>
+
+                    <TextBlock FontWeight="SemiBold" Margin="0,0,0,5" 
+                               Foreground="{StaticResource PrimaryText}"><Run Language="sv-se" Text="Email"/></TextBlock>
+                    <TextBox x:Name="txtEmail" Height="40" VerticalContentAlignment="Center" 
+                             Padding="10,0" Margin="0,0,0,15" 
+                             BorderBrush="{StaticResource InputBorder}"/>
+
+                    <TextBlock Text="Lösenord" FontWeight="SemiBold" Margin="0,0,0,5" 
+                               Foreground="{StaticResource PrimaryText}"/>
+                    <PasswordBox x:Name="txtPassword" Height="40" VerticalContentAlignment="Center" 
+                                 Padding="10,0" Margin="0,0,0,25" 
+                                 BorderBrush="{StaticResource InputBorder}"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <!--<RadioButton x:Name="rbMember" Content="Medlem" 
+                                     Foreground="{StaticResource PrimaryText}" Margin="0,0,20,0"
+                                     GroupName="UserRole"/>-->
+                        <RadioButton x:Name="rbStaff" Content="Personal" IsChecked="True" 
+                                     Foreground="{StaticResource PrimaryText}"
+                                     GroupName="UserRole"/>
+                    </StackPanel>
+
+                    <Button Content="Logga in" Height="45" 
+                            Style="{StaticResource DeepSeaButtonStyle}" 
+                            Click="btnLogin_Click"/>
+
+                    <!-- No sign up page made so this button is commented out for now -->
+                    <!--<Button Content="Inget konto? Skapa här." Background="Transparent" 
+                            BorderThickness="0" Foreground="{StaticResource SecondaryText}" 
+                            Margin="0,15,0,0" Click="btnGoToRegister_Click"/>-->
+                </StackPanel>
+
+                <StackPanel x:Name="LoadingVisual" 
+                    VerticalAlignment="Center" 
+                    HorizontalAlignment="Center" 
+                    Opacity="0" 
+                    IsHitTestVisible="False">
+                    <Path x:Name="Spinner" Data="M2,12A10,10 0 0,1 12,2" 
+                          Stroke="{StaticResource PrimaryText}" StrokeThickness="4" 
+                          Width="60" Height="60" RenderTransformOrigin="0.5,0.5">
+                        <Path.RenderTransform>
+                            <RotateTransform x:Name="SpinnerRotate" Angle="0"/>
+                        </Path.RenderTransform>
+                    </Path>
+                    <TextBlock Text="Verifierar..." Margin="0,20,0,0" FontSize="16" 
+                               FontWeight="Bold" Foreground="{StaticResource PrimaryText}" 
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
