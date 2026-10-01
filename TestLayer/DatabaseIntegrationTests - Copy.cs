@@ -51,10 +51,8 @@ namespace TestLayer
             Assert.That(savedCustomer.CustomerID, Is.GreaterThan(0), "Customer was not saved in the database");
 
             // If testdata should be removed. Uncomment this. 
-            /*
             _context.Customers.Remove(savedCustomer);
             _context.SaveChanges();
-            */
         }
 
         [Test] 

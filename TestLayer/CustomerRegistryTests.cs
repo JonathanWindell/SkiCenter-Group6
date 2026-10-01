@@ -8,6 +8,24 @@ namespace TestLayer
     {
         private SkiCenterDbContext _context;
 
+        [SetUp]
+        public void Setup()
+        {
+            // Initialize database. 
+            _context = new SkiCenterDbContext();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Ensure the DbContext is disposed after each test to avoid resource leaks
+            if (_context != null)
+            {
+                _context.Dispose();
+                _context = null;
+            }
+        }
+
         /// <summary>
         /// Happy path for testcase KR-HP-01.1
         /// </summary>
@@ -15,13 +33,18 @@ namespace TestLayer
         public void SearchExistingCustomer_ShouldFindExistingCustomer()
         {
             //Arrange
-            var Customer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10.2m);
+            var newCustomer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10.2m);
+            _context.Customers.Add(newCustomer);
+            _context.SaveChanges();
 
             // Act
-            var foundCustomer = Customer.Email == "anna@test.se";
+            var foundCustomer = newCustomer.Email == "anna@test.se";
 
             // Assert
             Assert.That(foundCustomer, Is.True, "System should find existing customer");
+
+            _context.Customers.Remove(newCustomer);
+            _context.SaveChanges();
 
         }
 

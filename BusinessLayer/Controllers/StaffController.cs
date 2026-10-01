@@ -16,6 +16,7 @@ namespace BusinessLayer.Controllers
             return false;
         }
 
+        /*
         public bool CanChangeSeasonPrices()
         {
             var user = LoginController.CurrentLoggedInUser;
@@ -28,6 +29,7 @@ namespace BusinessLayer.Controllers
 
             return false; //Deny Access;
         }
+        */
 
     }
 }

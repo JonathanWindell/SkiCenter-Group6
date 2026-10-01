@@ -50,9 +50,6 @@ namespace BusinessLayer.Controllers
 
         }
 
-
-
-
         // Sets current user to null to remove session
         public void Logout()
         {

@@ -1,6 +1,7 @@
 ﻿using DataLayer;
 using EntityLayer;
 using BusinessLayer.Controllers;
+using BusinessLayer;
 
 namespace TestLayer
 {
@@ -16,13 +17,16 @@ namespace TestLayer
         public void BookingAdminExists_SuccesfulLogin()
         {
             //Arrange
-            var Staff = new Staff("Johan", "Windell", "BookingAdmin@test.se", "TestBookingAdminPassword", staffRole.BookingAdmin);
+            string plainPassword = "TestBookingAdminPassword";
+            string hashedPassword = HashingPassword.HashPassword(plainPassword);
+
+            var staff = new Staff("Johan", "Windell", "admin@test.se", hashedPassword, staffRole.BookingAdmin);
 
             // Act
-            string inputEmail = "BookingAdmin@test.se";
-            string inputPassword = "CorrectBookingAdminPassword";
+            string inputEmail = "admin@test.se";
+            string inputPasswordHashed = HashingPassword.HashPassword("TestBookingAdminPassword");
 
-            bool loginSuccess = (Staff.Email == inputEmail && Staff.Password == inputPassword);
+            bool loginSuccess = (staff.Email == inputEmail && staff.Password == inputPasswordHashed);
 
             // Assert
             Assert.That(loginSuccess, Is.True, "System should find existing staff and allow login");
