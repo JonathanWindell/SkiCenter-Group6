@@ -29,27 +29,40 @@ namespace BusinessLayer.Controllers
         /// <param name="email">The email to search for.</param>
         /// <param name="plainTextPassword">The plain-text password to hash and compare.</param>
         /// <returns>The found <see cref="CurrentLoggedInUser"/> object if credentials match; otherwise, null.</returns>
-        public bool Login(string email, string plainTextPassword)
+        public (Staff? staff, string statusMsg) Login(string email, string plainTextPassword)
         {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(plainTextPassword))
-            {
-                return false;
-            }
-
-            string hashedPassword = SecurityHelper.HashPassword(plainTextPassword);
-
-            Staff foundStaff = _unitOfWork.Staff.GetStaffByEmailAndPassword(email, hashedPassword);
+            Staff? foundStaff = AuthenticateUser(email, plainTextPassword);
 
             if (foundStaff != null)
             {
                 CurrentLoggedInUser = foundStaff;
-                return true;
+                return (foundStaff, "Login successful.");
             }
 
-            return false;
+            return (null, "Invalid email or password.");
 
         }
 
+
+        private Staff? AuthenticateUser(string email, string password)
+        {
+            // Hash the incoming plain password to compare it with the hashed value stored in the DB
+            // Plain text passwords should never be compared directly for security reasons
+            string hashedPassword = HashingService.HashPassword(password);
+
+            return _unitOfWork.Staff.GetStaffByEmailAndPassword(email, hashedPassword);
+        }
+
+        private (bool inputValid, string errorMsg) ValidateInput(string email, string password)
+        {
+            // Check for null, empty strings, or strings consisting only of whitespace
+            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                return (false, "Email and password are required.");
+            }
+
+            return (true, "");
+        }
 
         // Sets current user to null to remove session
         public void Logout()

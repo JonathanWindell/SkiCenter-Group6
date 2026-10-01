@@ -8,7 +8,7 @@ namespace BusinessLayer
     /// <summary>
     /// Helper class for encryption.
     /// </summary>
-    public static class SecurityHelper
+    public static class HashingService
     {
         public static string HashPassword(string plainTextPassword)
         {
