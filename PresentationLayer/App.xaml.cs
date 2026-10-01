@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using DataLayer.Interfaces;
+using DataLayer;
+using System.Configuration;
 using System.Data;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +36,7 @@ namespace PresentationLayer
             // 3. Build the provider (the container that holds everything)
             _serviceProvider = services.BuildServiceProvider();
         }
+    
 
         /// <summary>
         /// Registers all required views (windows), controllers, repositories, and database contexts 
@@ -42,23 +45,21 @@ namespace PresentationLayer
         /// <param name="services">The collection where application services are registered.</param>
         private void ConfigureServices(IServiceCollection services)
         {
-            // 1. Register Views (Windows)
+           
             services.AddTransient<LoginView>();
 
             services.AddTransient<CustomerRegistrationView>();
+            services.AddTransient<SeasonPriceView>();
 
-            // 2. Register Controllers
+            
             services.AddTransient<LoginController>();
 
-            // 3. Register Repositories
-           // services.AddTransient<IStaffRepository, StaffRepository>();
-           // services.AddTransient<IResourceRepository, ResourceRepository>();
+           
 
-            // 4. Register and initialize DbContext
-          //  services.AddDbContext<LabDbContext>();
+       
+            services.AddDbContext<SkiCenterDbContext>();
 
-            // Register UnitOfWork so IUnitOfWork can be resolved
-           // services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
     }

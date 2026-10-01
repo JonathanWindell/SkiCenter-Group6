@@ -59,5 +59,10 @@ namespace DataLayer.Repositories
         {
             return _context.Set<T>().Find(id);
         }
+
+        public IEnumerable<T> GetAll()
+        {
+            return _context.Set<T>().ToList();
+        }
     }
 }

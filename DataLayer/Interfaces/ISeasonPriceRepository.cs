@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using EntityLayer;
 
 namespace DataLayer.Interfaces
 {
-    public interface ISeasonPriceRepository
+    public interface ISeasonPriceRepository : IRepository<SeasonPrice>
     {
     }
 }

@@ -26,5 +26,6 @@ namespace DataLayer.Interfaces
         /// Generic method for getting Entity by ID
         /// <summary>
         T GetByID(int id);
+        IEnumerable<T> GetAll();
     }
 }

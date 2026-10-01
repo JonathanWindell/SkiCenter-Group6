@@ -1,0 +1,50 @@
+﻿<Window x:Class="PresentationLayer.Views.SeasonPriceView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Season Prices"
+        Height="450"
+        Width="700">
+
+    <Grid Margin="20">
+
+        <StackPanel>
+
+            <TextBlock Text="Season Prices"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Margin="0,0,0,20"/>
+
+            <DataGrid x:Name="seasonPriceDataGrid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      Height="250">
+
+                <DataGrid.Columns>
+
+                    <DataGridTextColumn Header="Week"
+                                        Binding="{Binding WeekNumber}"
+                                        IsReadOnly="True"/>
+
+                    <DataGridTextColumn Header="Accommodation Type"
+                                        Binding="{Binding AccommodationType}"
+                                        IsReadOnly="True"/>
+
+                    <DataGridTextColumn Header="Price"
+                    Binding="{Binding Price, TargetNullValue=0, FallbackValue=0}"/>
+
+                </DataGrid.Columns>
+
+            </DataGrid>
+
+            <Button Content="Save Changes"
+                    Width="130"
+                    Height="35"
+                    Margin="0,15,0,0"
+                    HorizontalAlignment="Left"
+                    Click="SaveButton_Click"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>
