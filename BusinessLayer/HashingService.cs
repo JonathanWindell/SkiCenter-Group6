@@ -8,7 +8,11 @@ namespace BusinessLayer
     /// <summary>
     /// Helper class for encryption.
     /// </summary>
+<<<<<<< HEAD
     public static class HashingPassword
+=======
+    public static class HashingService
+>>>>>>> 256119f7aaa13b3ac64f7d21bdffd33c7e0b7db5
     {
         public static string HashPassword(string plainTextPassword)
         {
