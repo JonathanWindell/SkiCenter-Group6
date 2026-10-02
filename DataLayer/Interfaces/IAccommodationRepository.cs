@@ -1,6 +1,15 @@
-﻿namespace DataLayer.Interfaces
+﻿using EntityLayer;
+
+namespace DataLayer.Interfaces
 {
-    public interface IAccommodationRepository
+    public interface IAccommodationRepository : IRepository<Accommodation>
     {
+        IEnumerable<Accommodation> GetAvailableAccommodations(DateTime startDate, DateTime endDate, int numberOfBeds);
+
+        IEnumerable<Accommodation> GetAllAccommodations();
+
+        IEnumerable<Accommodation> GetAccommodationsByCategory(string category);
+
+        void UpdateAccommodation(Accommodation accommodation);
     }
 }
