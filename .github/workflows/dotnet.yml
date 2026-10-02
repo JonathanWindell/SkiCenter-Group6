@@ -33,5 +33,5 @@ jobs:
     - name: Restore dependencies for test project
       run: dotnet restore TestLayer/TestLayer.csproj
 
-    - name: Kör testerna
+    - name: Execute tests
       run: dotnet test TestLayer/TestLayer.csproj --configuration Release --verbosity normal
