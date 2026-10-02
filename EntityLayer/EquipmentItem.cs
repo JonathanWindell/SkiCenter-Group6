@@ -3,12 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
-    public enum equipmentStatus
+    public enum EquipmentStatus
     {
         Available,
         Rented,
         Damaged,
-        Maintenance
+        Maintenance,
+        Archived
     }
 
     public class EquipmentItem
@@ -19,7 +20,7 @@ namespace EntityLayer
         // Status for item, ex. Available, Broken, etc. 
         [Required]
         [AllowedValues("Available", "Rented", "Damaged", "Maintenance", ErrorMessage = "Not allowed value")]
-        public equipmentStatus Status { get; set; }
+        public EquipmentStatus Status { get; set; }
 
         // Describes current condition of item.
         [Required]
@@ -44,7 +45,7 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public EquipmentItem() { }
 
-        public EquipmentItem(equipmentStatus status, string condition, decimal pricePerDay, string size)
+        public EquipmentItem(EquipmentStatus status, string condition, decimal pricePerDay, string size)
         {
             Status = status;
             Condition = condition;
