@@ -1,9 +1,5 @@
 ﻿using DataLayer.Interfaces;
 using DataLayer.Repositories;
-using EntityLayer;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace DataLayer
 {
@@ -18,7 +14,7 @@ namespace DataLayer
         public ICustomerRepository Customer { get; private set; }
         public IStaffRepository Staff { get; private set; }
         public IBookingRepository Booking { get; private set; }
-        public IBookingAccommodationRepository BookingAccommodation {  get; private set; }
+        public IBookingAccommodationRepository BookingAccommodation { get; private set; }
         public IAccommodationRepository Accommodation { get; private set; }
         public IEquipmentRepository Equipment { get; private set; }
         public ISkiLessonRepository SkiLesson { get; private set; }

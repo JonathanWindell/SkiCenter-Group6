@@ -1,8 +1,5 @@
-﻿using DataLayer;
-using BusinessLayer;
-using DataLayer.Interfaces;
+﻿using DataLayer.Interfaces;
 using EntityLayer;
-using System;
 
 namespace BusinessLayer.Controllers
 {
@@ -31,6 +28,7 @@ namespace BusinessLayer.Controllers
         /// <returns>The found <see cref="CurrentLoggedInUser"/> object if credentials match; otherwise, null.</returns>
         public (Staff? staff, string statusMsg) Login(string email, string plainTextPassword)
         {
+
             Staff? foundStaff = AuthenticateUser(email, plainTextPassword);
 
             if (foundStaff != null)
@@ -42,7 +40,6 @@ namespace BusinessLayer.Controllers
             return (null, "Invalid email or password.");
 
         }
-
 
         private Staff? AuthenticateUser(string email, string password)
         {
@@ -63,7 +60,6 @@ namespace BusinessLayer.Controllers
 
             return (true, "");
         }
-
         // Sets current user to null to remove session
         public void Logout()
         {

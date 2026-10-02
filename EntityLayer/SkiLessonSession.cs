@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace EntityLayer
 {
@@ -11,7 +8,7 @@ namespace EntityLayer
         [Key]
         public int SkiLessonSessionID { get; set; }
 
-        [Required] 
+        [Required]
         public int WeekNumber { get; set; }
 
         // Monday - Wednesday or Thursday to Friday
@@ -20,7 +17,7 @@ namespace EntityLayer
 
         // Morning or Afternoon
         [Required]
-        public string TimeSlot { get; set; } 
+        public string TimeSlot { get; set; }
 
         // Relation to Customer. Foreign Key
         [ForeignKey("Customer")]

@@ -1,4 +1,4 @@
-﻿using DataLayer.Interfaces;
+using DataLayer.Interfaces;
 using EntityLayer;
 using System;
 using System.Collections.Generic;
