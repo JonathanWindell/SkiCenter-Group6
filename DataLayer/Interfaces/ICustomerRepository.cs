@@ -6,8 +6,6 @@ namespace DataLayer.Interfaces
     {
         IEnumerable<Customer> GetAllCustomers();
 
-        void UpdateCustomer(Customer customer);
-
         Customer GetCustomerHistory(int customerID);
 
         Customer SearchCustomer(string searchItem);

@@ -105,6 +105,7 @@ namespace DataLayer.Repositories
         public void UpdateBookingStatus(int bookingID, string status)
         {
             var booking = _context.Set<Booking>().Find(bookingID);
+
             if (booking != null)
             {
                 booking.Status = status;

@@ -30,7 +30,7 @@ namespace BusinessLayer
         public Booking GetBookingById(int bookingId)
         {
             if (bookingId <= 0) return null;
-            return _unitOfWork.Booking.GetSpecificBooking(bookingId);
+            return _unitOfWork.Booking.GetByID(bookingId);
         }
 
         /// <summary>

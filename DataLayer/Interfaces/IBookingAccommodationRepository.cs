@@ -1,6 +1,11 @@
-﻿namespace DataLayer.Interfaces
+﻿using EntityLayer;
+
+namespace DataLayer.Interfaces
 {
-    public interface IBookingAccommodationRepository
+    public interface IBookingAccommodationRepository : IRepository<BookingAccommodation>
     {
+        IEnumerable<BookingAccommodation> GetBookedAccommodations(string status);
+
+        bool HasOverlappedBooking(DateTime startDate, DateTime endDate, int accommodationID);
     }
 }

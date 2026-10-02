@@ -8,7 +8,8 @@ namespace EntityLayer
         Available,
         Rented,
         Damaged,
-        Maintenance
+        Maintenance,
+        Archived
     }
 
     public enum equipmentCondition
