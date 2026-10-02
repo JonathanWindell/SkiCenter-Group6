@@ -72,14 +72,5 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
-
-        /// <summary>
-        /// Updates the accommodation with new data.
-        /// </summary>
-        /// <param name="bookingAccommodation"></param>
-        public void UpdateAccommodation(Accommodation accommodation)
-        {
-            _context.Set<Accommodation>().Update(accommodation);
-        }
     }
 }

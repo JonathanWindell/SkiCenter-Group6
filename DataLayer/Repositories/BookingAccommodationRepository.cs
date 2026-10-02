@@ -54,14 +54,5 @@ namespace DataLayer.Repositories
                            ba.StartDate < endDate &&
                            ba.EndDate > startDate);
         }
-
-        /// <summary>
-        /// Updates the BookingAccommodation with new data.
-        /// </summary>
-        /// <param name="bookingAccommodation"></param>
-        public void UpdateBookingAccommodation(BookingAccommodation bookingAccommodation)
-        {
-            _context.Set<BookingAccommodation>().Update(bookingAccommodation);
-        }
     }
 }
