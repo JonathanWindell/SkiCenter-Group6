@@ -154,7 +154,7 @@ namespace BusinessLayer.Controllers
                 corpCustomer.CreditLimit = creditLimit;
                 corpCustomer.DiscountRate = discountRate;
 
-                _unitOfWork.Customer.UpdateCustomer(corpCustomer);
+                _unitOfWork.Customer.Update(corpCustomer);
                 return _unitOfWork.Complete() > 0;
             }
 
@@ -175,7 +175,7 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            _unitOfWork.Customer.UpdateCustomer(customer);
+            _unitOfWork.Customer.Update(customer);
             return _unitOfWork.Complete() > 0;
         }
 

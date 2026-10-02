@@ -9,7 +9,5 @@ namespace DataLayer.Interfaces
         IEnumerable<Accommodation> GetAllAccommodations();
 
         IEnumerable<Accommodation> GetAccommodationsByCategory(string category);
-
-        void UpdateAccommodation(Accommodation accommodation);
     }
 }
