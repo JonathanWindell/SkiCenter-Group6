@@ -1,4 +1,4 @@
-﻿/*
+﻿
 using BusinessLayer.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -146,4 +146,3 @@ namespace PresentationLayer.Views
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
     }
 }
-*/
