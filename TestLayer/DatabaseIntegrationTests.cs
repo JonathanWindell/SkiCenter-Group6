@@ -34,7 +34,7 @@ namespace TestLayer
             var newPrivateCustomer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10.2m);
 
             // Act
-            // CanConnect() opens a connectiona and tries to connect. 
+            // CanConnect() opens a connection and tries to connect. 
             // Returns true if connectionstring is valid.
             _context.Customers.Add(newPrivateCustomer);
             _context.SaveChanges();
@@ -45,7 +45,7 @@ namespace TestLayer
             Assert.That(savedCustomer, Is.Not.Null);
             Assert.That(savedCustomer.CustomerID, Is.GreaterThan(0), "Customer was not saved in the database");
 
-            // If testdata should be removed. Uncomment this. 
+            // If testdata should not be removed. Comment this
             _context.Customers.Remove(savedCustomer);
             _context.SaveChanges();
         }
@@ -68,11 +68,9 @@ namespace TestLayer
             Assert.That(savedCustomer, Is.Not.Null);
             Assert.That(savedCustomer.CustomerID, Is.GreaterThan(0), "Customer was not saved in the database");
 
-            // If testdata should be removed. Uncomment this. 
-            /*
+            // If testdata should not be removed. Comment this. 
             _context.Customers.Remove(savedCustomer);
             _context.SaveChanges();
-            */
         }
 
         [Test]
@@ -94,7 +92,7 @@ namespace TestLayer
             Assert.That(savedStaff, Is.Not.Null);
             Assert.That(savedStaff.StaffID, Is.GreaterThan(0), "Staff was not saved in the database.");
 
-            // If testdata should be removed. Uncomment this. 
+            // If testdata should not be removed. Comment this 
             _context.StaffMembers.Remove(savedStaff);
             _context.SaveChanges();
         }
