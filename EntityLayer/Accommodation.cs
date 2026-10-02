@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer
 {
@@ -12,7 +9,7 @@ namespace EntityLayer
 
         // Specific number of unit. Apartment 101 etc. 
         [Required]
-        public string UnitName{ get; set; }
+        public string UnitName { get; set; }
 
         // Describes type of apartments, lodges etc. 
         [Required]

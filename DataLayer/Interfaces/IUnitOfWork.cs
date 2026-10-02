@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DataLayer.Interfaces
+﻿namespace DataLayer.Interfaces
 {
     /// <summary>
     /// Defines the contract for the Unit of Work pattern.

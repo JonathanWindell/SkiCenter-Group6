@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace EntityLayer
 {
-    public enum staffRole 
-    { 
-        SkiShop, 
-        MarketingManager, 
+    public enum staffRole
+    {
+        SkiShop,
+        MarketingManager,
         BookingAdmin,
-        SystemAdmin 
+        SystemAdmin
     }
 
     public class Staff

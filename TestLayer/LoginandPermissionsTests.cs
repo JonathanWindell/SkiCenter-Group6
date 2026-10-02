@@ -1,11 +1,12 @@
-﻿using DataLayer;
+﻿using BusinessLayer;
+using BusinessLayer.Controllers;
+using DataLayer;
 using EntityLayer;
 
-/*
 namespace TestLayer
 {
     [TestFixture]
-    public class CustomerRegistryTests
+    public class LoginAndPermissionTests
     {
         private SkiCenterDbContext _context;
 
@@ -16,13 +17,16 @@ namespace TestLayer
         public void BookingAdminExists_SuccesfulLogin()
         {
             //Arrange
-            var Staff = new Staff("BookingAdmin", "Johan", "Windell", "BookingAdmin@test.se", "TestBookingAdminPassword");
+            string plainPassword = "TestBookingAdminPassword";
+            string hashedPassword = HashingService.HashPassword(plainPassword);
+
+            var staff = new Staff("Johan", "Windell", "admin@test.se", hashedPassword, staffRole.BookingAdmin);
 
             // Act
-            string inputEmail = "BookingAdmin@test.se";
-            string inputPassword = "CorrectBookingAdminPassword";
+            string inputEmail = "admin@test.se";
+            string inputPasswordHashed = HashingService.HashPassword("TestBookingAdminPassword");
 
-            bool loginSuccess = (Staff.Email == inputEmail && Staff.PasswordHash == inputPassword);
+            bool loginSuccess = (staff.Email == inputEmail && staff.Password == inputPasswordHashed);
 
             // Assert
             Assert.That(loginSuccess, Is.True, "System should find existing staff and allow login");
@@ -36,13 +40,13 @@ namespace TestLayer
         public void BookingAdminExists_IncorrectLoginInformation()
         {
             //Arrange
-            var Staff = new Staff("BookingAdmin", "Johan", "Windell", "BookingAdmin@test.se", "TestBookingAdminPassword");
+            var Staff = new Staff("Johan", "Windell", "BookingAdmin@test.se", "TestBookingAdminPassword", staffRole.BookingAdmin);
 
             // Act
             string inputEmail = "Johan";
             string inputPassword = "WrongBookingAdminPassword";
 
-            bool loginSuccess = (Staff.Email == inputEmail && Staff.PasswordHash == inputPassword);
+            bool loginSuccess = (Staff.Email == inputEmail && Staff.Password == inputPassword);
 
             // Assert
             Assert.That(loginSuccess, Is.False, "System should find and deny login");
@@ -55,24 +59,13 @@ namespace TestLayer
         public void SkiShop_DenyAccessToView()
         {
             //Arrange
-            var loggedInUser = new Staff("Vincent", "SkiShop@Test.se", "TestSkiShopPassword", staffRole.SkiShop);
+            var loggedInUser = new Staff("Vincent", "SkiShop@Test.se", "TestSkiShopPassword", "TestSkiShopPassword", staffRole.SkiShop);
 
             // Act
-            bool hasAccesstoSeasonPrices = CheckAccessToSeasonPrices(loggedInUser.Role);
+            bool hasAccesstoSeasonPrices = StaffController.CheckAccessToSeasonPrices(loggedInUser.Role);
 
             // Assert
-            Assert.That(hasAccessToSeasonPrices, Is.False, "Ski-shop personal should be denied season price view");
-        }
-
-        // Should be placed in business layer later,
-        private bool CheckAccessToSeasonPrices(StaffRole currentRole)
-        {
-            if (currentRole == StaffRole.SystemAdmin)
-            {
-                return true;
-            }
-            return false; 
+            Assert.That(hasAccesstoSeasonPrices, Is.False, "Ski-shop personal should be denied season price view");
         }
     }
 }
-*/
