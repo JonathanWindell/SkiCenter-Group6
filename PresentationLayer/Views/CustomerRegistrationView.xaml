@@ -20,7 +20,7 @@
 
             <StackPanel>
 
-                <!-- Rubrik -->
+                <!-- Header -->
                 <TextBlock Text="Registrera kund"
                            FontSize="28"
                            FontWeight="Bold"
@@ -32,7 +32,7 @@
                            Foreground="{StaticResource SecondaryText}"
                            Margin="0,0,0,30"/>
 
-                <!-- Kundtyp -->
+                <!-- Customer type -->
                 <TextBlock Text="Kundtyp"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource PrimaryText}"
@@ -51,7 +51,7 @@
 
                 </ComboBox>
 
-                <!-- Förnamn och efternamn -->
+                <!-- First & last name -->
                 <Grid Margin="0,0,0,15">
 
                     <Grid.ColumnDefinitions>
@@ -100,7 +100,7 @@
 
                 </Grid>
 
-                <!-- Adress -->
+                <!-- Address -->
                 <TextBlock Text="Adress *"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,5"/>
@@ -116,7 +116,7 @@
                            Visibility="Collapsed"
                            Margin="0,5,0,0"/>
 
-                <!-- E-postadress -->
+                <!-- E-mail -->
                 <TextBlock Text="E-postadress *"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,5"/>
@@ -132,7 +132,7 @@
                            Visibility="Collapsed"
                            Margin="0,5,0,0"/>
 
-                <!-- Telefonnummer -->
+                <!-- Phone number -->
                 <TextBlock Text="Telefonnummer *"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,5"/>
@@ -149,12 +149,12 @@
                            Margin="0,5,0,0"/>
 
 
-                <!-- Företagsuppgifter -->
+                <!-- Business -->
                 <StackPanel x:Name="CorporateFields"
                             Visibility="Collapsed"
                             Margin="0,0,0,20">
 
-                    <!-- Företagsnamn -->
+                    <!-- Business name -->
                     <TextBlock Text="Företagsnamn *"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
@@ -170,7 +170,7 @@
                                    Visibility="Collapsed"
                                    Margin="0,5,0,0"/>
 
-                    <!-- Organisationsnummer -->
+                    <!-- Organisation number -->
                     <TextBlock Text="Organisationsnummer *"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
@@ -186,7 +186,7 @@
                                    Visibility="Collapsed"
                                    Margin="0,5,0,0"/>
 
-                    <!-- Kontaktperson -->
+                    <!-- Contact person -->
                     <TextBlock Text="Kontaktperson *"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>

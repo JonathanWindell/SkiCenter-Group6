@@ -1,4 +1,4 @@
-﻿using DataLayer.Interfaces;
+using DataLayer.Interfaces;
 using EntityLayer;
 using System;
 using System.Collections.Generic;
@@ -116,6 +116,7 @@ namespace BusinessLayer.Controllers
 
             // Create new Corporate Customer, default IsApproved = false, CreditLimit = 0 and DiscountRate = 0
             var newCorpCustomer = new CorporateCustomer(
+                companyName: companyName.Trim(),
                 firstName: companyName.Trim(),
                 lastName: "",
                 address: address.Trim(),
@@ -125,7 +126,6 @@ namespace BusinessLayer.Controllers
                 contactPerson: contactPerson.Trim()
             )
             {
-                CompanyName = companyName.Trim(),
                 IsApproved = false,
                 CreditLimit = 0m,
                 DiscountRate = 0m

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DataLayer;
-using NUnit.Framework;
+﻿using DataLayer;
 
 namespace TestLayer
 {
@@ -16,7 +12,7 @@ namespace TestLayer
             using var context = new SkiCenterDbContext();
 
             // Act
-            // CanConnect() opens a connectiona and tries to connect. 
+            // CanConnect() opens a connection and tries to connect. 
             // Returns true if connectionstring is valid.
             bool isConnected = context.Database.CanConnect();
 
