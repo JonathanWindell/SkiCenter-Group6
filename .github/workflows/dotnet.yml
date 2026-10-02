@@ -22,6 +22,14 @@ jobs:
     - name: Create appsettings.json for database tests
       shell: bash
       run: |
+        cat <<EOF > DataLayer/appsettings.json
+        {
+          "ConnectionStrings": {
+            "DefaultConnection": "${{ secrets.DB_CONNECTION_STRING }}"
+          }
+        }
+        EOF
+
         cat <<EOF > TestLayer/appsettings.json
         {
           "ConnectionStrings": {
