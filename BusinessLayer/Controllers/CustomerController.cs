@@ -24,16 +24,6 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Customer.GetAllCustomers();
         }
 
-        // Needed?
-        ///// <summary>
-        ///// Gets a customer by searching for CustomerID.
-        ///// </summary>
-        //public Customer GetCustomerById(int customerId)
-        //{
-        //    if (customerId <= 0) return null;
-        //    return _unitOfWork.Customer.GetByID(customerId);
-        //}
-
         /// <summary>
         /// Searches for a specific customer. 
         /// </summary>
@@ -70,8 +60,8 @@ namespace BusinessLayer.Controllers
             if (string.IsNullOrWhiteSpace(firstName) ||
                 string.IsNullOrWhiteSpace(lastName) ||
                 string.IsNullOrWhiteSpace(address) ||
-                string.IsNullOrWhiteSpace(email) ||
-                string.IsNullOrWhiteSpace(phoneNumber))
+                string.IsNullOrWhiteSpace(phoneNumber) ||
+                !IsValidEmail(email))
             {
                 return false;
             }
@@ -112,8 +102,8 @@ namespace BusinessLayer.Controllers
                 string.IsNullOrWhiteSpace(orgNumber) ||
                 string.IsNullOrWhiteSpace(contactPerson) ||
                 string.IsNullOrWhiteSpace(address) ||
-                string.IsNullOrWhiteSpace(email) ||
-                string.IsNullOrWhiteSpace(phoneNumber))
+                string.IsNullOrWhiteSpace(phoneNumber) ||
+                !IsValidEmail(email))
             {
                 return false;
             }
@@ -180,7 +170,7 @@ namespace BusinessLayer.Controllers
             if (customer == null || customer.CustomerID <= 0) return false;
 
             if (string.IsNullOrWhiteSpace(customer.Address) ||
-                string.IsNullOrWhiteSpace(customer.Email))
+                !IsValidEmail(customer.Email))
             {
                 return false;
             }
@@ -226,6 +216,17 @@ namespace BusinessLayer.Controllers
             return customer.Bookings.Any(b =>
                 (b.Status == "Confirmed" || b.Status == "Completed") &&
                 b.Accommodations.Any(ba => ba.EndDate >= oneYearAgo));
+        }
+
+        /// <summary>
+        /// Checks if email contains @ and if its ends or start with @.
+        /// </summary>
+        /// <param name="email"></param>
+        private bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email)) return false;
+
+            return email.Contains('@') && !email.StartsWith("@") && !email.EndsWith('@'); 
         }
     }
 }
