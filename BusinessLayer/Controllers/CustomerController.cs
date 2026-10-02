@@ -126,10 +126,9 @@ namespace BusinessLayer.Controllers
 
             // Create new Corporate Customer, default IsApproved = false, CreditLimit = 0 and DiscountRate = 0
             var newCorpCustomer = new CorporateCustomer(
-                // OBS! Current solution for FName LName because of heritage. 
+                companyName: companyName.Trim(),
                 firstName: companyName.Trim(),
                 lastName: "",
-                // OBS!
                 address: address.Trim(),
                 email: email.Trim(),
                 phoneNumber: phoneNumber.Trim(),
@@ -137,7 +136,6 @@ namespace BusinessLayer.Controllers
                 contactPerson: contactPerson.Trim()
             )
             {
-                CompanyName = companyName.Trim(),
                 IsApproved = false,
                 CreditLimit = 0m,
                 DiscountRate = 0m
