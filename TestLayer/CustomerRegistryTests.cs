@@ -8,6 +8,7 @@ namespace TestLayer
     {
         private SkiCenterDbContext _context;
 
+        // Create connection to database.
         [SetUp]
         public void Setup()
         {
@@ -15,6 +16,7 @@ namespace TestLayer
             _context = new SkiCenterDbContext();
         }
 
+        // Remove connection to database.
         [TearDown]
         public void TearDown()
         {
@@ -27,7 +29,7 @@ namespace TestLayer
         }
 
         /// <summary>
-        /// Happy path for testcase KR-HP-01.1
+        /// Testcase: Booking admin searches for a customer that already exists in database. 
         /// </summary>
         [Test]
         public void SearchExistingCustomer_ShouldFindExistingCustomer()
@@ -38,7 +40,7 @@ namespace TestLayer
             _context.SaveChanges();
 
             // Act
-            var foundCustomer = newCustomer.Email == "anna@test.se";
+            bool foundCustomer = _context.Customers.Any(c => c.Email == "Anna@test.se");
 
             // Assert
             Assert.That(foundCustomer, Is.True, "System should find existing customer");
@@ -49,7 +51,7 @@ namespace TestLayer
         }
 
         /// <summary>
-        /// Error path for testcase KR-EP-01.2
+        /// Testcase: Booking admin tries to register a customer that already exists. 
         /// </summary>
         [Test]
         public void TryRegisterDuplicateCustomer_ShouldDeny()

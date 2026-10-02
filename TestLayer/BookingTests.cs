@@ -1,8 +1,4 @@
-﻿using NUnit.Framework;
-using EntityLayer;
-using DataLayer;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using System.Linq;
+﻿using DataLayer;
 
 namespace TestLayer
 {
@@ -28,6 +24,6 @@ namespace TestLayer
                 _context = null;
             }
         }
-       
+
     }
 }

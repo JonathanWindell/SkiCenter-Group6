@@ -1,7 +1,7 @@
-﻿using DataLayer;
-using EntityLayer;
+﻿using BusinessLayer;
 using BusinessLayer.Controllers;
-using BusinessLayer;
+using DataLayer;
+using EntityLayer;
 
 namespace TestLayer
 {
@@ -18,13 +18,13 @@ namespace TestLayer
         {
             //Arrange
             string plainPassword = "TestBookingAdminPassword";
-            string hashedPassword = HashingPassword.HashPassword(plainPassword);
+            string hashedPassword = HashingService.HashPassword(plainPassword);
 
             var staff = new Staff("Johan", "Windell", "admin@test.se", hashedPassword, staffRole.BookingAdmin);
 
             // Act
             string inputEmail = "admin@test.se";
-            string inputPasswordHashed = HashingPassword.HashPassword("TestBookingAdminPassword");
+            string inputPasswordHashed = HashingService.HashPassword("TestBookingAdminPassword");
 
             bool loginSuccess = (staff.Email == inputEmail && staff.Password == inputPasswordHashed);
 

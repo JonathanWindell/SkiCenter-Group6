@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Text;
+﻿using BusinessLayer;
 using DataLayer;
 using EntityLayer;
-using BusinessLayer;
-using NUnit.Framework;
 
 namespace TestLayer
 {
@@ -36,12 +31,12 @@ namespace TestLayer
         public void AddPrivateCustomer_ShouldSaveToDatabase()
         {
             // Arrange
-            var newCustomer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10.2m);
+            var newPrivateCustomer = new PrivateCustomer("Anna", "Stenvall", "Stigen 1", "Anna@test.se", "0701234567", 10.2m);
 
             // Act
             // CanConnect() opens a connectiona and tries to connect. 
             // Returns true if connectionstring is valid.
-            _context.Customers.Add(newCustomer);
+            _context.Customers.Add(newPrivateCustomer);
             _context.SaveChanges();
 
             // Assert
@@ -55,12 +50,37 @@ namespace TestLayer
             _context.SaveChanges();
         }
 
-        [Test] 
+        [Test]
+        public void AddCorporateCustomer_ShouldSaveToDatabase()
+        {
+            // Arrange
+            var newCorporateCustomer = new CorporateCustomer("Jonathan", "Windell", "Göteborgvägen 23", "FöretagAB@gmail.com", "0761635689", "645784-3454", "Johan Jonshede", "CyklingSport");
+
+            // Act
+            // CanConnect() opens a connectiona and tries to connect. 
+            // Returns true if connectionstring is valid.
+            _context.Customers.Add(newCorporateCustomer);
+            _context.SaveChanges();
+
+            // Assert
+            var savedCustomer = _context.Customers.FirstOrDefault(c => c.Email == "FöretagAB@gmail.com");
+
+            Assert.That(savedCustomer, Is.Not.Null);
+            Assert.That(savedCustomer.CustomerID, Is.GreaterThan(0), "Customer was not saved in the database");
+
+            // If testdata should be removed. Uncomment this. 
+            /*
+            _context.Customers.Remove(savedCustomer);
+            _context.SaveChanges();
+            */
+        }
+
+        [Test]
         public void AddStaff_ShouldSaveToDatabase()
         {
             // Arrange
             string inputPassword = "TestBookingAdminPassword";
-            string hashedPassword = HashingPassword.HashPassword(inputPassword);
+            string hashedPassword = HashingService.HashPassword(inputPassword);
 
             var newStaff = new Staff("Vincent", "Adolfsson", "BookingAdmin@Test.se", hashedPassword, staffRole.BookingAdmin);
 
@@ -75,10 +95,8 @@ namespace TestLayer
             Assert.That(savedStaff.StaffID, Is.GreaterThan(0), "Staff was not saved in the database.");
 
             // If testdata should be removed. Uncomment this. 
-            /*
             _context.StaffMembers.Remove(savedStaff);
             _context.SaveChanges();
-            */
         }
     }
 }

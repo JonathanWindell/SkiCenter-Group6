@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EntityLayer;
+﻿using EntityLayer;
 
 namespace DataLayer.Interfaces
 {

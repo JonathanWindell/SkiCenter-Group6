@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using DataLayer.Interfaces;
+﻿using DataLayer.Interfaces;
 using EntityLayer;
 
 namespace DataLayer.Repositories

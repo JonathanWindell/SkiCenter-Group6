@@ -27,7 +27,7 @@ namespace EntityLayer
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
         // Parameterless constructor for EF 
-        public Customer() { } 
+        public Customer() { }
 
         public Customer(string firstName, string lastName, string address, string email, string phoneNumber)
         {

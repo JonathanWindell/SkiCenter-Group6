@@ -1,8 +1,5 @@
-﻿using DataLayer;
-using BusinessLayer;
-using DataLayer.Interfaces;
+﻿using DataLayer.Interfaces;
 using EntityLayer;
-using System;
 
 namespace BusinessLayer.Controllers
 {

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace BusinessLayer
@@ -8,7 +6,7 @@ namespace BusinessLayer
     /// <summary>
     /// Helper class for encryption.
     /// </summary>
-    public static class HashingPassword
+    public static class HashingService
     {
         public static string HashPassword(string plainTextPassword)
         {
