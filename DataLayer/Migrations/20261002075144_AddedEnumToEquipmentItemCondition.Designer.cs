@@ -4,6 +4,7 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SkiCenterDbContext))]
-    partial class SkiCenterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261002075144_AddedEnumToEquipmentItemCondition")]
+    partial class AddedEnumToEquipmentItemCondition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,9 +59,6 @@ namespace DataLayer.Migrations
                     b.Property<int>("NumberOfBeds")
                         .HasColumnType("int");
 
-                    b.Property<int>("SeasonPriceID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -68,8 +68,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("AccommodationID");
-
-                    b.HasIndex("SeasonPriceID");
 
                     b.ToTable("Accommodations");
                 });
@@ -222,10 +220,6 @@ namespace DataLayer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("EquipmentItemID"));
-
-                    b.Property<string>("ArticleNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Condition")
                         .HasColumnType("int");
@@ -568,17 +562,6 @@ namespace DataLayer.Migrations
                         .HasForeignKey("MeetingRoomsMeetingRoomID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("EntityLayer.Accommodation", b =>
-                {
-                    b.HasOne("EntityLayer.SeasonPrice", "SeasonPrice")
-                        .WithMany()
-                        .HasForeignKey("SeasonPriceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SeasonPrice");
                 });
 
             modelBuilder.Entity("EntityLayer.Booking", b =>

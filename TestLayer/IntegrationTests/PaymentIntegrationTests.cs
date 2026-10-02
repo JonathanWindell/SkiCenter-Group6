@@ -1,11 +1,17 @@
-﻿using DataLayer;
+﻿using BusinessLayer;
+using DataLayer;
 
-namespace TestLayer
+namespace TestLayer.IntegrationTests
 {
     [TestFixture]
-    public class PaymentTests
+    [Category("Integraton")]
+    public class PaymentIntegrationTests
     {
         private SkiCenterDbContext _context;
+
+        private UnitOfWork _unitOfWork;
+
+        private BookingController _bookingController;
 
         [SetUp]
         public void Setup()

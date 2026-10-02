@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
@@ -26,6 +27,11 @@ namespace EntityLayer
         // Size of apartment
         [Required]
         public string Status { get; set; }
+
+        // Relation to SeasonPrice. Foreign Key
+        [ForeignKey("SeasonPrice")]
+        public int SeasonPriceID { get; private set; }
+        public virtual SeasonPrice SeasonPrice { get; set; }
 
         // Parameterless constructor for EF 
         public Accommodation() { }
