@@ -5,6 +5,7 @@ namespace TestLayer.IntegrationTests
     public class BookingIntegrationTests
     {
         [TestFixture]
+        [Category("Integration")]
         public class BookingTests
         {
             private SkiCenterDbContext _context;
@@ -27,6 +28,29 @@ namespace TestLayer.IntegrationTests
                 }
             }
 
+            [Test]
+            public void GetBookingsInRange_ValidData_ReturnsTrue()
+            {
+                // Requires bookings in database
+            }
+
+            [Test]
+            public void GetBookingsInRange_NonValidData_ThrowsArgumentException()
+            {
+                // Requires bookings in database
+            }
+
+            [Test]
+            public void GetBookingsByStatus_ValidData_ReturnsTrue()
+            {
+                // Requires bookings in database
+            }
+
+            [Test]
+            public void GetBookingsByStatus_NonValidData_ReturnsTrue()
+            {
+                // Requires bookings in database
+            }
         }
     }
 }

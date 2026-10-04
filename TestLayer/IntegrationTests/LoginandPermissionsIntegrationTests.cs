@@ -3,18 +3,37 @@ using BusinessLayer.Controllers;
 using DataLayer;
 using EntityLayer;
 
-namespace TestLayer
+namespace TestLayer.IntegrationTests
 {
     [TestFixture]
+    [Category("Integration")]
     public class LoginAndPermissionTests
     {
         private SkiCenterDbContext _context;
 
+        [SetUp]
+        public void Setup()
+        {
+            // Initialize database. 
+            _context = new SkiCenterDbContext();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            // Ensure the DbContext is disposed after each test to avoid resource leaks
+            if (_context != null)
+            {
+                _context.Dispose();
+                _context = null;
+            }
+        }
+
         /// <summary>
-        /// Happy path for testcase IB-HP-01.1
+        /// Verifies that when user enters correct login data the user is denied access. 
         /// </summary>
         [Test]
-        public void BookingAdminExists_SuccesfulLogin()
+        public void BookingAdminExists_ValidData_ReturnsTrue()
         {
             //Arrange
             string plainPassword = "TestBookingAdminPassword";
@@ -34,10 +53,10 @@ namespace TestLayer
         }
 
         /// <summary>
-        /// Error path for testcase IB-EP-01.2
+        /// Verifies that when user enters incorrect login data the user is denied access. 
         /// </summary>
         [Test]
-        public void BookingAdminExists_IncorrectLoginInformation()
+        public void BookingAdminExists_NonValidData_ReturnsFalse()
         {
             //Arrange
             var Staff = new Staff("Johan", "Windell", "BookingAdmin@test.se", "TestBookingAdminPassword", staffRole.BookingAdmin);
@@ -53,7 +72,7 @@ namespace TestLayer
         }
 
         /// <summary>
-        /// Error path for testcase IB-ES-01.1
+        /// Verifies that Ski-shop employee is denied access to season prices view.
         /// </summary>
         [Test]
         public void SkiShop_DenyAccessToView()

@@ -25,6 +25,7 @@ namespace TestLayer.IntegrationTests
             }
         }
 
+        //Integrate Businesslayer
         [Test]
         public void SkiRental_BookAvailableSkis()
         {
@@ -77,7 +78,7 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges();
         }
 
-
+        //Integrate Businesslayer
         [Test]
         public void SkiRental_BookDamagedSkis()
         {
@@ -131,7 +132,7 @@ namespace TestLayer.IntegrationTests
 
         }
 
-
+        //Integrate Businesslayer
         [Test]
         public void AccomodationRental_BookAvailableApartment()
         {
@@ -139,7 +140,7 @@ namespace TestLayer.IntegrationTests
 
         }
 
-
+        //Integrate Businesslayer
         [Test]
         public void AccomodationRental_BookOccupiedApartment()
         {

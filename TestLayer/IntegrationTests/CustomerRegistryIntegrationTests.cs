@@ -28,7 +28,7 @@ namespace TestLayer.IntegrationTests
         }
 
         [Test]
-        public void RegisterPrivateCustomer_ValidData_ShouldSaveToDatabaseWithDefaultCreditLimit()
+        public void RegisterPrivateCustomer_ValidData_ReturnsTrue()
         {
             // Arrange
             string testEmail = "integration_privat@test.se";
@@ -73,7 +73,7 @@ namespace TestLayer.IntegrationTests
         }
 
         [Test]
-        public void RegisterPrivateCustomer_DuplicateEmail_ShouldReturnFalse()
+        public void RegisterPrivateCustomer_DuplicateEmail_ReturnsFalse()
         {
             // Arrange
             string email = "duplicate@test.se";
@@ -97,7 +97,7 @@ namespace TestLayer.IntegrationTests
         }
 
         [Test]
-        public void RegisterCorporateCustomer_ValidData_ShouldSaveToDatabaseWithDefaultCreditLimit()
+        public void RegisterCorporateCustomer_ValidData_ReturnsTrue()
         {
             // Arrange
             string testEmail = "integration_corporate@test.se";
@@ -148,7 +148,7 @@ namespace TestLayer.IntegrationTests
         }
 
         [Test]
-        public void RegisterCorporateCustomer_DuplicateEmail_ShouldReturnFalse()
+        public void RegisterCorporateCustomer_DuplicateEmail_ReturnsFalse()
         {
             // Arrange
             string email = "duplicate@test.se";
@@ -173,7 +173,7 @@ namespace TestLayer.IntegrationTests
 
         /*
         [Test]
-        public void ApproveCreditLimit_MarketingManager_ShouldChangeValue()
+        public void ApproveCorporateCustomer_ValidData_ReturnsTrue()
         {
             _customerController.ApproveCorporateCustomer()
         }
