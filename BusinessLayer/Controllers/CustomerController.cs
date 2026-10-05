@@ -46,7 +46,6 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Customer.GetPendingCorporateCustomer();
         }
 
-
         /// <summary>
         /// Validates and creates a new PrivateCustomer with a default credit limit of 12000 kr.
         /// </summary>
@@ -113,8 +112,6 @@ namespace BusinessLayer.Controllers
             // Create new Corporate Customer, default IsApproved = false, CreditLimit = 0 and DiscountRate = 0
             var newCorpCustomer = new CorporateCustomer(
                 companyName: companyName.Trim(),
-                firstName: companyName.Trim(),
-                lastName: "",
                 address: address.Trim(),
                 email: email.Trim(),
                 phoneNumber: phoneNumber.Trim(),

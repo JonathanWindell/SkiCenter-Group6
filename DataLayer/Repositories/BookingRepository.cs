@@ -49,6 +49,7 @@ namespace DataLayer.Repositories
                 .Include(b => b.Rentals)
                     .ThenInclude(r => r.EquipmentItems)
                         .ThenInclude(ri => ri.Equipment)
+                            .ThenInclude(e => e.Prices)
                 .Include(b => b.Invoices)
                 .AsSplitQuery()
                 .FirstOrDefault(b => b.BookingID == bookingID);

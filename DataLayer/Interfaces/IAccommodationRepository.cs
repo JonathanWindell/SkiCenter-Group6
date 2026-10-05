@@ -8,6 +8,6 @@ namespace DataLayer.Interfaces
 
         IEnumerable<Accommodation> GetAllAccommodations();
 
-        IEnumerable<Accommodation> GetAccommodationsByCategory(string category);
+        IEnumerable<AccommodationType> GetAccommodationsByCategory(string category);
     }
 }

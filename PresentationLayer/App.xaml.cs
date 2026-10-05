@@ -1,12 +1,10 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
-using PresentationLayer.Views;
-using BusinessLayer.Controllers;
-using Microsoft.EntityFrameworkCore;
+﻿using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
+using DataLayer.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using PresentationLayer.Views;
+using System.Windows;
 
 
 namespace PresentationLayer
@@ -59,9 +57,11 @@ namespace PresentationLayer
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
+            services.AddTransient<CustomerController>();
             services.AddTransient<DashboardController>();
 
             // 3. Register Repositories
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
 
             // 4. Register and initialize DbContext
             services.AddDbContext<SkiCenterDbContext>();
@@ -82,6 +82,16 @@ namespace PresentationLayer
             // Resolve the main window (LoginView) from the service provider and show it
             var loginWindow = Services.GetRequiredService<LoginView>();
             loginWindow.Show();
+
+            /*
+            // Only use when data should be written from seeding files. I (Jonathan will fix this during this week)
+            using (var scope = Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SkiCenterDbContext>();
+                DbInitializer.Initialize(context);
+            }
+            */
+
         }
 
     }

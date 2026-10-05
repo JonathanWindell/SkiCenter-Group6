@@ -15,6 +15,10 @@ namespace EntityLayer
         [Required]
         public string Category { get; set; }
 
+        // Many to Many relations
+        public virtual ICollection<EquipmentItem> EquipmentItems { get; set; }
+        public virtual ICollection<EquipmentPriceMatrix> Prices { get; set; }
+
         // Parameterless constructor for EF 
         public Equipment() { }
 

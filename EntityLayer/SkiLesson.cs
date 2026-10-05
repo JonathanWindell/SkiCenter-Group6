@@ -16,9 +16,6 @@ namespace EntityLayer
         [Required]
         public int DurationHours { get; set; }
 
-        [Required]
-        public decimal Price { get; set; }
-
         // Parameterless constructor for EF 
         public SkiLesson() { }
 
@@ -27,7 +24,6 @@ namespace EntityLayer
             Level = level;
             MaxParticipants = maxParticipants;
             DurationHours = durationHours;
-            Price = price;
         }
     }
 }
