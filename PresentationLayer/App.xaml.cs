@@ -82,13 +82,14 @@ namespace PresentationLayer
             loginWindow.Show();
 
             /*
-             * Only use when data should be written from seeding files. I (Jonathan will fix this during this week)
+            // Only use when data should be written from seeding files. I (Jonathan will fix this during this week)
             using (var scope = Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<SkiCenterDbContext>();
                 DbInitializer.Initialize(context);
             }
             */
+
         }
 
     }
