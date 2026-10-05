@@ -222,7 +222,7 @@ namespace BusinessLayer.Controllers
         {
             if (string.IsNullOrWhiteSpace(email)) return false;
 
-            return email.Contains('@') && !email.StartsWith("@") && !email.EndsWith('@'); 
+            return email.Contains('@') && !email.StartsWith("@") && !email.EndsWith('@');
         }
     }
 }
