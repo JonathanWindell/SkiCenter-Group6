@@ -45,12 +45,12 @@ namespace TestLayer.UnitTests
             // Assert
             Assert.That(result, Is.Empty, "Expected empty collection when dates are logically invalid.");
 
-            // Verify that the database repository was NEVER queried
+            // Verify 
             _mockBookingRepo.Verify(r => r.GetBookingsInRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
         }
 
         /// <summary>
-        /// Verifies that when 
+        /// Verifies that when start date is invalid result is empty. 
         /// </summary>
         [Test]
         public void GetBookingsInRange_NonValidData_ReturnsTrue()
@@ -64,42 +64,28 @@ namespace TestLayer.UnitTests
 
             // Assert
             Assert.That(result, Is.Empty);
+
+            //Verify
             _mockBookingRepo.Verify(r => r.GetBookingsInRange(It.IsAny<DateTime>(), It.IsAny<DateTime>()), Times.Never);
         }
 
-        /*
         /// <summary>
-        /// Verifies that when 
+        /// Verifies that when CustomerID is not valid and empty list is returned. 
         /// </summary>
         [Test]
-        public void GetBookingsInRange_ValidData_ReturnsTrue()
+        public void GetBookingsByCustomer_InvalidCustomerId_ReturnsEmptyCollection()
         {
-            // Arrange
-            DateTime startDate = DateTime.Today;
-            DateTime endDate = DateTime.Today.AddDays(7);
-
-            // Refactor since booking does not have start and end date
-            var fakeBookings = new List<Booking>
-            {
-                new Booking { BookingID = 1, BookingDate =  },
-                new Booking { BookingID = 2, StartDate = startDate.AddDays(1), EndDate = endDate }
-            };
-         
-
-            // Instruct the mock to return fakeBookings when queried with these dates
-            _mockBookingRepo.Setup(r => r.GetBookingsInRange(startDate, endDate))
-                            .Returns(fakeBookings);
+            // Arrange 
+            int invalidCustomerID = -2;
 
             // Act
-            var result = _controller.GetBookingsInRange(startDate, endDate);
+            var result = _controller.GetBookingsByCustomer(invalidCustomerID);
 
             // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Count(), Is.EqualTo(2), "Expected to receive all bookings supplied by the repository.");
+            Assert.That(result, Is.Empty, "Expected an empty collection for an invalid CustomerID.");
 
-            // Verify that the repository was actually called exactly once with the right arguments
-            _mockBookingRepo.Verify(r => r.GetBookingsInRange(startDate, endDate), Times.Once);
+            // Verify
+            _mockBookingRepo.Verify(r => r.GetBookingsByCustomer(It.IsAny<int>()), Times.Never);
         }
-        */
     }
 }

@@ -1,21 +1,21 @@
-﻿using System.Text.RegularExpressions;
+﻿using BusinessLayer.Controllers;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace PresentationLayer.Views
 {
-    /// <summary>
-    /// Interaction logic for CustomerRegistrationView.xaml
-    /// </summary>
     public partial class CustomerRegistrationView : Window
     {
+        private readonly CustomerController _customerController;
 
-        public CustomerRegistrationView()
+        public CustomerRegistrationView(CustomerController customerController)
         {
             InitializeComponent();
+            _customerController = customerController;
         }
-        //show errors 
+
         private void ShowFieldError(TextBlock errorBlock, string message)
         {
             errorBlock.Text = message;
@@ -37,37 +37,70 @@ namespace PresentationLayer.Views
             ValidationMessage.Visibility = Visibility.Collapsed;
         }
 
+        private void ShowValidationError(string message)
+        {
+            ValidationMessage.Text = message;
+            ValidationMessage.Foreground = Brushes.Red;
+            ValidationMessage.Visibility = Visibility.Visible;
+        }
 
+        private void CustomerTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CorporateFields == null)
+                return;
+
+            // Empty all fields when customer type is changed.
+            FirstNameTextBox.Clear();
+            LastNameTextBox.Clear();
+            AddressTextBox.Clear();
+            EmailTextBox.Clear();
+            PhoneTextBox.Clear();
+
+            CompanyNameTextBox.Clear();
+            OrgNumberTextBox.Clear();
+            ContactPersonTextBox.Clear();
+
+            // Clear validation messages. 
+            ClearFieldErrors();
+
+            ValidationMessage.Text = "";
+            ValidationMessage.Visibility = Visibility.Collapsed;
+
+            // Only show corporate customer fields when corporate customer is chosen. 
+            CorporateFields.Visibility = CustomerTypeComboBox.SelectedIndex == 1
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
 
         private void SaveCustomer_Click(object sender, RoutedEventArgs e)
         {
             ClearFieldErrors();
 
             bool isValid = true;
+            bool isCorporate = CustomerTypeComboBox.SelectedIndex == 1;
 
-            // Förnamn
-            if (string.IsNullOrWhiteSpace(FirstNameTextBox.Text))
-            {
-                ShowFieldError(FirstNameError, "Ange förnamn.");
-                isValid = false;
-            }
+            string email = EmailTextBox.Text.Trim();
+            string phone = PhoneTextBox.Text.Trim();
+            string address = AddressTextBox.Text.Trim();
 
-            // Efternamn
-            if (string.IsNullOrWhiteSpace(LastNameTextBox.Text))
-            {
-                ShowFieldError(LastNameError, "Ange efternamn.");
-                isValid = false;
-            }
+            string firstName = FirstNameTextBox.Text.Trim();
+            string lastName = LastNameTextBox.Text.Trim();
 
-            // Adress
-            if (string.IsNullOrWhiteSpace(AddressTextBox.Text))
+            string companyName = CompanyNameTextBox.Text.Trim();
+            string orgNumber = OrgNumberTextBox.Text.Trim();
+            string contactPerson = ContactPersonTextBox.Text.Trim();
+
+            // Validation for both customer types. 
+            if (string.IsNullOrWhiteSpace(address))
             {
                 ShowFieldError(AddressError, "Ange adress.");
                 isValid = false;
             }
-
-            // E-postadress
-            string email = EmailTextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(email))
             {
@@ -80,9 +113,6 @@ namespace PresentationLayer.Views
                 isValid = false;
             }
 
-            // Telefonnummer
-            string phone = PhoneTextBox.Text.Trim();
-
             if (string.IsNullOrWhiteSpace(phone))
             {
                 ShowFieldError(PhoneError, "Ange telefonnummer.");
@@ -94,103 +124,90 @@ namespace PresentationLayer.Views
                 isValid = false;
             }
 
-            // Företagsuppgifter
-            if (CustomerTypeComboBox.SelectedIndex == 1)
+            // Validation based on customer type.
+            if (isCorporate)
             {
-                if (string.IsNullOrWhiteSpace(CompanyNameTextBox.Text))
+                if (string.IsNullOrWhiteSpace(companyName))
                 {
                     ShowFieldError(CompanyNameError, "Ange företagsnamn.");
                     isValid = false;
                 }
 
-                if (string.IsNullOrWhiteSpace(OrgNumberTextBox.Text))
+                if (string.IsNullOrWhiteSpace(orgNumber))
                 {
                     ShowFieldError(OrgNumberError, "Ange organisationsnummer.");
                     isValid = false;
                 }
-                else if (!Regex.IsMatch(
-                    OrgNumberTextBox.Text.Trim(), @"^\d{6}-?\d{4}$"))
+                else if (!Regex.IsMatch(orgNumber, @"^\d{6}-?\d{4}$"))
                 {
-                    ShowFieldError(
-                        OrgNumberError,
-                        "Ange organisationsnummer med 10 siffror.");
+                    ShowFieldError(OrgNumberError, "Ange organisationsnummer med 10 siffror.");
                     isValid = false;
                 }
 
-                if (string.IsNullOrWhiteSpace(ContactPersonTextBox.Text))
+                if (string.IsNullOrWhiteSpace(contactPerson))
                 {
                     ShowFieldError(ContactPersonError, "Ange kontaktperson.");
                     isValid = false;
                 }
             }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(firstName))
+                {
+                    ShowFieldError(FirstNameError, "Ange förnamn.");
+                    isValid = false;
+                }
 
+                if (string.IsNullOrWhiteSpace(lastName))
+                {
+                    ShowFieldError(LastNameError, "Ange efternamn.");
+                    isValid = false;
+                }
+            }
+
+            // Cancel if validation of frontend failed.
             if (!isValid)
                 return;
 
-            // Frontend-valideringen lyckades.
-            ValidationMessage.Text =
-                "Uppgifterna är korrekt ifyllda och redo att sparas.";
+            // Save to database via BusinessLayer
+            bool saveSuccess = false;
 
-            ValidationMessage.Foreground = Brushes.Green;
-            ValidationMessage.Visibility = Visibility.Visible;
+            if (isCorporate)
+            {
+                saveSuccess = _customerController.RegisterCorporateCustomer(
+                    companyName: companyName,
+                    orgNumber: orgNumber,
+                    contactPerson: contactPerson,
+                    address: address,
+                    email: email,
+                    phoneNumber: phone
+                );
+            }
+            else
+            {
+                saveSuccess = _customerController.RegisterPrivateCustomer(
+                    firstName: firstName,
+                    lastName: lastName,
+                    address: address,
+                    email: email,
+                    phoneNumber: phone
+                );
+            }
+
+            // Handle result
+            if (saveSuccess)
+            {
+                ValidationMessage.Text = "Kunden har sparats i databasen!";
+                ValidationMessage.Foreground = Brushes.Green;
+                ValidationMessage.Visibility = Visibility.Visible;
+
+                MessageBox.Show("Kunden registrerades framgångsrikt!", "Registrering klar", MessageBoxButton.OK, MessageBoxImage.Information);
+                Close();
+            }
+            else
+            {
+                ShowValidationError("Kunde inte spara kunden. Kontrollera om e-post/telefon redan finns registrerat.");
+            }
         }
-
-
-
-        private void ShowValidationError(string message)
-        {
-            ValidationMessage.Text = message;
-
-            ValidationMessage.Foreground =
-                System.Windows.Media.Brushes.Red;
-
-            ValidationMessage.Visibility = Visibility.Visible;
-        }
-
-
-        private void CustomerTypeComboBox_SelectionChanged(
-            object sender,
-            SelectionChangedEventArgs e)
-        {
-            if (CorporateFields == null)
-                return;
-
-            // Töm alla fält när kundtypen ändras.
-            FirstNameTextBox.Clear();
-            LastNameTextBox.Clear();
-            AddressTextBox.Clear();
-            EmailTextBox.Clear();
-            PhoneTextBox.Clear();
-
-            CompanyNameTextBox.Clear();
-            OrgNumberTextBox.Clear();
-            ContactPersonTextBox.Clear();
-
-            // Töm valideringsmeddelanden.
-            ClearFieldErrors();
-
-            // Dölj tidigare valideringsmeddelanden.
-            ValidationMessage.Text = "";
-            ValidationMessage.Visibility = Visibility.Collapsed;
-
-            // Visa företagsfält endast för företagskunder.
-            CorporateFields.Visibility =
-                CustomerTypeComboBox.SelectedIndex == 1
-                    ? Visibility.Visible
-                    : Visibility.Collapsed;
-        }
-
-        //Avbryt knapppen
-        private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
-
-
-
-
-
-
-
     }
 }

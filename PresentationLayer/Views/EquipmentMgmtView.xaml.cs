@@ -44,7 +44,7 @@ namespace PresentationLayer.Views
 
             // Sample data only; nothing is saved to the database.
             _previewItems.Add(
-                new EquipmentItem(EquipmentStatus.Available, "Bra skick", 130m, "170 cm")
+                new EquipmentItem(equipmentStatus.Available, equipmentCondition.New, 130m, "170 cm", "34556")
                 {
                     EquipmentItemID = 1,
                     EquipmentID = 1,
@@ -55,7 +55,7 @@ namespace PresentationLayer.Views
                 });
 
             _previewItems.Add(
-                new EquipmentItem(EquipmentStatus.Damaged, "Trasigt spänne", 115m, "38")
+                new EquipmentItem(equipmentStatus.Damaged, equipmentCondition.New, 115m, "38", "34556")
                 {
                     EquipmentItemID = 2,
                     EquipmentID = 2,
@@ -110,7 +110,7 @@ namespace PresentationLayer.Views
             foreach (ComboBoxItem option in EquipmentStatusComboBox.Items)
             {
                 string statusstring = option.Content?.ToString() ?? string.Empty;
-                if (Enum.TryParse<EquipmentStatus>(statusstring, out var parsedStatus)) { }
+                if (Enum.TryParse<equipmentStatus>(statusstring, out var parsedStatus)) { }
 
                 if (parsedStatus == selectedItem.Status)
                 {
@@ -138,7 +138,7 @@ namespace PresentationLayer.Views
             if (result != MessageBoxResult.Yes)
                 return;
 
-            selectedItem.Status = EquipmentStatus.Archived;
+            selectedItem.Status = equipmentStatus.Archived;
             EquipmentDataGrid.Items.Refresh();
 
             ResetForm();
@@ -164,7 +164,7 @@ namespace PresentationLayer.Views
             string? statusstring =
                 (StatusFilterComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString();
 
-            if (Enum.TryParse<EquipmentStatus>(statusstring, out var parsedStatus)) { }
+            if (Enum.TryParse<equipmentStatus>(statusstring, out var parsedStatus)) { }
 
             bool matchesCategory =
                 CategoryFilterComboBox.SelectedIndex <= 0 ||
@@ -266,7 +266,7 @@ namespace PresentationLayer.Views
             bool isNewItem = _editingItem == null;
             EquipmentItem itemToSave = _editingItem ?? new EquipmentItem();
 
-            if (Enum.TryParse<EquipmentStatus>(statusString, out var parsedStatus))
+            if (Enum.TryParse<equipmentStatus>(statusString, out var parsedStatus))
             {
                 itemToSave.Status = parsedStatus;
             }

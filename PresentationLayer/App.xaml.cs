@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
+using DataLayer.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
 using System.Windows;
@@ -58,7 +59,7 @@ namespace PresentationLayer
             services.AddTransient<CustomerController>();
 
             // 3. Register Repositories
-            services.AddTransient<ICustomerRepository, ICustomerRepository>();
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
 
             // 4. Register and initialize DbContext
             services.AddDbContext<SkiCenterDbContext>();
@@ -76,14 +77,9 @@ namespace PresentationLayer
         {
             base.OnStartup(e);
 
-            /*
             // Resolve the main window (LoginView) from the service provider and show it
             var loginWindow = Services.GetRequiredService<LoginView>();
             loginWindow.Show();
-            */
-
-            var registrationWindow = Services.GetRequiredService<CustomerRegistrationView>();
-            registrationWindow.Show();
         }
 
     }

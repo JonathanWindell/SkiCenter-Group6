@@ -5,6 +5,7 @@ using EntityLayer;
 namespace TestLayer
 {
     [TestFixture]
+    [Category("Database")]
     public class DatabaseTests
     {
         private SkiCenterDbContext _context;
