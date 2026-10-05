@@ -6,11 +6,7 @@ namespace BusinessLayer.Controllers
     {
         public static bool CheckAccessToSeasonPrices(staffRole currentRole)
         {
-            if (currentRole == staffRole.SystemAdmin)
-            {
-                return true;
-            }
-            return false;
+            return DashboardController.HasAccess(currentRole, SystemModule.SeasonPrices);
         }
 
         /*
