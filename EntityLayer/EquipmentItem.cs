@@ -41,6 +41,13 @@ namespace EntityLayer
         [Required]
         public string Size { get; set; }
 
+<<<<<<< HEAD
+=======
+        // Article number.
+        [Required]
+        public string ArticleNumber { get; set; }
+
+>>>>>>> origin/johan-branch
         // Relation to Rental. Many to Many relation
         public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
 

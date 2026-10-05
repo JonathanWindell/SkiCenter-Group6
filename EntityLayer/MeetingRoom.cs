@@ -51,6 +51,5 @@ namespace EntityLayer
             Price = price;
             Status = status;
         }
-
     }
 }

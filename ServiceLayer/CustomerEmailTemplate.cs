@@ -18,7 +18,7 @@ namespace ServiceLayer
             sb.Append($"<p><strong>Bokningsnummer:</strong> #{booking.BookingID}</p>");
             sb.Append($"<p><strong>Bokningen genomfördes:</strong> {booking.BookingDate:yyyy-MM-dd}</p>");
 
-            // Om bokningen har uthyrning kopplad till sig
+            // If booking has rentals tied to it. 
             if (booking.Rentals != null && booking.Rentals.Count > 0)
             {
                 sb.Append("<h3>Hyrd utrustning</h3><ul>");
@@ -32,7 +32,7 @@ namespace ServiceLayer
                 sb.Append("</ul>");
             }
 
-            // Om bokningen har boende kopplat till sig
+            // If booking has accomodation tied to it.
             if (booking.Accommodations != null && booking.Accommodations.Count > 0)
             {
                 sb.Append("<h3>Bokat boende</h3><ul>");

@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 
+
 namespace PresentationLayer.Views
 {
     public partial class EquipmentMgmtView : Window
@@ -44,7 +45,7 @@ namespace PresentationLayer.Views
 
             // Sample data only; nothing is saved to the database.
             _previewItems.Add(
-                new EquipmentItem(equipmentStatus.Available, equipmentCondition.New, 130m, "170 cm", "34556")
+                new EquipmentItem(equipmentStatus.Available, equipmentCondition.New, 130m, "170 cm", "A89273891")
                 {
                     EquipmentItemID = 1,
                     EquipmentID = 1,
@@ -55,7 +56,7 @@ namespace PresentationLayer.Views
                 });
 
             _previewItems.Add(
-                new EquipmentItem(equipmentStatus.Damaged, equipmentCondition.New, 115m, "38", "34556")
+                new EquipmentItem(equipmentStatus.Damaged, equipmentCondition.Worn, 115m, "38", "B98364728")
                 {
                     EquipmentItemID = 2,
                     EquipmentID = 2,
@@ -101,7 +102,7 @@ namespace PresentationLayer.Views
             EquipmentNumberTextBox.Text = selectedItem.EquipmentItemID.ToString();
             EquipmentCategoryComboBox.SelectedItem = selectedItem.Equipment?.Category;
             EquipmentSizeTextBox.Text = selectedItem.Size;
-            EquipmentConditionTextBox.Text = selectedItem.Condition;
+            EquipmentConditionTextBox.Text = selectedItem.Condition.ToString();
             EquipmentPriceTextBox.Text =
                 selectedItem.PricePerDay.ToString(CultureInfo.GetCultureInfo("sv-SE"));
 
@@ -273,12 +274,21 @@ namespace PresentationLayer.Views
             else
             {
                 // Fallback if the string doesn't match any enum value
-                itemToSave.Status = EquipmentStatus.Available;
+                itemToSave.Status = equipmentStatus.Available;
+            }
+
+            if (Enum.TryParse<equipmentCondition>(EquipmentConditionTextBox.Text, out var parsedCondition))
+            {
+                itemToSave.Condition = parsedCondition;
+            }
+            else
+            {
+                // Fallback if the string doesn't match any enum value
+                itemToSave.Condition = equipmentCondition.New;
             }
 
             itemToSave.EquipmentItemID = itemNumber;
             itemToSave.Size = EquipmentSizeTextBox.Text.Trim();
-            itemToSave.Condition = EquipmentConditionTextBox.Text.Trim();
             itemToSave.PricePerDay = pricePerDay;
             itemToSave.EquipmentID = categoryId;
             itemToSave.Equipment = new Equipment(category, category)
