@@ -21,12 +21,11 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public CorporateCustomer() { }
 
-        public CorporateCustomer(string companyName, string orgNumber, string contactPerson, bool isApproved, string address, string email, string phoneNumber) : base(address, email, phoneNumber)
+        public CorporateCustomer(string companyName, string orgNumber, string contactPerson, string address, string email, string phoneNumber) : base(address, email, phoneNumber)
         {
             CompanyName = companyName;
             OrganisationNumber = orgNumber;
             ContactPerson = contactPerson;
-            IsApproved = isApproved;
             IsApproved = false;
             CreditLimit = 0;
             DiscountRate = 0;

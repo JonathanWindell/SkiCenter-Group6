@@ -27,7 +27,7 @@ namespace ServiceLayer
                 // Sender is Ski-Center.
                 mailMessage.From = new MailAddress("noreply@skicenter.se", "SkiCenter Bokning");
                 // Receiver is customer. 
-                mailMessage.To.Add(new MailAddress(customer.Email, $"{customer.FirstName} {customer.LastName}".Trim()));
+                mailMessage.To.Add(new MailAddress(customer.Email, $"{customer.DisplayName}".Trim()));
 
                 mailMessage.Subject = $"Bokningsbekräftelse - Bokning #{booking.BookingID}";
                 mailMessage.Body = _template.GenerateBookingConfirmation(customer, booking);

@@ -58,7 +58,7 @@ namespace DataLayer.Repositories
                 .FirstOrDefault(c =>
                     c.PhoneNumber == search ||
                     c.Email == search ||
-                    (c.FirstName + " " + c.LastName).Contains(search) ||
+                    (c is PrivateCustomer && (((PrivateCustomer)c).FirstName + " " + ((PrivateCustomer)c).LastName).Contains(search)) ||
                     (c is CorporateCustomer && (((CorporateCustomer)c).OrganisationNumber == search || ((CorporateCustomer)c).CompanyName.Contains(search)))
                 );
         }

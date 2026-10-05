@@ -53,7 +53,5 @@ namespace EntityLayer
         [ForeignKey("Customer")]
         public int CustomerID { get; private set; }
         public virtual Customer Customer { get; set; }
-
-
     }
 }

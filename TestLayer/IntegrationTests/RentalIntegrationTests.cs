@@ -40,8 +40,12 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges(); // Save Equipment 
 
             // Create EquipmentItem and assign to category
-            var skiItem = new EquipmentItem(equipmentStatus.Available, equipmentCondition.New, 250m, "175cm", "AS302")
+            var skiItem = new EquipmentItem
             {
+                ArticleNumber = "AS365",
+                Status = EquipmentStatus.Available,
+                Condition = EquipmentCondition.New,
+                Size = "175cm",
                 EquipmentID = skiCategory.EquipmentID
             };
             _context.EquipmentItems.Add(skiItem);
@@ -57,7 +61,7 @@ namespace TestLayer.IntegrationTests
             };
 
             rental.EquipmentItems.Add(skiItem);
-            skiItem.Status = equipmentStatus.Rented; // Update status
+            skiItem.Status = EquipmentStatus.Rented; // Update status
 
             _context.Rentals.Add(rental);
             _context.SaveChanges();
@@ -69,7 +73,7 @@ namespace TestLayer.IntegrationTests
 
             Assert.That(savedRental, Is.Not.Null);
             Assert.That(savedRental.RentalID, Is.GreaterThan(0));
-            Assert.That(skiItem.Status, Is.EqualTo(equipmentStatus.Rented));
+            Assert.That(skiItem.Status, Is.EqualTo(EquipmentStatus.Rented));
 
             // Clean up testdata
             _context.Rentals.Remove(rental);
@@ -93,8 +97,12 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges(); // Save Equipment 
 
             // Create EquipmentItem and assign to category
-            var skiItem = new EquipmentItem(equipmentStatus.Damaged, equipmentCondition.Worn, 250m, "175cm", "AS302")
+            var skiItem = new EquipmentItem
             {
+                ArticleNumber = "AS365",
+                Status = EquipmentStatus.Available,
+                Condition = EquipmentCondition.New,
+                Size = "175cm",
                 EquipmentID = skiCategory.EquipmentID
             };
             _context.EquipmentItems.Add(skiItem);
@@ -110,7 +118,7 @@ namespace TestLayer.IntegrationTests
             };
 
             rental.EquipmentItems.Add(skiItem);
-            skiItem.Status = equipmentStatus.Damaged; // Update status
+            skiItem.Status = EquipmentStatus.Damaged; // Update status
 
             _context.Rentals.Add(rental);
             _context.SaveChanges();
@@ -122,7 +130,7 @@ namespace TestLayer.IntegrationTests
 
             Assert.That(savedRental, Is.Not.Null);
             Assert.That(savedRental.RentalID, Is.GreaterThan(0));
-            Assert.That(skiItem.Status, Is.EqualTo(equipmentStatus.Damaged));
+            Assert.That(skiItem.Status, Is.EqualTo(EquipmentStatus.Damaged));
 
             // Clean up testdata
             _context.Rentals.Remove(rental);

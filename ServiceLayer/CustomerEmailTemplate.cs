@@ -11,7 +11,7 @@ namespace ServiceLayer
 
             sb.Append("<html><body style='font-family: Arial, sans-serif;'>");
             sb.Append($"<h2>Bokningsbekräftelse - SkiCenter</h2>");
-            sb.Append($"<p>Hej {customer.FirstName} {customer.LastName}!</p>");
+            sb.Append($"<p>Hej {customer.DisplayName}!</p>");
             sb.Append($"<p>Tack för din bokning. Här kommer dina bokningsdetaljer:</p>");
 
             sb.Append("<hr/>");
@@ -24,9 +24,17 @@ namespace ServiceLayer
                 sb.Append("<h3>Hyrd utrustning</h3><ul>");
                 foreach (var rental in booking.Rentals)
                 {
+                    int days = (rental.EndDate.Date - rental.StartDate.Date).Days;
+                    if (days <= 0) days = 1;
+
                     foreach (var item in rental.EquipmentItems)
                     {
-                        sb.Append($"<li>{item.Size} - Pris per dag: {item.PricePerDay:C}</li>");
+                        string itemName = item.Equipment?.Description ?? "Utrustning";
+
+                        var priceMatrix = item.Equipment?.Prices?.FirstOrDefault(p => p.Days == days);
+                        decimal itemPrice = priceMatrix != null ? priceMatrix.TotalAmount : 0;
+
+                        sb.Append($"<li>{itemName} (Stl: {item.Size}) - Pris för {days} dagar: {itemPrice:C}</li>");
                     }
                 }
                 sb.Append("</ul>");

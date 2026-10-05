@@ -70,7 +70,7 @@ namespace TestLayer
         public void AddCorporateCustomer_ShouldSaveToDatabase()
         {
             // Arrange
-            var newCorporateCustomer = new CorporateCustomer("Jonathan", "Windell", "Göteborgvägen 23", "FöretagAB@gmail.com", "0761635689", "645784-3454", "Johan Jonshede", "CyklingSport");
+            var newCorporateCustomer = new CorporateCustomer("Göteborgvägen 23", "FöretagAB@gmail.com", "0761635689", "645784-3454", "Johan Jonshede", "CyklingSport");
 
             // Act
             // CanConnect() opens a connectiona and tries to connect. 

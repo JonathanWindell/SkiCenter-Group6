@@ -1,7 +1,6 @@
 ﻿using DataLayer.Interfaces;
 using EntityLayer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 namespace DataLayer.Repositories
 {
@@ -41,7 +40,7 @@ namespace DataLayer.Repositories
             // Gets all items with the status Available.
             return _context.Set<EquipmentItem>()
                 .Include(ei => ei.Equipment)
-                .Where(ei => ei.EquipmentID == equipmentID && ei.Status == equipmentStatus.Available)
+                .Where(ei => ei.EquipmentID == equipmentID && ei.Status == EquipmentStatus.Available)
                 .AsNoTracking()
                 .ToList();
         }
@@ -52,7 +51,7 @@ namespace DataLayer.Repositories
         /// <param name="articleNumber"></param>
         /// <param name="status"></param>
         /// <param name="condition"></param>
-        public void UpdateStatusAndCondition(string articleNumber, equipmentStatus status, equipmentCondition condition)
+        public void UpdateStatusAndCondition(string articleNumber, EquipmentStatus status, EquipmentCondition condition)
         {
             if (string.IsNullOrWhiteSpace(articleNumber)) return;
 

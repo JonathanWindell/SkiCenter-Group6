@@ -1,6 +1,5 @@
 ﻿using DataLayer.Interfaces;
 using EntityLayer;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {
@@ -13,6 +12,6 @@ namespace DataLayer.Repositories
             _context = context;
         }
 
-       
+
     }
 }
