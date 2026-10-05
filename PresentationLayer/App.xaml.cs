@@ -55,9 +55,11 @@ namespace PresentationLayer
             services.AddTransient<LoginView>();
             services.AddTransient<DashboardView>();
             services.AddTransient<CustomerRegistrationView>();
+            services.AddTransient<EquipmentMgmtView>();
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
+            services.AddTransient<DashboardController>();
 
             // 3. Register Repositories
 
