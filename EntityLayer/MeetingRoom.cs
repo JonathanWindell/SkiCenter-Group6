@@ -38,6 +38,5 @@ namespace EntityLayer
             Status = status;
             Status = status;
         }
-
     }
 }

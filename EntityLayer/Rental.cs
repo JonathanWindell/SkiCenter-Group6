@@ -35,6 +35,5 @@ namespace EntityLayer
             Status = status;
             Sum = sum;
         }
-
     }
 }

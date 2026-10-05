@@ -25,15 +25,6 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
-        /// Updates customer with new data.
-        /// </summary>
-        /// <param name="customer"></param>
-        public void UpdateCustomer(Customer customer)
-        {
-            _context.Set<Customer>().Update(customer);
-        }
-
-        /// <summary>
         /// Gets a single customer with all bookinghistory and accommodation data. 
         /// </summary>
         /// <param name="customerID"></param>

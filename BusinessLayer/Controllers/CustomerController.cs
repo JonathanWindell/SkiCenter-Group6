@@ -46,7 +46,6 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Customer.GetPendingCorporateCustomer();
         }
 
-
         /// <summary>
         /// Validates and creates a new PrivateCustomer with a default credit limit of 12000 kr.
         /// </summary>
