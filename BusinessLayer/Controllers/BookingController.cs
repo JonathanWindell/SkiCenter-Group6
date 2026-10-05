@@ -27,10 +27,10 @@ namespace BusinessLayer
         /// </summary>
         /// <param name="bookingId"/param>
         /// <returns>The complete booking entity, or null if not found.</returns>
-        public Booking GetBookingById(int bookingId)
+        public Booking GetSpecificBooking(int bookingID)
         {
-            if (bookingId <= 0) return null;
-            return _unitOfWork.Booking.GetByID(bookingId);
+            if (bookingID <= 0) return null;
+            return _unitOfWork.Booking.GetByID(bookingID);
         }
 
         /// <summary>
