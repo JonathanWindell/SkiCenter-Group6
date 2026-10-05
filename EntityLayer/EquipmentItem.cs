@@ -44,6 +44,8 @@ namespace EntityLayer
 
         public string ArticleNumber { get; set; }
 
+
+
         // Relation to Rental. Many to Many relation
         public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
 

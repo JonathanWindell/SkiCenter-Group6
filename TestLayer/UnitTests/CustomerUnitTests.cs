@@ -12,9 +12,9 @@ namespace TestLayer.UnitTests
             /// <summary>
             /// Verifies that when Private customer data is missing no data is written to the database. 
             /// </summary>
-            [TestCase("", "", "", "test@test.se", "070111")]
-            [TestCase("Kalle", "", "Gatan 1", "test@test.se", "070111")]
-            [TestCase("Kalle", "Svensson", "", "test@test.se", "070111")]
+            [TestCase("", "", "", "CarlSvensson@gmail.se", "070111")]
+            [TestCase("Carl", "", "GöteborgsGatan 1", "CarlSvensson@gmail.se", "070111")]
+            [TestCase("Carl", "Svensson", "", "CarlSvensson@gmail.se", "070111")]
             public void RegisterPrivateCustomer_EmptyFields_ReturnsFalse(
                 string firstName, string lastName, string address, string email, string phone)
             {

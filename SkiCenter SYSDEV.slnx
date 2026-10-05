@@ -6,5 +6,6 @@
   <Project Path="DataLayer/DataLayer.csproj" Id="0005a190-58cb-4087-bc86-088ea5393b79" />
   <Project Path="EntityLayer/EntityLayer.csproj" Id="455a0783-378d-4fda-b103-d352aed8cc74" />
   <Project Path="PresentationLayer/PresentationLayer.csproj" />
+  <Project Path="ServiceLayer/ServiceLayer.csproj" Id="33923e19-d1d9-4139-8f29-0ccd35e822cd" />
   <Project Path="TestLayer/TestLayer.csproj" Id="369114b1-73c4-4d6b-a7f7-394dbd741c88" />
 </Solution>
