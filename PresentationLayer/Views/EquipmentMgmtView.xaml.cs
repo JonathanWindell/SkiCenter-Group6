@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿/*
+using EntityLayer;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using EntityLayer;
 
 namespace PresentationLayer.Views
 {
@@ -66,6 +65,7 @@ namespace PresentationLayer.Views
                     }
                 });
 
+  
             EquipmentDataGrid.ItemsSource = _previewItems;
 
             CollectionViewSource.GetDefaultView(_previewItems).Filter =
@@ -258,7 +258,7 @@ namespace PresentationLayer.Views
             }
 
             string category = (string)EquipmentCategoryComboBox.SelectedItem;
-            string statusString = ((ComboBoxItem)EquipmentStatusComboBox.SelectedItem).Content.ToString()!; 
+            string statusString = ((ComboBoxItem)EquipmentStatusComboBox.SelectedItem).Content.ToString()!;
 
             // Category IDs are temporary preview values, not database IDs.
             int categoryId = EquipmentCategoryComboBox.SelectedIndex + 1;
@@ -291,15 +291,15 @@ namespace PresentationLayer.Views
 
             // Refresh rows because the entity does not notify property changes.
             EquipmentDataGrid.Items.Refresh();
-            
+
             ResetForm();
 
 
-        ShowFeedback(
-                isNewItem
-                    ? "Utrustningen har lagts till i testvyn. Inte sparad i databasen."
-                    : "Utrustningen har uppdaterats i testvyn. Inte sparad i databasen.",
-                true);
+            ShowFeedback(
+                    isNewItem
+                        ? "Utrustningen har lagts till i testvyn. Inte sparad i databasen."
+                        : "Utrustningen har uppdaterats i testvyn. Inte sparad i databasen.",
+                    true);
         }
 
         // Use red for errors and green for successful preview actions.
@@ -373,7 +373,7 @@ namespace PresentationLayer.Views
             }
         }
 
-        
+
 
         // Clear the form and reset the status to Available.
         private void ResetForm()
@@ -392,3 +392,4 @@ namespace PresentationLayer.Views
         }
     }
 }
+*/

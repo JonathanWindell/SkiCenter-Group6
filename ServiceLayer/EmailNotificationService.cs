@@ -1,5 +1,4 @@
 ﻿using EntityLayer;
-using System;
 using System.Net;
 using System.Net.Mail;
 
@@ -38,7 +37,7 @@ namespace ServiceLayer
                 using var smtpClient = new SmtpClient("smtp.skicenter.se", 587)
                 {
                     Credentials = new NetworkCredential(_settings.Username, _settings.Password),
-                    EnableSsl = true, 
+                    EnableSsl = true,
                     UseDefaultCredentials = false
                 };
 
