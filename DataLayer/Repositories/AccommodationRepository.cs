@@ -39,11 +39,12 @@ namespace DataLayer.Repositories
                 .Distinct();
 
             return _context.Set<Accommodation>()
-                .Where(a => a.NumberOfBeds >= numberOfBeds &&
-                            a.Status == "Available" &&
-                            !bookedAccommodationIds.Contains(a.AccommodationID))
-                .AsNoTracking()
-                .ToList();
+                .Include(a => a.AccommodationType)
+                .Where(a => !bookedAccommodationIds.Contains(a.AccommodationID) &&
+                    a.AccommodationType.NumberOfBeds >= numberOfBeds &&
+                    a.Status == accommodationStatus.Available)
+                 .AsNoTracking()
+                 .ToList();
         }
 
         /// <summary>
@@ -60,15 +61,15 @@ namespace DataLayer.Repositories
         /// Gets all accommodations in a specific category.
         /// </summary>
         /// <param name="category"></param>
-        public IEnumerable<Accommodation> GetAccommodationsByCategory(string category)
+        public IEnumerable<AccommodationType> GetAccommodationsByCategory(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
             {
-                return Enumerable.Empty<Accommodation>();
+                return Enumerable.Empty<AccommodationType>();
             }
 
-            return _context.Set<Accommodation>()
-                .Where(a => a.Category == category.Trim())
+            return _context.Set<AccommodationType>()
+                .Where(a => a.CategoryCode == category.Trim())
                 .AsNoTracking()
                 .ToList();
         }

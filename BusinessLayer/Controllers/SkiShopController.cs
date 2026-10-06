@@ -1,6 +1,16 @@
-﻿namespace BusinessLayer.Controllers
+﻿using DataLayer.Interfaces;
+
+namespace BusinessLayer.Controllers
 {
-    internal class Class2
+    public class SkiShopController
     {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public SkiShopController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+
     }
 }

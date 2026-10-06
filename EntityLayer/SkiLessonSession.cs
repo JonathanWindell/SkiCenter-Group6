@@ -19,6 +19,10 @@ namespace EntityLayer
         [Required]
         public string TimeSlot { get; set; }
 
+        // Price of ski-lession session
+        [Required]
+        public decimal Price { get; set; }
+
         // Relation to Customer. Foreign Key
         [ForeignKey("Customer")]
         public int SkiLessonID { get; set; }
@@ -30,11 +34,12 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public SkiLessonSession() { }
 
-        public SkiLessonSession(int weekNumber, string days, string timeSlot)
+        public SkiLessonSession(int weekNumber, string days, string timeSlot, decimal price)
         {
             WeekNumber = weekNumber;
             Days = days;
             TimeSlot = timeSlot;
+            Price = price;
         }
     }
 }

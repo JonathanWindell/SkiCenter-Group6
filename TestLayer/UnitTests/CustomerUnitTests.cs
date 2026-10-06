@@ -32,8 +32,8 @@ namespace TestLayer.UnitTests
             /// Verifies that when Corporate customer data is missing no data is written to the database. 
             /// </summary>
             [TestCase("", "345689-3454", "Mark Johnson", "Dietmar-Hopp-Allee 16", "SAP@gmail.com", "0761678943")]
-            [TestCase("", "345689-3454", "Mark Johnson", "Dietmar-Hopp-Allee 16", "SAP@gmail.com", "0761678943")]
-            [TestCase("", "345689-3454", "Mark Johnson", "Dietmar-Hopp-Allee 16", "SAP@gmail.com", "0761678943")]
+            [TestCase("SAP", "", "Mark Johnson", "Dietmar-Hopp-Allee 16", "SAP@gmail.com", "0761678943")] // Émpty org-number
+            [TestCase("SAP", "345689-3454", "", "Dietmar-Hopp-Allee 16", "SAP@gmail.com", "0761678943")] // Empty contact person
             public void RegisterCorporateCustomer_EmptyFields_ReturnsFalse(
                 string companyName, string organisationNumber, string contactPerson, string address, string email, string phoneNumber)
             {
