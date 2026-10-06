@@ -1,12 +1,13 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
-using PresentationLayer.Views;
+﻿using BusinessLayer;
 using BusinessLayer.Controllers;
-using Microsoft.EntityFrameworkCore;
 using DataLayer;
 using DataLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PresentationLayer.Views;
+using System.Configuration;
+using System.Data;
+using System.Windows;
 
 
 namespace PresentationLayer
@@ -55,9 +56,12 @@ namespace PresentationLayer
             services.AddTransient<LoginView>();
             services.AddTransient<DashboardView>();
             services.AddTransient<CustomerRegistrationView>();
+            services.AddTransient<CustomerBookingsView>();
+            services.AddTransient<BookingDetailsView>();
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
+            services.AddTransient<BookingController>(); 
 
             // 3. Register Repositories
 
@@ -78,8 +82,12 @@ namespace PresentationLayer
             base.OnStartup(e);
 
             // Resolve the main window (LoginView) from the service provider and show it
-            var loginWindow = Services.GetRequiredService<LoginView>();
-            loginWindow.Show();
+            // var loginWindow = Services.GetRequiredService<LoginView>();
+            // loginWindow.Show();
+
+            // Temporarily open BookingDetailsView for local UI testing.
+            var customerBookingsWindow = Services.GetRequiredService<CustomerBookingsView>();
+            customerBookingsWindow.Show();
         }
 
     }
