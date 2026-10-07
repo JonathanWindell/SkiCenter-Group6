@@ -10,7 +10,7 @@ namespace DataLayer.Interfaces
 
         IEnumerable<Booking> GetBookingsInRange(DateTime startDate, DateTime endDate);
 
-        IEnumerable<Booking> GetBookingsByStatus(string status);
+        IEnumerable<Booking> GetBookingsByStatus(BookingStatus status);
 
         IEnumerable<Booking> GetBookingsByCustomer(int customerID);
     }

@@ -19,7 +19,8 @@ namespace DataLayer.Repositories
         /// <param name="status"></param>
         public IEnumerable<BookingAccommodation> GetBookedAccommodations(string status)
         {
-            if (string.IsNullOrWhiteSpace(status))
+            if (string.IsNullOrWhiteSpace(status) ||
+                !Enum.TryParse<BookingStatus>(status, true, out var parsedStatus))
             {
                 return Enumerable.Empty<BookingAccommodation>();
             }
@@ -27,7 +28,7 @@ namespace DataLayer.Repositories
             return _context.Set<BookingAccommodation>()
                 .Include(ba => ba.Accommodation)
                 .Include(ba => ba.Booking)
-                .Where(ba => ba.Booking != null && ba.Booking.Status == status.Trim())
+                .Where(ba => ba.Booking != null && ba.Booking.BookingStatus == parsedStatus)
                 .AsNoTracking()
                 .ToList();
         }
@@ -50,7 +51,7 @@ namespace DataLayer.Repositories
                 .Include(ba => ba.Booking)
                 .Any(ba => ba.AccommodationID == accommodationID &&
                            ba.Booking != null &&
-                           ba.Booking.Status != "Cancelled" &&
+                           ba.Booking.BookingStatus != BookingStatus.Cancelled &&
                            ba.StartDate < endDate &&
                            ba.EndDate > startDate);
         }

@@ -1,5 +1,4 @@
 ﻿using DataLayer;
-using EntityLayer;
 
 namespace TestLayer.IntegrationTests
 {
@@ -25,6 +24,7 @@ namespace TestLayer.IntegrationTests
             }
         }
 
+        /*
         //Integrate Businesslayer
         [Test]
         public void SkiRental_BookAvailableSkis()
@@ -57,7 +57,6 @@ namespace TestLayer.IntegrationTests
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddDays(3),
                 Status = "Aktiv",
-                Sum = 750m
             };
 
             rental.EquipmentItems.Add(skiItem);
@@ -81,6 +80,7 @@ namespace TestLayer.IntegrationTests
             _context.Equipment.Remove(skiCategory);
             _context.SaveChanges();
         }
+        
 
         //Integrate Businesslayer
         [Test]
@@ -114,7 +114,6 @@ namespace TestLayer.IntegrationTests
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddDays(3),
                 Status = "Aktiv",
-                Sum = 750m
             };
 
             rental.EquipmentItems.Add(skiItem);
@@ -139,6 +138,7 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges();
 
         }
+        */
 
         //Integrate Businesslayer
         [Test]

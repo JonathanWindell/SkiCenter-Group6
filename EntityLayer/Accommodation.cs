@@ -5,10 +5,10 @@ namespace EntityLayer
 {
     public enum accommodationStatus
     {
-        Available,
-        Rented,
-        Damaged,
-        Maintenance
+        Available = 0,
+        Rented = 1,
+        Damaged = 2,
+        Maintenance = 3
     }
 
     public class Accommodation
@@ -20,7 +20,7 @@ namespace EntityLayer
         [Required]
         public string AccommodationNumber { get; set; }
 
-        // S// T.ex. "Available", "Cleaning", "Maintenance"
+        // "Available", "Cleaning", "Maintenance"
         [Required]
         public accommodationStatus Status { get; set; }
 

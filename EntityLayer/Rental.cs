@@ -19,8 +19,6 @@ namespace EntityLayer
 
         public string Status { get; set; }
 
-        public decimal Sum { get; set; }
-
         // Parameterless constructor for EF 
         public Rental() { }
 
@@ -33,7 +31,6 @@ namespace EntityLayer
             EndDate = endDate;
             ReturnDate = returnDate;
             Status = status;
-            Sum = sum;
         }
     }
 }
