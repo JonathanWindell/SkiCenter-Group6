@@ -24,6 +24,7 @@ namespace EntityLayer
         public int EquipmentItemID { get; set; }
 
         // Unique number for each post in database. 
+        [Required]
         public string ArticleNumber { get; set; }
 
         // Status for item, ex. Available, Broken, etc. 
