@@ -70,6 +70,10 @@ namespace PresentationLayer.Views
             CorporateFields.Visibility = CustomerTypeComboBox.SelectedIndex == 1
                     ? Visibility.Visible
                     : Visibility.Collapsed;
+
+            PrivateFields.Visibility = CustomerTypeComboBox.SelectedIndex == 1
+                ? Visibility.Collapsed
+                : Visibility.Visible;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)

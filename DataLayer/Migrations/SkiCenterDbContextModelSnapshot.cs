@@ -192,6 +192,10 @@ namespace DataLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal>("CreditLimit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasMaxLength(21)
@@ -545,10 +549,6 @@ namespace DataLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("CreditLimit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("DiscountRate")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -567,10 +567,6 @@ namespace DataLayer.Migrations
                 {
                     b.HasBaseType("EntityLayer.Customer");
 
-                    b.Property<decimal>("CreditLimit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -578,12 +574,6 @@ namespace DataLayer.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("Customers", t =>
-                        {
-                            t.Property("CreditLimit")
-                                .HasColumnName("PrivateCustomer_CreditLimit");
-                        });
 
                     b.HasDiscriminator().HasValue("PrivateCustomer");
                 });
