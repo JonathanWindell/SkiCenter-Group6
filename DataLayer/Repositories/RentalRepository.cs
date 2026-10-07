@@ -72,7 +72,7 @@ namespace DataLayer.Repositories
 
             return _context.Set<Rental>()
                 .Include(r => r.EquipmentItems)
-                    .ThenInclude(ei => ei.Equipment)
+                .ThenInclude(ei => ei.Equipment)
                 .AsNoTracking()
                 .ToList();
         }
