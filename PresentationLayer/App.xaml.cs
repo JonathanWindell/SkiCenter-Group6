@@ -1,4 +1,14 @@
-﻿using BusinessLayer.Controllers;
+﻿using BusinessLayer;
+using BusinessLayer.Controllers;
+using DataLayer;
+using DataLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PresentationLayer.Views;
+using System.Configuration;
+using System.Data;
+using System.Windows;
+using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
 using DataLayer.Repositories;
@@ -54,9 +64,12 @@ namespace PresentationLayer
             services.AddTransient<DashboardView>();
             services.AddTransient<CustomerRegistrationView>();
             services.AddTransient<EquipmentMgmtView>();
+            services.AddTransient<CustomerBookingsView>();
+            services.AddTransient<BookingDetailsView>();
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
+            services.AddTransient<BookingController>(); 
             services.AddTransient<CustomerController>();
             services.AddTransient<DashboardController>();
 
