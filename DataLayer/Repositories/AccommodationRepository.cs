@@ -32,7 +32,7 @@ namespace DataLayer.Repositories
 
             var bookedAccommodationIds = _context.Set<BookingAccommodation>()
                 .Where(ba => ba.Booking != null &&
-                             ba.Booking.Status != "Cancelled" &&
+                             ba.Booking.BookingStatus != BookingStatus.Cancelled &&
                              ba.StartDate < endDate &&
                              ba.EndDate > startDate)
                 .Select(ba => ba.AccommodationID)

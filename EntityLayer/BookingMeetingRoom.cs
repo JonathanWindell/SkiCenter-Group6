@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
     public class BookingMeetingRoom
     {
-        public int BookingMeetingID { get; set; }
+        public int BookingMeetingRoomID { get; set; }
 
         public DateTime StartDate { get; set; }
 

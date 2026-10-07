@@ -22,12 +22,6 @@ namespace EntityLayer
         public int Capacity { get; set; }
 
         [Required]
-        public DateTime StartDate { get; set; }
-
-        [Required]
-        public DateTime EndDate { get; set; }
-
-        [Required]
         public string Description { get; set; }
 
         [Required]
@@ -39,17 +33,14 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public MeetingRoom() { }
 
-        // Relation to Booking. Many to Many Relation. 
-        public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
-
-        public MeetingRoom(int capacity, DateTime startDate, DateTime endDate, string description, decimal price, meetingRoomStatus status)
+        public MeetingRoom(int capacity, string description, decimal price, meetingRoomStatus status)
         {
             Capacity = capacity;
-            StartDate = startDate;
-            EndDate = endDate;
             Description = description;
             Price = price;
             Status = status;
         }
+
+        public virtual ICollection<BookingMeetingRoom> BookingMeetingRooms { get; set; } = new List<BookingMeetingRoom>();
     }
 }

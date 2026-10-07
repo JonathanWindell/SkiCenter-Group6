@@ -55,9 +55,9 @@ namespace BusinessLayer
         /// </summary>
         /// <param name="status"/param>
         /// <returns>A collection of bookings with the specified status.</returns>
-        public IEnumerable<Booking> GetBookingsByStatus(string status)
+        public IEnumerable<Booking> GetBookingsByStatus(BookingStatus status)
         {
-            if (string.IsNullOrWhiteSpace(status))
+            if (!Enum.IsDefined(typeof(BookingStatus), status))
             {
                 return Enumerable.Empty<Booking>();
             }

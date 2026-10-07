@@ -11,5 +11,13 @@ namespace DataLayer.Repositories
         {
             _context = context;
         }
+
+        /// <summary>
+        /// Gets a specific booking with all its associated data and calculates total price using AmountExcl and Moms
+        /// </summary>
+        public Invoice CalculateAmountInclusiveMoms()
+        {
+            return null;
+        }
     }
 }

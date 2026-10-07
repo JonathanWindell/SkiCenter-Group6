@@ -181,7 +181,9 @@ namespace BusinessLayer.Controllers
             if (customer == null) return false;
 
             // Logic for protecting against customer removal when there is a preliminary or confirmed booking
-            bool hasActiveBookings = customer.Bookings.Any(b => b.Status == "Preliminary" || b.Status == "Confirmed");
+            bool hasActiveBookings = customer.Bookings.Any(b =>
+            b.BookingStatus == BookingStatus.Preliminary ||
+            b.BookingStatus == BookingStatus.Confirmed);
             if (hasActiveBookings)
             {
                 return false;
@@ -207,8 +209,8 @@ namespace BusinessLayer.Controllers
 
             // Checks if last booking ended in 365 days
             return customer.Bookings.Any(b =>
-                (b.Status == "Confirmed" || b.Status == "Completed") &&
-                b.Accommodations.Any(ba => ba.EndDate >= oneYearAgo));
+                (b.BookingStatus == BookingStatus.Finished) &&
+                b.Accommodations.Any(ba => ba.EndDate >= oneYearAgo && ba.EndDate <= DateTime.Now));
         }
 
         /// <summary>

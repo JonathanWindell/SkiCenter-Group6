@@ -3,18 +3,35 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    public enum BookingStatus
+    {
+        Preliminary = 0,
+        Confirmed = 1,
+        Cancelled = 2,
+        Finished = 3
+    }
+
+    public enum CheckInStatus
+    {
+        NotCheckedIn = 0,
+        CheckedIn = 1,
+        CheckedOut = 2
+    }
+
     public class Booking
     {
         [Key]
         public int BookingID { get; set; }
 
-        //Date when booking was made. 
+        // Date when booking was made. 
         [Required]
         public DateTime BookingDate { get; set; }
 
         // Sets standard status to preliminary
         [Required]
-        public string Status { get; set; } // "Preliminary", "Confirmed", "Cancelled"
+        public BookingStatus BookingStatus { get; set; }
+
+        public CheckInStatus CheckInStatus { get; set; } = CheckInStatus.NotCheckedIn;
 
         // Check if CancellationInsurance is Active
         [Required]
@@ -27,20 +44,12 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public Booking() { }
 
-        public Booking(DateTime bookingDate, string status, bool hasCancellationInsurance, decimal totalAmount)
-        {
-            BookingDate = bookingDate;
-            Status = status;
-            HasCancellationInsurance = hasCancellationInsurance;
-            TotalAmount = totalAmount;
-        }
-
         /// <summary>
         /// Given booking is central with Many to Many relations collections are used to create necessary connection.
         /// </summary>
         public virtual ICollection<BookingAccommodation> Accommodations { get; set; } = new List<BookingAccommodation>();
 
-        public virtual ICollection<MeetingRoom> MeetingRooms { get; set; } = new List<MeetingRoom>();
+        public virtual ICollection<BookingMeetingRoom> MeetingRooms { get; set; } = new List<BookingMeetingRoom>();
 
         public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
@@ -48,10 +57,9 @@ namespace EntityLayer
 
         public virtual ICollection<SkiLessonBooking> SkiLessons { get; set; } = new List<SkiLessonBooking>();
 
-
         // Relation to Customer. Foreign Key
         [ForeignKey("Customer")]
-        public int CustomerID { get; private set; }
+        public int CustomerID { get; set; }
         public virtual Customer Customer { get; set; }
     }
 }

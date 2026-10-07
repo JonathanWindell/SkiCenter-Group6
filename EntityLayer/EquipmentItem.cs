@@ -5,18 +5,17 @@ namespace EntityLayer
 {
     public enum EquipmentStatus
     {
-        Available,
-        Rented,
-        Damaged,
-        Maintenance,
-        Archived
+        Available = 0,
+        Rented = 1,
+        Damaged = 2,
+        Maintenance = 3
     }
 
     public enum EquipmentCondition
     {
-        New,
-        BarelyUsed,
-        Worn
+        New = 0,
+        BarelyUsed = 1,
+        Worn = 2
     }
 
     public class EquipmentItem

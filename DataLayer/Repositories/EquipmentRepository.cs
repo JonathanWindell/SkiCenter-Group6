@@ -29,5 +29,22 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        /// <summary>
+        /// Get all equipment by category and fetches information regarding price for number of days.  
+        /// </summary>
+        /// <param name="category"></param>
+        public IEnumerable<Equipment> GetEquipmentWithPricesByCategory(string category)
+        {
+            if (string.IsNullOrWhiteSpace(category))
+            {
+                return Enumerable.Empty<Equipment>();
+            }
+
+            return _context.Set<Equipment>()
+                .Where(e => e.Category == category)
+                .Include(e => e.Prices)
+                .ToList();
+        }
     }
 }

@@ -4,6 +4,7 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SkiCenterDbContext))]
-    partial class SkiCenterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261007074340_RefactoredEntitiesToThirdNormalForm")]
+    partial class RefactoredEntitiesToThirdNormalForm
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,12 +85,6 @@ namespace DataLayer.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("BookingStatus")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CheckInStatus")
-                        .HasColumnType("int");
-
                     b.Property<int>("CustomerID")
                         .HasColumnType("int");
 
@@ -96,6 +93,10 @@ namespace DataLayer.Migrations
 
                     b.Property<int?>("StaffID")
                         .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
                         .HasPrecision(18, 2)
@@ -385,6 +386,10 @@ namespace DataLayer.Migrations
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Sum")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("RentalID");
 
