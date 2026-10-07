@@ -38,7 +38,8 @@ namespace BusinessLayer.Controllers
                 SystemModule.Bookings,
                 SystemModule.CustomerRegistration,
                 SystemModule.Accommodation,
-                SystemModule.SkiSchool
+                SystemModule.SkiSchool,
+                SystemModule.EquipmentManagement
             },
             [staffRole.MarketingManager] = new[]
             {
