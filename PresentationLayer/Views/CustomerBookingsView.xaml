@@ -20,6 +20,7 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
@@ -32,39 +33,102 @@
                                FontWeight="Bold"
                                Foreground="{StaticResource PrimaryText}"/>
 
-                    <TextBlock Text="Se kundens aktuella och tidigare bokningar."
+                    <TextBlock Text="Sök efter en kund för att se aktuella och tidigare bokningar."
                                Margin="0,6,0,0"
                                FontSize="13"
                                Foreground="{StaticResource SecondaryText}"/>
 
                 </StackPanel>
 
-                <!-- Customer information -->
+                <!-- Customer search -->
                 <Border Grid.Row="1"
-                        Margin="0,25,0,20"
-                        Padding="15"
+                        Margin="0,25,0,0"
+                        Padding="20"
                         BorderBrush="{StaticResource InputBorder}"
                         BorderThickness="1"
-                        CornerRadius="8">
+                        CornerRadius="10">
 
                     <StackPanel>
 
-                        <!-- Selected customer information -->
+                        <TextBlock Text="Sök kund"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryText}"/>
+
+                        <TextBlock Text="Sök med namn, e-post, telefonnummer, företagsnamn eller organisationsnummer."
+                                   Margin="0,5,0,12"
+                                   FontSize="12"
+                                   Foreground="{StaticResource SecondaryText}"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBox x:Name="CustomerSearchTextBox"
+                                     Grid.Column="0"
+                                     Height="38"
+                                     Padding="10,7"
+                                     Margin="0,0,12,0"
+                                     VerticalContentAlignment="Center"
+                                     BorderBrush="{StaticResource InputBorder}"
+                                     BorderThickness="1"
+                                     FontSize="14"/>
+
+                            <Button x:Name="SearchCustomerButton"
+                                    Grid.Column="1"
+                                    Content="Sök"
+                                    Width="100"
+                                    Height="38"
+                                    Style="{StaticResource DeepSeaButtonStyle}"
+                                    Click="SearchCustomer_Click"/>
+
+                        </Grid>
+
+                        <!-- Search error message -->
+                        <TextBlock x:Name="CustomerSearchMessage"
+                                   Margin="0,10,0,0"
+                                   FontSize="12"
+                                   Foreground="Red"
+                                   Visibility="Collapsed"/>
+
+                    </StackPanel>
+                </Border>
+
+                <!-- Selected customer information -->
+                <Border x:Name="CustomerInformationBorder"
+                        Grid.Row="2"
+                        Margin="0,15,0,20"
+                        Padding="15"
+                        BorderBrush="{StaticResource InputBorder}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Visibility="Collapsed">
+
+                    <StackPanel>
+
+                        <TextBlock Text="VALD KUND"
+                                   FontSize="12"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource SecondaryText}"
+                                   Margin="0,0,0,8"/>
+
                         <TextBlock x:Name="CustomerNameTextBlock"
-           FontSize="16"
-           FontWeight="SemiBold"
-           Foreground="{StaticResource PrimaryText}"/>
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource PrimaryText}"/>
 
                         <TextBlock x:Name="CustomerEmailTextBlock"
-           Margin="0,4,0,0"
-           Foreground="{StaticResource SecondaryText}"/>
+                                   Margin="0,4,0,0"
+                                   Foreground="{StaticResource SecondaryText}"/>
 
                     </StackPanel>
                 </Border>
 
                 <!-- Message displayed when the customer has no bookings -->
                 <StackPanel x:Name="NoBookingsMessage"
-                            Grid.Row="2"
+                            Grid.Row="3"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Visibility="Collapsed">
@@ -83,9 +147,11 @@
                 </StackPanel>
 
                 <!-- Booking list -->
-                <ScrollViewer Grid.Row="2"
+                <ScrollViewer x:Name="BookingsScrollViewer"
+                              Grid.Row="3"
                               VerticalScrollBarVisibility="Auto"
-                              HorizontalScrollBarVisibility="Disabled">
+                              HorizontalScrollBarVisibility="Disabled"
+                              Visibility="Collapsed">
 
                     <!-- Creates one booking card for each booking in the collection -->
                     <ItemsControl x:Name="BookingsItemsControl">
@@ -221,7 +287,7 @@
                 </ScrollViewer>
 
                 <!-- Back button -->
-                <Button Grid.Row="3"
+                <Button Grid.Row="4"
                         Content="Tillbaka"
                         Width="110"
                         Height="38"

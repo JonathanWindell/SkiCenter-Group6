@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using BusinessLayer;
+using BusinessLayer.Controllers;
 using EntityLayer;
 
 namespace PresentationLayer.Views
@@ -13,12 +14,65 @@ namespace PresentationLayer.Views
     public partial class CustomerBookingsView : Window
     {
         private readonly BookingController _bookingController;
+        private readonly CustomerController _customerController;
 
-        public CustomerBookingsView(BookingController bookingController)
+        public CustomerBookingsView(
+            BookingController bookingController,
+            CustomerController customerController)
         {
             InitializeComponent();
 
             _bookingController = bookingController;
+            _customerController = customerController;
+        }
+
+        /// <summary>
+        /// Searches for a customer and loads the customer's bookings.
+        /// </summary>
+        private void SearchCustomer_Click(object sender, RoutedEventArgs e)
+        {
+            CustomerSearchMessage.Visibility = Visibility.Collapsed;
+            CustomerInformationBorder.Visibility = Visibility.Collapsed;
+            NoBookingsMessage.Visibility = Visibility.Collapsed;
+            BookingsScrollViewer.Visibility = Visibility.Collapsed;
+
+            string searchItem = CustomerSearchTextBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(searchItem))
+            {
+                CustomerSearchMessage.Text = "Ange något att söka efter.";
+                CustomerSearchMessage.Visibility = Visibility.Visible;
+                return;
+            }
+
+            Customer customer = _customerController.SearchCustomer(searchItem);
+
+            if (customer == null)
+            {
+                CustomerSearchMessage.Text = "Ingen kund hittades.";
+                CustomerSearchMessage.Visibility = Visibility.Visible;
+                return;
+            }
+
+            // Displays the correct customer name depending on customer type.
+            if (customer is PrivateCustomer privateCustomer)
+            {
+                CustomerNameTextBlock.Text =
+                    $"{privateCustomer.FirstName} {privateCustomer.LastName}";
+            }
+            else if (customer is CorporateCustomer corporateCustomer)
+            {
+                CustomerNameTextBlock.Text = corporateCustomer.CompanyName;
+            }
+            else
+            {
+                CustomerNameTextBlock.Text = $"Kund #{customer.CustomerID}";
+            }
+
+            CustomerEmailTextBlock.Text = customer.Email;
+            CustomerInformationBorder.Visibility = Visibility.Visible;
+
+            LoadCustomerBookings(customer.CustomerID);
         }
 
         /// <summary>
@@ -36,12 +90,12 @@ namespace PresentationLayer.Views
             if (bookings.Count == 0)
             {
                 NoBookingsMessage.Visibility = Visibility.Visible;
-                BookingsItemsControl.Visibility = Visibility.Collapsed;
+                BookingsScrollViewer.Visibility = Visibility.Collapsed;
             }
             else
             {
                 NoBookingsMessage.Visibility = Visibility.Collapsed;
-                BookingsItemsControl.Visibility = Visibility.Visible;
+                BookingsScrollViewer.Visibility = Visibility.Visible;
             }
         }
 
@@ -50,10 +104,16 @@ namespace PresentationLayer.Views
         {
             if (sender is Button button && button.DataContext is Booking booking)
             {
-                BookingDetailsView bookingDetailsView =
-                    new BookingDetailsView(booking);
+                Booking specificBooking =
+                    _bookingController.GetSpecificBooking(booking.BookingID);
 
-                bookingDetailsView.ShowDialog();
+                if (specificBooking != null)
+                {
+                    BookingDetailsView bookingDetailsView =
+                        new BookingDetailsView(specificBooking);
+
+                    bookingDetailsView.ShowDialog();
+                }
             }
         }
 
