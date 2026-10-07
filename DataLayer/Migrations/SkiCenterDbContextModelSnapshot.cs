@@ -405,16 +405,16 @@ namespace DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SeasonPriceID"));
 
-                    b.Property<string>("AccommodationType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("AccommodationTypeID")
+                    b.Property<int>("AccommodationTypeID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WeekNumber")
                         .HasColumnType("int");
@@ -607,7 +607,7 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("EntityLayer.BookingAccommodation", b =>
                 {
                     b.HasOne("EntityLayer.Accommodation", "Accommodation")
-                        .WithMany()
+                        .WithMany("BookingAccommodations")
                         .HasForeignKey("AccommodationID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -688,9 +688,13 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("EntityLayer.SeasonPrice", b =>
                 {
-                    b.HasOne("EntityLayer.AccommodationType", null)
+                    b.HasOne("EntityLayer.AccommodationType", "AccommodationType")
                         .WithMany("SeasonPrices")
-                        .HasForeignKey("AccommodationTypeID");
+                        .HasForeignKey("AccommodationTypeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AccommodationType");
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLessonBooking", b =>
@@ -721,6 +725,11 @@ namespace DataLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("SkiLesson");
+                });
+
+            modelBuilder.Entity("EntityLayer.Accommodation", b =>
+                {
+                    b.Navigation("BookingAccommodations");
                 });
 
             modelBuilder.Entity("EntityLayer.AccommodationType", b =>

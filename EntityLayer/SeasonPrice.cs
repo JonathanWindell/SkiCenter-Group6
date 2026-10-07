@@ -7,25 +7,28 @@ namespace EntityLayer
         [Key]
         public int SeasonPriceID { get; set; }
 
-        // Type of apartment. Nr 1 or 2
-        [Required]
-        public string AccommodationType { get; set; }
-
         // Week number in year
         [Required]
         public int WeekNumber { get; set; }
+
+        // Type of Price. Week, Weekend or Week. 
+        [Required]
+        public string PriceType { get; set; }
 
         // Price per apartment
         [Required]
         public decimal Price { get; set; }
 
+        public int AccommodationTypeID { get; set; }
+        public virtual AccommodationType AccommodationType { get; set; }
+
         // Parameterless constructor for EF 
         public SeasonPrice() { }
 
-        public SeasonPrice(string accommodationType, int weekNumber, decimal price)
+        public SeasonPrice(int weekNumber, string priceType, decimal price)
         {
-            AccommodationType = accommodationType;
             WeekNumber = weekNumber;
+            PriceType = priceType;
             Price = price;
         }
     }

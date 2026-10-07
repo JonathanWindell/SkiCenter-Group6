@@ -18,15 +18,20 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="accommodationType"></param>
         /// <param name="week"></param>
-        public SeasonPrice GetSeasonPrice(string accommodationType, int week)
+        public SeasonPrice GetSeasonPrice(string categoryCode, int week, string priceType)
         {
-            if (string.IsNullOrWhiteSpace(accommodationType) || week <= 0)
+            if (string.IsNullOrWhiteSpace(categoryCode) || week <= 0)
             {
                 return null;
             }
 
+            string code = categoryCode.Trim();
+
             return _context.Set<SeasonPrice>()
-                .FirstOrDefault(sp => sp.AccommodationType == accommodationType.Trim() && sp.WeekNumber == week);
+                .Include(sp => sp.AccommodationType)
+                .FirstOrDefault(sp => sp.AccommodationType.CategoryCode == code &&
+                                      sp.WeekNumber == week &&
+                                      sp.PriceType == priceType);
         }
 
         /// <summary>
@@ -59,15 +64,18 @@ namespace DataLayer.Repositories
         /// Gets all season prices for a specific type of accommodation.
         /// </summary>
         /// <param name="accommodationType"></param>
-        public IEnumerable<SeasonPrice> GetPricesByType(string accommodationType)
+        public IEnumerable<SeasonPrice> GetPricesByType(string categoryCode)
         {
-            if (string.IsNullOrWhiteSpace(accommodationType))
+            if (string.IsNullOrWhiteSpace(categoryCode))
             {
                 return Enumerable.Empty<SeasonPrice>();
             }
 
+            string code = categoryCode.Trim();
+
             return _context.Set<SeasonPrice>()
-                .Where(sp => sp.AccommodationType == accommodationType.Trim())
+                .Include(sp => sp.AccommodationType)
+                .Where(sp => sp.AccommodationType.CategoryCode == code)
                 .OrderBy(sp => sp.WeekNumber)
                 .AsNoTracking()
                 .ToList();
