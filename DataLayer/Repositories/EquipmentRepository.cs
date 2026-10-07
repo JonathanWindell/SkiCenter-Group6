@@ -46,5 +46,16 @@ namespace DataLayer.Repositories
                 .Include(e => e.Prices)
                 .ToList();
         }
+
+        /// <summary>
+        /// Gets all equipment including articles with stock count. 
+        /// </summary>
+        public IEnumerable<Equipment> GetAllEquipmentWithStock()
+        {
+            return _context.Set<Equipment>()
+                .Include(e => e.EquipmentItems)
+                .AsNoTracking()
+                .ToList();
+        }
     }
 }
