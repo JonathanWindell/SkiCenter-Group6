@@ -38,6 +38,11 @@
         IEquipmentRepository Equipment { get; }
 
         /// <summary>
+        /// Repository for managing specific items.
+        /// </summary>
+        IEquipmentItemRepository EquipmentItem { get; }
+
+        /// <summary>
         /// Repository for handling skilessons.
         /// </summary>
         ISkiLessonRepository SkiLesson { get; }

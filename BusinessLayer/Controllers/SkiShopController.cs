@@ -103,15 +103,15 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            var newItem = new EquipmentItem(
-                EquipmentStatus.Available,
-                EquipmentCondition.New,
-                size.Trim(),
-                articleNumber.Trim())
+            var newItem = new EquipmentItem
             {
+                ArticleNumber = articleNumber.Trim(),
+                Status = EquipmentStatus.Available,
+                Condition = EquipmentCondition.New,
+                Size = size.Trim(),
                 EquipmentID = equipmentId
             };
-
+     
             _unitOfWork.EquipmentItem.Add(newItem);
             return _unitOfWork.Complete() > 0;
         }
@@ -139,7 +139,7 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            _unitOfWork.EquipmentItem.Remove(item);
+            _unitOfWork.EquipmentItem.Delete(item);
             return _unitOfWork.Complete() > 0;
         }
 
