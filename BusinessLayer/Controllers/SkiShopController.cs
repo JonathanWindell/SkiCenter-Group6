@@ -13,11 +13,19 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
-        /// Gets all equipment types with their current stock.
+        /// Gets all equipment types and models with their current stock.
         /// </summary>
         public IEnumerable<Equipment> GetAllEquipmentWithStock()
         {
             return _unitOfWork.Equipment.GetAllEquipmentWithStock();
+        }
+
+        /// <summary>
+        /// Gets a list of all individual items in the system.
+        /// </summary>
+        public IEnumerable<EquipmentItem> GetAllEquipmentItems()
+        {
+            return _unitOfWork.EquipmentItem.GetAllEquipmentItems();
         }
 
         /// <summary>
