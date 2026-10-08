@@ -3,7 +3,7 @@ using EntityLayer;
 
 namespace BusinessLayer.Controllers
 {
-    public class SkiShopController // WIP
+    public class SkiShopController
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -76,14 +76,14 @@ namespace BusinessLayer.Controllers
         /// /// <param name="articleNumber"/param>
         /// /// <param name="status"/param>
         /// /// <param name="condition"/param>
-        public bool UpdateItemConditionAndStatus(string articleNumber, EquipmentStatus status, EquipmentCondition condition)
+        public bool UpdateEquipmentItem(string articleNumber, int equipmentID, string size, EquipmentStatus status, EquipmentCondition condition)
         {
-            if (string.IsNullOrWhiteSpace(articleNumber))
+            if (string.IsNullOrWhiteSpace(articleNumber) || string.IsNullOrWhiteSpace(size))
             {
                 return false;
             }
-
-            _unitOfWork.EquipmentItem.UpdateStatusAndCondition(articleNumber, status, condition);
+   
+            _unitOfWork.EquipmentItem.UpdateEquipmentItem(articleNumber, equipmentID, size, status, condition);
             return _unitOfWork.Complete() > 0;
         }
 
@@ -93,10 +93,10 @@ namespace BusinessLayer.Controllers
         /// <param name="equipmentId"/param>
         /// <param name="articleNumber"/param>
         /// <param name="size"/param>
-        /// <param name="pricePerDay"/param>
+        /// <param name="status"/param>
         /// <param name="condition"/param>
         /// <returns>True if the add was successful, otherwise false.</returns>
-        public bool AddEquipmentItem(int equipmentId, string articleNumber, string size, decimal pricePerDay, EquipmentCondition condition = EquipmentCondition.New)
+        public bool AddEquipmentItem(int equipmentId, string articleNumber, string size, EquipmentStatus status, EquipmentCondition condition)
         {
             // Validation
             if (equipmentId <= 0 || string.IsNullOrWhiteSpace(articleNumber) || string.IsNullOrWhiteSpace(size))
@@ -114,8 +114,8 @@ namespace BusinessLayer.Controllers
             var newItem = new EquipmentItem
             {
                 ArticleNumber = articleNumber.Trim(),
-                Status = EquipmentStatus.Available,
-                Condition = EquipmentCondition.New,
+                Status = status,
+                Condition = condition,
                 Size = size.Trim(),
                 EquipmentID = equipmentId
             };

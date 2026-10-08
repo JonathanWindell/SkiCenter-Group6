@@ -15,6 +15,8 @@ namespace EntityLayer
         [Required]
         public string Category { get; set; }
 
+        public string DisplayName => $"{Category} - {Description}";
+
         // Many to Many relations
         public virtual ICollection<EquipmentItem> EquipmentItems { get; set; }
         public virtual ICollection<EquipmentPriceMatrix> Prices { get; set; }
