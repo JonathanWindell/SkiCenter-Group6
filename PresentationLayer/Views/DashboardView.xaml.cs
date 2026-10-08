@@ -31,7 +31,7 @@ namespace PresentationLayer.Views
             [SystemModule.Bookings] = new("Bokningar", "Skapa och hantera bokningar", typeof(CustomerBookingsView)),
             [SystemModule.Accommodation] = new("Boende", "Lägenheter, stugor och konferensrum", null),
             [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", null),
-            [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", null),
+            [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", typeof(SeasonPriceView)),
             [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", null),
             [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", null)
         };

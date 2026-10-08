@@ -4,6 +4,7 @@ using DataLayer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataLayer.Migrations
 {
     [DbContext(typeof(SkiCenterDbContext))]
-    partial class SkiCenterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261008102513_AddSeasonPriceHistory")]
+    partial class AddSeasonPriceHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -401,7 +404,11 @@ namespace DataLayer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SeasonPriceID"));
 
-                    b.Property<int>("AccommodationTypeID")
+                    b.Property<string>("AccommodationType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("AccommodationTypeID")
                         .HasColumnType("int");
 
                     b.Property<int?>("ChangedByStaffID")
@@ -410,10 +417,6 @@ namespace DataLayer.Migrations
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PriceType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ValidFrom")
                         .HasColumnType("datetime2");
@@ -424,8 +427,6 @@ namespace DataLayer.Migrations
                     b.HasKey("SeasonPriceID");
 
                     b.HasIndex("AccommodationTypeID");
-
-                    b.HasIndex("ChangedByStaffID");
 
                     b.ToTable("SeasonPrices");
                 });
@@ -706,20 +707,9 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("EntityLayer.SeasonPrice", b =>
                 {
-                    b.HasOne("EntityLayer.AccommodationType", "AccommodationType")
+                    b.HasOne("EntityLayer.AccommodationType", null)
                         .WithMany("SeasonPrices")
-                        .HasForeignKey("AccommodationTypeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EntityLayer.Staff", "ChangedBy")
-                        .WithMany()
-                        .HasForeignKey("ChangedByStaffID")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("AccommodationType");
-
-                    b.Navigation("ChangedBy");
+                        .HasForeignKey("AccommodationTypeID");
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLessonBooking", b =>
