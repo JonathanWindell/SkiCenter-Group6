@@ -191,26 +191,26 @@
                                 Margin="0,12,0,0">
 
                         <Button x:Name="EditEquipmentButton"
-                                Content="Ändra"
-                                Width="105"
-                                Height="36"
-                                IsEnabled="False"
-                                Margin="0,0,10,0">
+                            Content="Ändra"
+                            Width="105"
+                            Height="36"
+                            IsEnabled="False"
+                            Margin="0,0,10,0"
+                            Style="{StaticResource DeepSeaButtonStyle}"/>
+
+                        <Button x:Name="DeleteEquipmentButton"
+                            Content="Ta bort"
+                            Width="105"
+                            Height="36"
+                            IsEnabled="False">
                             <Button.Style>
                                 <Style TargetType="Button"
-                                       BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                BasedOn="{StaticResource DeepSeaButtonStyle}">
                                     <Setter Property="Background" Value="#E5E7EB"/>
                                     <Setter Property="Foreground" Value="#374151"/>
                                 </Style>
                             </Button.Style>
                         </Button>
-
-                        <Button x:Name="ArchiveEquipmentButton"
-                                Content="Arkivera"
-                                Width="105"
-                                Height="36"
-                                IsEnabled="False"
-                                Style="{StaticResource DeepSeaButtonStyle}"/>
                     </StackPanel>
                 </Grid>
 
@@ -306,18 +306,6 @@
                                     <ColumnDefinition Width="12"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Pris per dag (kr) *"
-                                               Foreground="{StaticResource PrimaryText}"
-                                               Margin="0,0,0,4"/>
-
-                                    <TextBox x:Name="EquipmentPriceTextBox"
-                                             Height="32"
-                                             Padding="6,3"
-                                             VerticalContentAlignment="Center"
-                                             BorderBrush="{StaticResource InputBorder}"/>
-                                </StackPanel>
 
                                 <StackPanel Grid.Column="2">
                                     <TextBlock Text="Status *"

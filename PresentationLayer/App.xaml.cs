@@ -72,6 +72,7 @@ namespace PresentationLayer
             services.AddTransient<BookingController>(); 
             services.AddTransient<CustomerController>();
             services.AddTransient<DashboardController>();
+            services.AddTransient<SkiShopController>();
 
             // 3. Register Repositories
             services.AddTransient<ICustomerRepository, CustomerRepository>();

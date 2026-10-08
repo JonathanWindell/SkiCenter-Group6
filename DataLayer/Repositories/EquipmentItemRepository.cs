@@ -27,6 +27,17 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
+        /// Gets a list of all individual items in the system.
+        /// </summary>
+        /// 
+        public IEnumerable<EquipmentItem> GetAllEquipmentItems()
+        {
+            return _context.EquipmentItems
+                .Include(ei => ei.Equipment)
+                .ToList();
+        }
+
+        /// <summary>
         /// Gets all items of a equipment type that is available. 
         /// </summary>
         /// <param name="equipmentID"></param>
