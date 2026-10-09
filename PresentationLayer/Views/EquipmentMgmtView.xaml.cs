@@ -384,5 +384,10 @@ namespace PresentationLayer.Views
 
             CollectionViewSource.GetDefaultView(_previewItems)?.Refresh();
         }
+
+        private void CategoryFilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }
