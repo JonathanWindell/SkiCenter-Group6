@@ -326,13 +326,22 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock x:Name="SelectedGuestTextBlock"
-                           Grid.Column="0"
-                           Text="Välj en bokning i listan."
-                           VerticalAlignment="Center"
-                           TextWrapping="Wrap"
-                           Margin="0,0,15,0"
-                           Foreground="{StaticResource PrimaryText}"/>
+                <StackPanel Grid.Column="0"
+                            VerticalAlignment="Center"
+                            Margin="0,0,15,0">
+
+                    <TextBlock x:Name="SelectedGuestTextBlock"
+                               Text="Välj en bokning i listan."
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource PrimaryText}"/>
+
+                    <TextBlock x:Name="SelectedGuestDetailsTextBlock"
+                               Margin="0,6,0,0"
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource SecondaryText}"/>
+                </StackPanel>
 
                 <StackPanel Grid.Column="1" MaxWidth="350">
                     <!-- Permission information will use the logged-in user's access. -->

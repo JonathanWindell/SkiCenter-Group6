@@ -48,6 +48,12 @@ namespace PresentationLayer.Views
             SelectedGuestTextBlock.Text =
                 $"Bokning {guest.BookingID} – {guest.CustomerName}";
 
+            //Show the accommodation name and the arrival/departure dates for the selected guest
+            SelectedGuestDetailsTextBlock.Text =
+                $"{guest.CustomerType} · {guest.AccommodationName}\n" +
+                $"Ankomst: {guest.ArrivalDate:yyyy-MM-dd} · " + $"Avresa: {guest.DepartureDate:yyyy-MM-dd}";
+
+
             // Real user permissions will be supplied by the business layer.
             GuestPermissionTextBlock.Text =
                 "Testvy: användarbehörighet är ännu inte ansluten.";
@@ -216,6 +222,7 @@ namespace PresentationLayer.Views
             CheckOutButton.IsEnabled = false;
             GuestFeedbackBorder.Visibility = Visibility.Collapsed;
             SelectedGuestTextBlock.Text = "Välj en bokning i listan.";
+            SelectedGuestDetailsTextBlock.Text = string.Empty;
 
             if (GuestDatePicker.SelectedDate is not DateTime selectedDate)
             {
