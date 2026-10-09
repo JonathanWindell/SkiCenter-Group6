@@ -4,20 +4,26 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using PresentationLayer.Models;
+using BusinessLayer;
+using EntityLayer;
 
 namespace PresentationLayer.Views
 {
     public partial class GuestCheckInOutView : Window
+
     {
+        // Uses the existing controller to retrieve booking data.
+        private readonly BookingController _bookingController;
         // Preview data only; no database changes are made.
         private readonly ObservableCollection<GuestStayRow> _previewGuests = new();
         private readonly ObservableCollection<GuestStayRow> _visibleGuests = new();
 
-        public GuestCheckInOutView() //runs when window is opned, loads the guests, selects today and connects the controls to their methods
+        public GuestCheckInOutView(BookingController bookingController) 
         {
             InitializeComponent();
+            _bookingController = bookingController;
 
-            AddPreviewGuests();
+            LoadGuests();
             GuestsDataGrid.ItemsSource = _visibleGuests;
             GuestDatePicker.SelectedDate = DateTime.Today;
 
@@ -35,9 +41,15 @@ namespace PresentationLayer.Views
 
         private void GuestsDataGrid_SelectionChanged( object sender, SelectionChangedEventArgs e)
         {
+            // Keep actions disabled until saving and permissions are connected.
             CheckInButton.IsEnabled = false;
             CheckOutButton.IsEnabled = false;
             GuestFeedbackBorder.Visibility = Visibility.Collapsed;
+
+            SelectedGuestTextBlock.Text = "Välj en bokning i listan.";
+            SelectedGuestDetailsTextBlock.Text = string.Empty;
+            GuestPermissionTextBlock.Visibility = Visibility.Collapsed;
+
 
             if (GuestsDataGrid.SelectedItem is not GuestStayRow guest)
             {
@@ -46,7 +58,7 @@ namespace PresentationLayer.Views
             }
 
             SelectedGuestTextBlock.Text =
-                $"Bokning {guest.BookingID} – {guest.CustomerName}";
+                  $"{guest.BookingID} – {guest.CustomerName}";
 
             //Show the accommodation name and the arrival/departure dates for the selected guest
             SelectedGuestDetailsTextBlock.Text =
@@ -56,31 +68,9 @@ namespace PresentationLayer.Views
 
             // Real user permissions will be supplied by the business layer.
             GuestPermissionTextBlock.Text =
-                "Testvy: användarbehörighet är ännu inte ansluten.";
+                "In- och utcheckning är ännu inte kopplad till sparande och behörighet.";
             GuestPermissionTextBlock.Visibility = Visibility.Visible;
 
-            // Preview actions are limited to today's arrivals and departures.
-            if (GuestDatePicker.SelectedDate?.Date != DateTime.Today)
-                return;
-
-            bool canCheckIn =
-                guest.ArrivalDate.Date == DateTime.Today &&
-                guest.StayStatus == "Ej incheckad";
-
-            bool hasUnpaidBalance = guest.PaymentStatus != "Fullbetald";
-
-            CheckInButton.IsEnabled = canCheckIn && !hasUnpaidBalance;
-
-            CheckOutButton.IsEnabled =
-                guest.DepartureDate.Date == DateTime.Today &&
-                guest.StayStatus == "Incheckad";
-
-            if (canCheckIn && hasUnpaidBalance)
-            {
-                GuestFeedbackTextBlock.Text =
-                    "Bokningen är inte fullbetald. Gästen kan inte checkas in.";
-                GuestFeedbackBorder.Visibility = Visibility.Visible;
-            }
         }
 
         private void CheckInButton_Click(object sender, RoutedEventArgs e)
@@ -147,61 +137,63 @@ namespace PresentationLayer.Views
                 $"Bokning {guest.BookingID} – {status.ToLowerInvariant()} i testvyn.";
         }
 
-        private void AddPreviewGuests() // Will hold all our 'fake' guest data
+        private void LoadGuests()
         {
-            DateTime today = DateTime.Today;
+            _previewGuests.Clear();
 
-            _previewGuests.Add(new GuestStayRow
+            try
             {
-                BookingID = 2031,
-                BookingAccommodationID = 1,
-                CustomerName = "Anna Andersson",
-                CustomerType = "Privatkund",
-                AccommodationName = "Stuga 12",
-                ArrivalDate = today,
-                DepartureDate = today.AddDays(7),
-                PaymentStatus = "Fullbetald",
-                StayStatus = "Ej incheckad"
-            });
+                // Load bookings through the existing business controller.
+                var bookings = _bookingController.GetAllBookings();
 
-            _previewGuests.Add(new GuestStayRow
-            {
-                BookingID = 2032,
-                BookingAccommodationID = 2,
-                CustomerName = "Fjällteam AB",
-                CustomerType = "Företagskund",
-                AccommodationName = "Lägenhet 4",
-                ArrivalDate = today,
-                DepartureDate = today.AddDays(5),
-                PaymentStatus = "Obetald",
-                StayStatus = "Ej incheckad"
-            });
+                foreach (Booking booking in bookings)
+                {
+                    if (booking.BookingStatus == BookingStatus.Cancelled)
+                        continue;
 
-            _previewGuests.Add(new GuestStayRow
-            {
-                BookingID = 2033,
-                BookingAccommodationID = 3,
-                CustomerName = "Erik Svensson",
-                CustomerType = "Privatkund",
-                AccommodationName = "Stuga 8",
-                ArrivalDate = today.AddDays(-7),
-                DepartureDate = today,
-                PaymentStatus = "Fullbetald",
-                StayStatus = "Incheckad"
-            });
+                    foreach (BookingAccommodation stay in booking.Accommodations)
+                    {
+                        _previewGuests.Add(new GuestStayRow
+                        {
+                            BookingID = booking.BookingID,
+                            BookingAccommodationID = stay.BookingAccommodationID,
+                            CustomerName =
+                                booking.Customer?.DisplayName ?? "Kunduppgift saknas",
+                            CustomerType = booking.Customer == null
+                                ? "Okänd"
+                                : booking.Customer is CorporateCustomer
+                                    ? "Företagskund"
+                                    : "Privatkund",
+                            AccommodationName = stay.Accommodation?.AccommodationNumber ?? "Boendeuppgift saknas",
+                            ArrivalDate = stay.StartDate,
+                            DepartureDate = stay.EndDate,
 
-            _previewGuests.Add(new GuestStayRow
+                            // Payment rules have not been connected yet.
+                            PaymentStatus = "Ej tillgänglig",
+
+                            StayStatus = booking.CheckInStatus switch
+                            {
+                                CheckInStatus.NotCheckedIn => "Ej incheckad",
+                                CheckInStatus.CheckedIn => "Incheckad",
+                                CheckInStatus.CheckedOut => "Utcheckad",
+                                _ => "Okänd"
+                            }
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                BookingID = 2034,
-                BookingAccommodationID = 4,
-                CustomerName = "Sara Nilsson",
-                CustomerType = "Privatkund",
-                AccommodationName = "Lägenhet 2",
-                ArrivalDate = today.AddDays(-5),
-                DepartureDate = today,
-                PaymentStatus = "Fullbetald",
-                StayStatus = "Utcheckad"
-            });
+                System.Diagnostics.Debug.WriteLine(ex.ToString());
+               
+                _previewGuests.Clear();
+
+                MessageBox.Show(
+                    "Bokningarna kunde inte hämtas. Kontrollera databasanslutningen.",
+                    "Kunde inte läsa bokningar",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
         }
 
         private void FiltersChanged(object sender, SelectionChangedEventArgs e)
