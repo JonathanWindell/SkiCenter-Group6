@@ -81,7 +81,7 @@ namespace TestLayer.IntegrationTests
             var loggedInUser = new Staff("Vincent", "SkiShop@Test.se", "TestSkiShopPassword", "TestSkiShopPassword", staffRole.SkiShop);
 
             // Act
-            bool hasAccesstoSeasonPrices = StaffController.CheckAccessToSeasonPrices(loggedInUser.Role);
+            bool hasAccesstoSeasonPrices = StaffController.CanChangeSeasonPrices(loggedInUser.Role);
 
             // Assert
             Assert.That(hasAccesstoSeasonPrices, Is.False, "Ski-shop personal should be denied season price view");

@@ -3,20 +3,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
-    public enum equipmentStatus
+    public enum EquipmentStatus
     {
-        Available,
-        Rented,
-        Damaged,
-        Maintenance,
-        Archived
+        Available = 0,
+        Rented = 1,
+        Damaged = 2,
+        Maintenance = 3
     }
 
-    public enum equipmentCondition
+    public enum EquipmentCondition
     {
-        New,
-        BarelyUsed,
-        Worn
+        New = 0,
+        BarelyUsed = 1,
+        Worn = 2
     }
 
     public class EquipmentItem
@@ -24,46 +23,29 @@ namespace EntityLayer
         [Key]
         public int EquipmentItemID { get; set; }
 
+        // Unique number for each post in database. 
+        [Required]
+        public string ArticleNumber { get; set; }
+
         // Status for item, ex. Available, Broken, etc. 
         [Required]
         [AllowedValues("Available", "Rented", "Damaged", "Maintenance", ErrorMessage = "Not allowed value")]
-        public equipmentStatus Status { get; set; }
+        public EquipmentStatus Status { get; set; }
 
         // Describes current condition of item.
         [Required]
         [AllowedValues("New", "BarelyUsed", "Worn", ErrorMessage = "Not allowed value")]
-        public equipmentCondition Condition { get; set; }
-
-        // Price per day for item.
-        [Required]
-        public decimal PricePerDay { get; set; }
+        public EquipmentCondition Condition { get; set; }
 
         // Size of item.
         [Required]
         public string Size { get; set; }
 
-        public string ArticleNumber { get; set; }
-
-
-
-        // Relation to Rental. Many to Many relation
-        public virtual ICollection<Rental> Rentals { get; set; } = new List<Rental>();
-
-        // Relation to Equipment. Foreign Key
+        // Relation to Customer. Foreign Key
         [ForeignKey("Equipment")]
         public int EquipmentID { get; set; }
         public virtual Equipment Equipment { get; set; }
 
-        // Parameterless constructor for EF 
         public EquipmentItem() { }
-
-        public EquipmentItem(equipmentStatus status, equipmentCondition condition, decimal pricePerDay, string size, string articleNumber)
-        {
-            Status = status;
-            Condition = condition;
-            PricePerDay = pricePerDay;
-            Size = size;
-            ArticleNumber = articleNumber;
-        }
     }
 }

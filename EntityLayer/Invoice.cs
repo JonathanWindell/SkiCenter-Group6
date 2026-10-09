@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
@@ -23,10 +24,6 @@ namespace EntityLayer
         [Required]
         public decimal Moms { get; set; }
 
-        // Invoice amount including moms.
-        [Required]
-        public decimal AmountIncl { get; set; }
-
         // Status of invoice
         [Required]
         public string Status { get; set; }
@@ -34,14 +31,19 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public Invoice() { }
 
-        public Invoice(DateTime date, DateTime dueDate, decimal amountExcl, decimal moms, decimal amountIncl, string status)
+        public Invoice(DateTime date, DateTime dueDate, decimal amountExcl, decimal moms, string status)
         {
             Date = date;
             DueDate = dueDate;
             AmountExcl = amountExcl;
             Moms = moms;
-            AmountIncl = amountIncl;
             Status = status;
         }
+
+        // Relation to Booking. Foreign Key
+        [ForeignKey("Booking")]
+        public int BookingID;
+        public virtual Booking Booking { get; set; }
+
     }
 }

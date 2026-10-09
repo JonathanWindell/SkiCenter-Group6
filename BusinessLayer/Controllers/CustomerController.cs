@@ -46,7 +46,6 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Customer.GetPendingCorporateCustomer();
         }
 
-
         /// <summary>
         /// Validates and creates a new PrivateCustomer with a default credit limit of 12000 kr.
         /// </summary>
@@ -113,8 +112,6 @@ namespace BusinessLayer.Controllers
             // Create new Corporate Customer, default IsApproved = false, CreditLimit = 0 and DiscountRate = 0
             var newCorpCustomer = new CorporateCustomer(
                 companyName: companyName.Trim(),
-                firstName: companyName.Trim(),
-                lastName: "",
                 address: address.Trim(),
                 email: email.Trim(),
                 phoneNumber: phoneNumber.Trim(),
@@ -184,7 +181,9 @@ namespace BusinessLayer.Controllers
             if (customer == null) return false;
 
             // Logic for protecting against customer removal when there is a preliminary or confirmed booking
-            bool hasActiveBookings = customer.Bookings.Any(b => b.Status == "Preliminary" || b.Status == "Confirmed");
+            bool hasActiveBookings = customer.Bookings.Any(b =>
+            b.BookingStatus == BookingStatus.Preliminary ||
+            b.BookingStatus == BookingStatus.Confirmed);
             if (hasActiveBookings)
             {
                 return false;
@@ -210,8 +209,8 @@ namespace BusinessLayer.Controllers
 
             // Checks if last booking ended in 365 days
             return customer.Bookings.Any(b =>
-                (b.Status == "Confirmed" || b.Status == "Completed") &&
-                b.Accommodations.Any(ba => ba.EndDate >= oneYearAgo));
+                (b.BookingStatus == BookingStatus.Finished) &&
+                b.Accommodations.Any(ba => ba.EndDate >= oneYearAgo && ba.EndDate <= DateTime.Now));
         }
 
         /// <summary>

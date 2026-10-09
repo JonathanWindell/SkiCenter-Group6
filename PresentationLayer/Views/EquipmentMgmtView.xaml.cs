@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityLayer;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -6,7 +7,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using EntityLayer;
+using BusinessLayer.Controllers;
+
 
 namespace PresentationLayer.Views
 {
@@ -14,57 +16,22 @@ namespace PresentationLayer.Views
     {
         // Temporary items for UI testing without database access.
         private readonly ObservableCollection<EquipmentItem> _previewItems = new();
+        private readonly SkiShopController _skiShopController;
 
         // Tracks the item currently being edited.
         private EquipmentItem? _editingItem;
 
-        public EquipmentMgmtView()
+        public EquipmentMgmtView(SkiShopController skiShopController)
         {
             InitializeComponent();
+            _skiShopController = skiShopController;
 
             AddEquipmentButton.Click += AddEquipmentButton_Click;
             CancelEquipmentButton.Click += CancelEquipmentButton_Click;
             SaveEquipmentButton.Click += SaveEquipmentButton_Click;
             EditEquipmentButton.Click += EditEquipmentButton_Click;
-            ArchiveEquipmentButton.Click += ArchiveEquipmentButton_Click;
+            DeleteEquipmentButton.Click += DeleteEquipmentButton_Click;
             EquipmentDataGrid.SelectionChanged += EquipmentDataGrid_SelectionChanged;
-
-            // Temporary categories for UI testing.
-            string[] testCategories =
-            {
-                "Alpina skidor", "Alpina pjäxor", "Alpina stavar",
-                "Längdskidor", "Längdpjäxor", "Längdstavar",
-                "Snowboard", "Snowboardskor", "Hjälm", "Skoter", "Pulka"
-            };
-
-            foreach (string category in testCategories)
-            {
-                EquipmentCategoryComboBox.Items.Add(category);
-                CategoryFilterComboBox.Items.Add(category);
-            }
-
-            // Sample data only; nothing is saved to the database.
-            _previewItems.Add(
-                new EquipmentItem(EquipmentStatus.Available, "Bra skick", 130m, "170 cm")
-                {
-                    EquipmentItemID = 1,
-                    EquipmentID = 1,
-                    Equipment = new Equipment("Alpina skidor", "Alpina skidor")
-                    {
-                        EquipmentID = 1
-                    }
-                });
-
-            _previewItems.Add(
-                new EquipmentItem(EquipmentStatus.Damaged, "Trasigt spänne", 115m, "38")
-                {
-                    EquipmentItemID = 2,
-                    EquipmentID = 2,
-                    Equipment = new Equipment("Alpina pjäxor", "Alpina pjäxor")
-                    {
-                        EquipmentID = 2
-                    }
-                });
 
             EquipmentDataGrid.ItemsSource = _previewItems;
 
@@ -74,8 +41,11 @@ namespace PresentationLayer.Views
             CategoryFilterComboBox.SelectionChanged += EquipmentFilters_SelectionChanged;
             StatusFilterComboBox.SelectionChanged += EquipmentFilters_SelectionChanged;
 
+            LoadCategories();
+            LoadEquipmentData();
+
             EditEquipmentButton.IsEnabled = false;
-            ArchiveEquipmentButton.IsEnabled = false;
+            DeleteEquipmentButton.IsEnabled = false;
         }
 
         // Enable equipment actions when a row is selected.
@@ -85,7 +55,7 @@ namespace PresentationLayer.Views
             bool hasSelection = EquipmentDataGrid.SelectedItem != null;
 
             EditEquipmentButton.IsEnabled = hasSelection;
-            ArchiveEquipmentButton.IsEnabled = hasSelection;
+            DeleteEquipmentButton.IsEnabled = hasSelection;
         }
 
         private void EditEquipmentButton_Click(object sender, RoutedEventArgs e)
@@ -101,9 +71,7 @@ namespace PresentationLayer.Views
             EquipmentNumberTextBox.Text = selectedItem.EquipmentItemID.ToString();
             EquipmentCategoryComboBox.SelectedItem = selectedItem.Equipment?.Category;
             EquipmentSizeTextBox.Text = selectedItem.Size;
-            EquipmentConditionTextBox.Text = selectedItem.Condition;
-            EquipmentPriceTextBox.Text =
-                selectedItem.PricePerDay.ToString(CultureInfo.GetCultureInfo("sv-SE"));
+            EquipmentConditionTextBox.Text = selectedItem.Condition.ToString();
 
             EquipmentStatusComboBox.SelectedIndex = -1;
 
@@ -122,30 +90,35 @@ namespace PresentationLayer.Views
             EquipmentFeedbackTextBlock.Text = string.Empty;
         }
 
-        private void ArchiveEquipmentButton_Click(object sender, RoutedEventArgs e)
+
+        private void DeleteEquipmentButton_Click(object sender, RoutedEventArgs e)
         {
             if (EquipmentDataGrid.SelectedItem is not EquipmentItem selectedItem)
                 return;
 
-            // Ask for confirmation before archiving the preview item.
             MessageBoxResult result = MessageBox.Show(
-                $"Vill du arkivera utrustning {selectedItem.EquipmentItemID}?",
-                "Arkivera utrustning",
+                $"Är du säker på att du vill ta bort utrustning med artikelnummer {selectedItem.ArticleNumber}?",
+                "Ta bort utrustning",
                 MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
+                MessageBoxImage.Warning,
                 MessageBoxResult.No);
 
             if (result != MessageBoxResult.Yes)
                 return;
 
-            selectedItem.Status = EquipmentStatus.Archived;
-            EquipmentDataGrid.Items.Refresh();
+            bool isDeleted = _skiShopController.DeleteEquipmentItem(selectedItem.ArticleNumber);
 
-            ResetForm();
+            if (isDeleted)
+            {
+                _previewItems.Remove(selectedItem);
+                ResetForm();
 
-            ShowFeedback(
-                "Utrustningen har arkiverats i testvyn. Inte sparad i databasen.",
-                true);
+                ShowFeedback($"Artikeln {selectedItem.ArticleNumber} har tagits bort.", true);
+            }
+            else
+            {
+                ShowFeedback("Kunde inte ta bort artikeln. Kontrollera att den inte är uthyrd.", false);
+            }
         }
 
         private void EquipmentFilters_SelectionChanged(
@@ -235,20 +208,6 @@ namespace PresentationLayer.Views
             if (EquipmentStatusComboBox.SelectedItem == null)
                 errors.Add("Välj status.");
 
-            if (string.IsNullOrWhiteSpace(EquipmentPriceTextBox.Text))
-            {
-                errors.Add("Ange pris per dag.");
-            }
-            else if (!decimal.TryParse(
-                EquipmentPriceTextBox.Text.Trim(),
-                NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign,
-                CultureInfo.GetCultureInfo("sv-SE"),
-                out pricePerDay) || pricePerDay < 0)
-            {
-                errors.Add(
-                    "Priset måste vara 0 kr eller mer. Använd komma för decimaler.");
-            }
-
             if (errors.Count > 0)
             {
                 // Display every error message.
@@ -258,7 +217,7 @@ namespace PresentationLayer.Views
             }
 
             string category = (string)EquipmentCategoryComboBox.SelectedItem;
-            string statusString = ((ComboBoxItem)EquipmentStatusComboBox.SelectedItem).Content.ToString()!; 
+            string statusString = ((ComboBoxItem)EquipmentStatusComboBox.SelectedItem).Content.ToString()!;
 
             // Category IDs are temporary preview values, not database IDs.
             int categoryId = EquipmentCategoryComboBox.SelectedIndex + 1;
@@ -276,10 +235,18 @@ namespace PresentationLayer.Views
                 itemToSave.Status = EquipmentStatus.Available;
             }
 
+            if (Enum.TryParse<EquipmentCondition>(EquipmentConditionTextBox.Text, out var parsedCondition))
+            {
+                itemToSave.Condition = parsedCondition;
+            }
+            else
+            {
+                // Fallback if the string doesn't match any enum value
+                itemToSave.Condition = EquipmentCondition.New;
+            }
+
             itemToSave.EquipmentItemID = itemNumber;
             itemToSave.Size = EquipmentSizeTextBox.Text.Trim();
-            itemToSave.Condition = EquipmentConditionTextBox.Text.Trim();
-            itemToSave.PricePerDay = pricePerDay;
             itemToSave.EquipmentID = categoryId;
             itemToSave.Equipment = new Equipment(category, category)
             {
@@ -291,15 +258,15 @@ namespace PresentationLayer.Views
 
             // Refresh rows because the entity does not notify property changes.
             EquipmentDataGrid.Items.Refresh();
-            
+
             ResetForm();
 
 
-        ShowFeedback(
-                isNewItem
-                    ? "Utrustningen har lagts till i testvyn. Inte sparad i databasen."
-                    : "Utrustningen har uppdaterats i testvyn. Inte sparad i databasen.",
-                true);
+            ShowFeedback(
+                    isNewItem
+                        ? "Utrustningen har lagts till i testvyn. Inte sparad i databasen."
+                        : "Utrustningen har uppdaterats i testvyn. Inte sparad i databasen.",
+                    true);
         }
 
         // Use red for errors and green for successful preview actions.
@@ -331,10 +298,6 @@ namespace PresentationLayer.Views
             SetFieldError(EquipmentConditionTextBox, errors,
                 "Ange skick.");
 
-            SetFieldError(EquipmentPriceTextBox, errors,
-                "Ange pris per dag.",
-                "Priset måste vara 0 kr eller mer. Använd komma för decimaler.");
-
             SetFieldError(EquipmentStatusComboBox, errors,
                 "Välj status.");
         }
@@ -363,8 +326,8 @@ namespace PresentationLayer.Views
             Control[] fields =
             { EquipmentNumberTextBox,  EquipmentCategoryComboBox,
                 EquipmentSizeTextBox, EquipmentConditionTextBox,
-                EquipmentPriceTextBox, EquipmentStatusComboBox
-    };
+                EquipmentStatusComboBox
+            };
 
             foreach (Control field in fields)
             {
@@ -373,7 +336,7 @@ namespace PresentationLayer.Views
             }
         }
 
-        
+
 
         // Clear the form and reset the status to Available.
         private void ResetForm()
@@ -386,9 +349,40 @@ namespace PresentationLayer.Views
             EquipmentCategoryComboBox.SelectedIndex = -1;
             EquipmentSizeTextBox.Clear();
             EquipmentConditionTextBox.Clear();
-            EquipmentPriceTextBox.Clear();
             EquipmentStatusComboBox.SelectedIndex = 0;
             EquipmentFeedbackTextBlock.Text = string.Empty;
+        }
+
+        private void LoadCategories()
+        {
+            // Gets all categories to fill dropdown
+            var categories = _skiShopController.GetAllEquipmentWithStock();
+
+            EquipmentCategoryComboBox.Items.Clear();
+            CategoryFilterComboBox.Items.Clear();
+
+            CategoryFilterComboBox.Items.Add("Alla kategorier");
+            CategoryFilterComboBox.SelectedIndex = 0;
+
+            foreach (var eq in categories)
+            {
+                EquipmentCategoryComboBox.Items.Add(eq.Category);
+                CategoryFilterComboBox.Items.Add(eq.Category);
+            }
+        }
+
+        private void LoadEquipmentData()
+        {
+            _previewItems.Clear();
+
+            // Gets all items via controller
+            var items = _skiShopController.GetAllEquipmentItems();
+            foreach (var item in items)
+            {
+                _previewItems.Add(item);
+            }
+
+            CollectionViewSource.GetDefaultView(_previewItems)?.Refresh();
         }
     }
 }

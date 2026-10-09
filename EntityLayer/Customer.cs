@@ -1,18 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
-    public class Customer
+    public abstract class Customer
     {
         // Primary key for Customer
         [Key]
         public int CustomerID { get; set; }
-
-        [Required]
-        public string FirstName { get; set; }
-
-        [Required]
-        public string LastName { get; set; }
 
         [Required]
         public string Address { get; set; }
@@ -26,13 +21,15 @@ namespace EntityLayer
         // One to Many relation between Customer & Booking
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
+        // Can be uses to write out name for bookings etc. 
+        [NotMapped]
+        public abstract string DisplayName { get; }
+
         // Parameterless constructor for EF 
         public Customer() { }
 
-        public Customer(string firstName, string lastName, string address, string email, string phoneNumber)
+        public Customer(string address, string email, string phoneNumber)
         {
-            FirstName = firstName;
-            LastName = lastName;
             Address = address;
             Email = email;
             PhoneNumber = phoneNumber;

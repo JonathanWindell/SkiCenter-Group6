@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
@@ -13,15 +14,19 @@ namespace EntityLayer
         public decimal DiscountRate { get; set; }
         public bool IsApproved { get; set; } // Decided by marketing manager
 
+        // Maps company name to DisplayName
+        [NotMapped]
+        public override string DisplayName => CompanyName;
+
         // Parameterless constructor for EF 
         public CorporateCustomer() { }
 
-        public CorporateCustomer(string firstName, string lastName, string address, string email, string phoneNumber, string orgNumber, string contactPerson, string companyName) : base(firstName, lastName, address, email, phoneNumber)
+        public CorporateCustomer(string companyName, string orgNumber, string contactPerson, string address, string email, string phoneNumber) : base(address, email, phoneNumber)
         {
             CompanyName = companyName;
             OrganisationNumber = orgNumber;
             ContactPerson = contactPerson;
-            IsApproved = false; // Standard value (Pending)
+            IsApproved = false;
             CreditLimit = 0;
             DiscountRate = 0;
         }

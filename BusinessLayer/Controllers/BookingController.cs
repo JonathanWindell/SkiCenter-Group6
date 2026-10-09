@@ -3,7 +3,7 @@ using EntityLayer;
 
 namespace BusinessLayer
 {
-    public class BookingController
+    public class BookingController // WIP
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -27,10 +27,10 @@ namespace BusinessLayer
         /// </summary>
         /// <param name="bookingId"/param>
         /// <returns>The complete booking entity, or null if not found.</returns>
-        public Booking GetBookingById(int bookingId)
+        public Booking GetSpecificBooking(int bookingID)
         {
-            if (bookingId <= 0) return null;
-            return _unitOfWork.Booking.GetByID(bookingId);
+            if (bookingID <= 0) return null;
+            return _unitOfWork.Booking.GetSpecificBooking(bookingID);
         }
 
         /// <summary>
@@ -55,9 +55,9 @@ namespace BusinessLayer
         /// </summary>
         /// <param name="status"/param>
         /// <returns>A collection of bookings with the specified status.</returns>
-        public IEnumerable<Booking> GetBookingsByStatus(string status)
+        public IEnumerable<Booking> GetBookingsByStatus(BookingStatus status)
         {
-            if (string.IsNullOrWhiteSpace(status))
+            if (!Enum.IsDefined(typeof(BookingStatus), status))
             {
                 return Enumerable.Empty<Booking>();
             }

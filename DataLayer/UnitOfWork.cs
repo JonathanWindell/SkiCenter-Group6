@@ -17,6 +17,7 @@ namespace DataLayer
         public IBookingAccommodationRepository BookingAccommodation { get; private set; }
         public IAccommodationRepository Accommodation { get; private set; }
         public IEquipmentRepository Equipment { get; private set; }
+        public IEquipmentItemRepository EquipmentItem { get; private set; }
         public ISkiLessonRepository SkiLesson { get; private set; }
         public IRentalRepository Rental { get; private set; }
         public IInvoiceRepository Invoice { get; private set; }
@@ -33,6 +34,7 @@ namespace DataLayer
             BookingAccommodation = new BookingAccommodationRepository(_context);
             Accommodation = new AccommodationRepository(_context);
             Equipment = new EquipmentRepository(_context);
+            EquipmentItem = new EquipmentItemRepository(_context);
             SkiLesson = new SkiLessonRepository(_context);
             Rental = new RentalRepository(_context);
             Invoice = new InvoiceRepository(_context);

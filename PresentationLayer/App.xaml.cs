@@ -1,12 +1,20 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
-using PresentationLayer.Views;
+﻿using BusinessLayer;
 using BusinessLayer.Controllers;
-using Microsoft.EntityFrameworkCore;
 using DataLayer;
 using DataLayer.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PresentationLayer.Views;
+using System.Configuration;
+using System.Data;
+using System.Windows;
+using BusinessLayer.Controllers;
+using DataLayer;
+using DataLayer.Interfaces;
+using DataLayer.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using PresentationLayer.Views;
+using System.Windows;
 
 
 namespace PresentationLayer
@@ -55,11 +63,21 @@ namespace PresentationLayer
             services.AddTransient<LoginView>();
             services.AddTransient<DashboardView>();
             services.AddTransient<CustomerRegistrationView>();
+            services.AddTransient<EquipmentMgmtView>();
+            services.AddTransient<CustomerBookingsView>();
+            services.AddTransient<BookingDetailsView>();
+            services.AddTransient<SeasonPriceView>();
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
+            services.AddTransient<BookingController>(); 
+            services.AddTransient<CustomerController>();
+            services.AddTransient<DashboardController>();
+            services.AddTransient<SkiShopController>();
+            services.AddTransient<AdminController>();
 
             // 3. Register Repositories
+            services.AddTransient<ICustomerRepository, CustomerRepository>();
 
             // 4. Register and initialize DbContext
             services.AddDbContext<SkiCenterDbContext>();
@@ -80,6 +98,16 @@ namespace PresentationLayer
             // Resolve the main window (LoginView) from the service provider and show it
             var loginWindow = Services.GetRequiredService<LoginView>();
             loginWindow.Show();
+
+            /*
+            // Only use when data should be written from seeding files. I (Jonathan will fix this during this week)
+            using (var scope = Services.CreateScope())
+            {
+                var context = scope.ServiceProvider.GetRequiredService<SkiCenterDbContext>();
+                DbInitializer.Initialize(context);
+            }
+            */
+
         }
 
     }

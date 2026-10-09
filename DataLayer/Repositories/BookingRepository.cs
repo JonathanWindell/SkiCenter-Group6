@@ -46,9 +46,11 @@ namespace DataLayer.Repositories
                 .Include(b => b.MeetingRooms)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
+                    .ThenInclude(sls => sls.SkiLesson)
                 .Include(b => b.Rentals)
                     .ThenInclude(r => r.EquipmentItems)
                         .ThenInclude(ri => ri.Equipment)
+                            .ThenInclude(e => e.Prices)
                 .Include(b => b.Invoices)
                 .AsSplitQuery()
                 .FirstOrDefault(b => b.BookingID == bookingID);
@@ -75,11 +77,11 @@ namespace DataLayer.Repositories
         /// Gets booking by a specific status.
         /// </summary>
         /// <param name="status"></param>
-        public IEnumerable<Booking> GetBookingsByStatus(string status)
+        public IEnumerable<Booking> GetBookingsByStatus(BookingStatus status)
         {
             return _context.Set<Booking>()
                 .Include(b => b.Customer)
-                .Where(b => b.Status == status)
+                .Where(b => b.BookingStatus == status)
                 .AsNoTracking()
                 .ToList();
         }
@@ -102,13 +104,14 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="bookingID"></param>
         /// <param name="status"></param>
-        public void UpdateBookingStatus(int bookingID, string status)
+        public void UpdateBookingStatus(int bookingID, BookingStatus status)
         {
             var booking = _context.Set<Booking>().Find(bookingID);
 
             if (booking != null)
             {
-                booking.Status = status;
+                booking.BookingStatus = status;
+                _context.SaveChanges();
             }
         }
     }

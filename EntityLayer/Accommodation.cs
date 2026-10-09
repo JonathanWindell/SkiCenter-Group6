@@ -3,6 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    public enum accommodationStatus
+    {
+        Available = 0,
+        Rented = 1,
+        Damaged = 2,
+        Maintenance = 3
+    }
+
     public class Accommodation
     {
         [Key]
@@ -10,38 +18,23 @@ namespace EntityLayer
 
         // Specific number of unit. Apartment 101 etc. 
         [Required]
-        public string UnitName { get; set; }
+        public string AccommodationNumber { get; set; }
 
-        // Describes type of apartments, lodges etc. 
+        // "Available", "Cleaning", "Maintenance"
         [Required]
-        public string Category { get; set; }
+        public accommodationStatus Status { get; set; }
 
-        // Specific description of the accommodation. 
         [Required]
-        public string Description { get; set; }
-
-        // Number of beds per apartment
-        [Required]
-        public int NumberOfBeds { get; set; }
-
-        // Size of apartment
-        [Required]
-        public string Status { get; set; }
-
-        // Relation to SeasonPrice. Foreign Key
-        [ForeignKey("SeasonPrice")]
-        public int SeasonPriceID { get; private set; }
-        public virtual SeasonPrice SeasonPrice { get; set; }
+        [ForeignKey("AccommodationType")]
+        public int AccommodationTypeID { get; set; }
+        public virtual AccommodationType AccommodationType { get; set; }
 
         // Parameterless constructor for EF 
         public Accommodation() { }
 
-        public Accommodation(string unitName, string category, string description, int numberOfBeds, string status)
+        public Accommodation(string accommodationNumber, accommodationStatus status)
         {
-            UnitName = unitName;
-            Category = category;
-            Description = description;
-            NumberOfBeds = numberOfBeds;
+            AccommodationNumber = accommodationNumber;
             Status = status;
         }
     }

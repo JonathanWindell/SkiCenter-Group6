@@ -5,6 +5,7 @@ using EntityLayer;
 namespace TestLayer
 {
     [TestFixture]
+    [Category("Database")]
     public class DatabaseTests
     {
         private SkiCenterDbContext _context;
@@ -69,7 +70,7 @@ namespace TestLayer
         public void AddCorporateCustomer_ShouldSaveToDatabase()
         {
             // Arrange
-            var newCorporateCustomer = new CorporateCustomer("Jonathan", "Windell", "Göteborgvägen 23", "FöretagAB@gmail.com", "0761635689", "645784-3454", "Johan Jonshede", "CyklingSport");
+            var newCorporateCustomer = new CorporateCustomer("Cykelkraft", "145678-4867", "Jonathan Windell", "Företagsvägen 23", "Cykelkraft@gmail.com", "0761658967");
 
             // Act
             // CanConnect() opens a connectiona and tries to connect. 
@@ -78,7 +79,7 @@ namespace TestLayer
             _context.SaveChanges();
 
             // Assert
-            var savedCustomer = _context.Customers.FirstOrDefault(c => c.Email == "FöretagAB@gmail.com");
+            var savedCustomer = _context.Customers.FirstOrDefault(c => c.Email == "Cykelkraft@gmail.com");
 
             Assert.That(savedCustomer, Is.Not.Null);
             Assert.That(savedCustomer.CustomerID, Is.GreaterThan(0), "Customer was not saved in the database");

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PresentationLayer.Models
+﻿namespace PresentationLayer.Models
 {
     // Display data for one row in the booking overview.
     public class BookingStatusRow

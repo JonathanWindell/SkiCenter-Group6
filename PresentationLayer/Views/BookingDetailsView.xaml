@@ -1,0 +1,490 @@
+﻿<Window x:Class="PresentationLayer.Views.BookingDetailsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SkiCenter - Bokningsdetaljer"
+        Width="1000"
+        Height="650"
+        MinWidth="950"
+        MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource WindowBg}">
+
+    <Grid Margin="40">
+
+        <!-- Main content card -->
+        <Border Background="{StaticResource CardBg}"
+                CornerRadius="18"
+                Padding="35">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0"
+                            Margin="0,0,0,25">
+
+                    <TextBlock Text="Bokningsdetaljer"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource PrimaryText}"/>
+
+                    <TextBlock Text="Fullständig information om bokningen."
+                               Margin="0,6,0,0"
+                               FontSize="13"
+                               Foreground="{StaticResource SecondaryText}"/>
+                </StackPanel>
+
+                <!-- Scrollable booking information -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+
+                    <StackPanel>
+
+                        <!-- Booking information -->
+                        <Border BorderBrush="{StaticResource InputBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="20"
+                                Margin="0,0,0,15">
+
+                            <StackPanel>
+
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,0,0,12">
+
+                                    <TextBlock Text="Bokning #"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryText}"/>
+
+                                    <TextBlock Text="{Binding BookingID}"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               Foreground="{StaticResource PrimaryText}"/>
+
+                                </StackPanel>
+
+                                <TextBlock>
+                                    <Run Text="Bokningsdatum: "/>
+                                    <Run Text="{Binding BookingDate,
+                                        StringFormat={}{0:yyyy-MM-dd}}"/>
+                                </TextBlock>
+
+                                <TextBlock Margin="0,5,0,0">
+                                    <Run Text="Status: "/>
+                                    <Run Text="{Binding Status}"/>
+                                </TextBlock>
+
+                                <TextBlock Margin="0,5,0,0">
+                                    <Run Text="Avbeställningsskydd: "/>
+                                    <Run Text="{Binding HasCancellationInsurance}"/>
+                                </TextBlock>
+
+                                <TextBlock Margin="0,5,0,0">
+                                    <Run Text="Totalt belopp: "/>
+                                    <Run Text="{Binding TotalAmount,
+                                        StringFormat={}{0:N0} kr}"/>
+                                </TextBlock>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Accommodation information -->
+                        <ItemsControl ItemsSource="{Binding Accommodations}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border BorderBrush="{StaticResource InputBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="20"
+                                            Margin="0,0,0,15">
+
+                                        <StackPanel>
+
+                                            <TextBlock Text="BOENDE"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource PrimaryText}"
+                                                       Margin="0,0,0,12"/>
+
+                                            <TextBlock>
+                                                <Run Text="Namn: "/>
+                                                <Run Text="{Binding Accommodation.UnitName}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Kategori: "/>
+                                                <Run Text="{Binding Accommodation.Category}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Beskrivning: "/>
+                                                <Run Text="{Binding Accommodation.Description}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Antal bäddar: "/>
+                                                <Run Text="{Binding Accommodation.NumberOfBeds}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Status: "/>
+                                                <Run Text="{Binding Accommodation.Status}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Startdatum: "/>
+                                                <Run Text="{Binding StartDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Slutdatum: "/>
+                                                <Run Text="{Binding EndDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Rabatt: "/>
+                                                <Run Text="{Binding DiscountRate}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Rabattbelopp: "/>
+                                                <Run Text="{Binding DiscountAmount,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Slutpris: "/>
+                                                <Run Text="{Binding FinalPrice,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                        </StackPanel>
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Meeting room information -->
+                        <ItemsControl ItemsSource="{Binding MeetingRooms}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border BorderBrush="{StaticResource InputBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="20"
+                                            Margin="0,0,0,15">
+
+                                        <StackPanel>
+
+                                            <TextBlock Text="MÖTESRUM"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource PrimaryText}"
+                                                       Margin="0,0,0,12"/>
+
+                                            <TextBlock>
+                                                <Run Text="Rumsnummer: "/>
+                                                <Run Text="{Binding MeetingRoomNumber}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Kapacitet: "/>
+                                                <Run Text="{Binding Capacity}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Startdatum: "/>
+                                                <Run Text="{Binding StartDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Slutdatum: "/>
+                                                <Run Text="{Binding EndDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Beskrivning: "/>
+                                                <Run Text="{Binding Description}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Pris: "/>
+                                                <Run Text="{Binding Price,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Status: "/>
+                                                <Run Text="{Binding Status}"/>
+                                            </TextBlock>
+
+                                        </StackPanel>
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Equipment information -->
+                        <ItemsControl ItemsSource="{Binding Rentals}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border BorderBrush="{StaticResource InputBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="20"
+                                            Margin="0,0,0,15">
+
+                                        <StackPanel>
+
+                                            <TextBlock Text="UTRUSTNING"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource PrimaryText}"
+                                                       Margin="0,0,0,12"/>
+
+                                            <!-- Rental information -->
+                                            <TextBlock>
+                                                <Run Text="Startdatum: "/>
+                                                <Run Text="{Binding StartDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Slutdatum: "/>
+                                                <Run Text="{Binding EndDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Återlämningsdatum: "/>
+                                                <Run Text="{Binding ReturnDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Status: "/>
+                                                <Run Text="{Binding Status}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,15">
+                                                <Run Text="Summa: "/>
+                                                <Run Text="{Binding Sum,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                            <!-- Equipment items -->
+                                            <ItemsControl ItemsSource="{Binding EquipmentItems}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+
+                                                        <StackPanel Margin="0,5,0,15">
+
+                                                            <TextBlock Text="{Binding Equipment.Category}"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{StaticResource PrimaryText}"/>
+
+                                                            <TextBlock Margin="0,5,0,0">
+                                                                <Run Text="Beskrivning: "/>
+                                                                <Run Text="{Binding Equipment.Description}"/>
+                                                            </TextBlock>
+
+                                                            <TextBlock Margin="0,5,0,0">
+                                                                <Run Text="Artikelnummer: "/>
+                                                                <Run Text="{Binding ArticleNumber}"/>
+                                                            </TextBlock>
+
+                                                            <TextBlock Margin="0,5,0,0">
+                                                                <Run Text="Storlek: "/>
+                                                                <Run Text="{Binding Size}"/>
+                                                            </TextBlock>
+
+                                                            <TextBlock Margin="0,5,0,0">
+                                                                <Run Text="Skick: "/>
+                                                                <Run Text="{Binding Condition}"/>
+                                                            </TextBlock>
+
+                                                            <TextBlock Margin="0,5,0,0">
+                                                                <Run Text="Status: "/>
+                                                                <Run Text="{Binding Status}"/>
+                                                            </TextBlock>
+
+                                                            <TextBlock Margin="0,5,0,0">
+                                                                <Run Text="Pris per dag: "/>
+                                                                <Run Text="{Binding PricePerDay,
+                                                                    StringFormat={}{0:N0} kr}"/>
+                                                            </TextBlock>
+
+                                                        </StackPanel>
+
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
+                                        </StackPanel>
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Ski school information -->
+                        <ItemsControl ItemsSource="{Binding SkiLessons}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border BorderBrush="{StaticResource InputBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="20"
+                                            Margin="0,0,0,15">
+
+                                        <StackPanel>
+
+                                            <TextBlock Text="SKIDSKOLA"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource PrimaryText}"
+                                                       Margin="0,0,0,12"/>
+
+                                            <TextBlock>
+                                                <Run Text="Nivå: "/>
+                                                <Run Text="{Binding SkiLessonSession.SkiLesson.Level}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Vecka: "/>
+                                                <Run Text="{Binding SkiLessonSession.WeekNumber}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Dagar: "/>
+                                                <Run Text="{Binding SkiLessonSession.Days}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Tid: "/>
+                                                <Run Text="{Binding SkiLessonSession.TimeSlot}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Längd: "/>
+                                                <Run Text="{Binding SkiLessonSession.SkiLesson.DurationHours}"/>
+                                                <Run Text=" timmar"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Max deltagare: "/>
+                                                <Run Text="{Binding SkiLessonSession.SkiLesson.MaxParticipants}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Pris: "/>
+                                                <Run Text="{Binding SkiLessonSession.SkiLesson.Price,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                        </StackPanel>
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Invoice information -->
+                        <ItemsControl ItemsSource="{Binding Invoices}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+
+                                    <Border BorderBrush="{StaticResource InputBorder}"
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="20"
+                                            Margin="0,0,0,15">
+
+                                        <StackPanel>
+
+                                            <TextBlock Text="FAKTURA"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource PrimaryText}"
+                                                       Margin="0,0,0,12"/>
+
+                                            <TextBlock>
+                                                <Run Text="Fakturanummer: "/>
+                                                <Run Text="{Binding InvoiceID}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Fakturadatum: "/>
+                                                <Run Text="{Binding Date,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Förfallodatum: "/>
+                                                <Run Text="{Binding DueDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Belopp exkl. moms: "/>
+                                                <Run Text="{Binding AmountExcl,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Moms: "/>
+                                                <Run Text="{Binding Moms,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Belopp inkl. moms: "/>
+                                                <Run Text="{Binding AmountIncl,
+                                                    StringFormat={}{0:N0} kr}"/>
+                                            </TextBlock>
+
+                                            <TextBlock Margin="0,5,0,0">
+                                                <Run Text="Status: "/>
+                                                <Run Text="{Binding Status}"/>
+                                            </TextBlock>
+
+                                        </StackPanel>
+                                    </Border>
+
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Back button -->
+                <Button Grid.Row="2"
+                        Content="Tillbaka"
+                        Width="110"
+                        Height="38"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Right"
+                        Style="{StaticResource DeepSeaButtonStyle}"
+                        Click="BackButton_Click"/>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

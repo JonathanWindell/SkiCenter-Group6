@@ -25,15 +25,6 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
-        /// Updates customer with new data.
-        /// </summary>
-        /// <param name="customer"></param>
-        public void UpdateCustomer(Customer customer)
-        {
-            _context.Set<Customer>().Update(customer);
-        }
-
-        /// <summary>
         /// Gets a single customer with all bookinghistory and accommodation data. 
         /// </summary>
         /// <param name="customerID"></param>
@@ -67,7 +58,7 @@ namespace DataLayer.Repositories
                 .FirstOrDefault(c =>
                     c.PhoneNumber == search ||
                     c.Email == search ||
-                    (c.FirstName + " " + c.LastName).Contains(search) ||
+                    (c is PrivateCustomer && (((PrivateCustomer)c).FirstName + " " + ((PrivateCustomer)c).LastName).Contains(search)) ||
                     (c is CorporateCustomer && (((CorporateCustomer)c).OrganisationNumber == search || ((CorporateCustomer)c).CompanyName.Contains(search)))
                 );
         }
