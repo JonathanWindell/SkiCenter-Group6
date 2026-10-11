@@ -78,7 +78,7 @@ namespace BusinessLayer.Controllers
         /// /// <param name="condition"/param>
         public bool UpdateEquipmentItem(string articleNumber, int equipmentID, string size, EquipmentStatus status, EquipmentCondition condition)
         {
-            if (string.IsNullOrWhiteSpace(articleNumber) || string.IsNullOrWhiteSpace(size))
+            if (equipmentID <= 0 || string.IsNullOrWhiteSpace(articleNumber) || string.IsNullOrWhiteSpace(size))
             {
                 return false;
             }
