@@ -69,6 +69,14 @@
                     </ComboBox>
                 </StackPanel>
 
+                <TextBlock x:Name="EquipmentFeedbackTextBlock"
+                           Grid.Column="3"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Bottom"
+                           Margin="20,0,0,8"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource PrimaryText}"/>
+
                 <Button x:Name="AddEquipmentButton"
                         Grid.Column="3"
                         Content="+ Lägg till utrustning"
@@ -336,10 +344,6 @@
                                        Foreground="{StaticResource SecondaryText}"
                                        Margin="0,0,0,6"/>
 
-                            <TextBlock x:Name="EquipmentFeedbackTextBlock"
-                                       TextWrapping="Wrap"
-                                       Foreground="{StaticResource PrimaryText}"
-                                       Margin="0,0,0,8"/>
 
                             <!-- Related actions sit side by side. -->
                             <Grid>
