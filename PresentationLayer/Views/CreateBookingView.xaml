@@ -1,0 +1,310 @@
+﻿<Window x:Class="PresentationLayer.Views.CreateBookingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SkiCenter - Skapa bokning"
+        Width="1000"
+        Height="650"
+        MinWidth="950"
+        MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource WindowBg}">
+
+    <Grid Margin="40">
+
+        <!-- Main content card -->
+        <Border Background="{StaticResource CardBg}"
+                CornerRadius="18"
+                Padding="35">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0">
+
+                    <TextBlock Text="Skapa ny bokning"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource PrimaryText}"/>
+
+                    <TextBlock Text="Välj kund, datum och ledigt boende för att skapa en bokning."
+                               Margin="0,6,0,0"
+                               FontSize="13"
+                               Foreground="{StaticResource SecondaryText}"/>
+
+                </StackPanel>
+
+                <!-- Scrollable booking form -->
+                <ScrollViewer Grid.Row="1"
+                              Margin="0,25,0,0"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+
+                    <StackPanel>
+
+                        <!-- Customer selection -->
+                        <Border Padding="20"
+                                BorderBrush="{StaticResource InputBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+
+                            <StackPanel>
+
+                                <TextBlock Text="1. Välj kund"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <TextBlock Text="Sök efter en befintlig kund eller registrera en ny."
+                                           Margin="0,5,0,12"
+                                           FontSize="12"
+                                           Foreground="{StaticResource SecondaryText}"/>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <TextBox x:Name="CustomerSearchTextBox"
+                                             Grid.Column="0"
+                                             Height="38"
+                                             Padding="10,7"
+                                             Margin="0,0,12,0"
+                                             VerticalContentAlignment="Center"
+                                             BorderBrush="{StaticResource InputBorder}"
+                                             BorderThickness="1"
+                                             FontSize="14"/>
+
+                                    <Button x:Name="SearchCustomerButton"
+                                            Grid.Column="1"
+                                            Content="Sök"
+                                            Width="100"
+                                            Height="38"
+                                            Style="{StaticResource DeepSeaButtonStyle}"
+                                            Click="SearchCustomer_Click"/>
+
+                                </Grid>
+
+                                <!-- Opens the existing customer registration view -->
+                                <Button x:Name="RegisterCustomerButton"
+                                        Content="+ Registrera ny kund"
+                                        Width="180"
+                                        Height="38"
+                                        Margin="0,12,0,0"
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource DeepSeaButtonStyle}"
+                                        Click="RegisterCustomer_Click"/>
+
+                                <!-- Customer search results -->
+                                <ListBox x:Name="CustomerResultsListBox"
+                                         Margin="0,12,0,0"
+                                         MinHeight="55"
+                                         MaxHeight="120"
+                                         DisplayMemberPath="DisplayName"/>
+
+                                <TextBlock x:Name="SelectedCustomerTextBlock"
+                                           Text="Ingen kund vald."
+                                           Margin="0,10,0,0"
+                                           FontSize="12"
+                                           Foreground="{StaticResource SecondaryText}"/>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Booking dates -->
+                        <Border Margin="0,15,0,0"
+                                Padding="20"
+                                BorderBrush="{StaticResource InputBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+
+                            <StackPanel>
+
+                                <TextBlock Text="2. Bokningsuppgifter"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Check-in date -->
+                                    <StackPanel Grid.Column="0">
+
+                                        <TextBlock Text="Incheckning"
+                                                   Margin="0,0,0,7"
+                                                   Foreground="{StaticResource PrimaryText}"/>
+
+                                        <DatePicker x:Name="StartDatePicker"
+                                                    Height="38"/>
+
+                                    </StackPanel>
+
+                                    <!-- Check-out date -->
+                                    <StackPanel Grid.Column="2">
+
+                                        <TextBlock Text="Utcheckning"
+                                                   Margin="0,0,0,7"
+                                                   Foreground="{StaticResource PrimaryText}"/>
+
+                                        <DatePicker x:Name="EndDatePicker"
+                                                    Height="38"/>
+
+                                    </StackPanel>
+
+                                    <!-- Number of guests -->
+                                    <StackPanel Grid.Column="4">
+
+                                        <TextBlock Text="Antal gäster"
+                                                   Margin="0,0,0,7"
+                                                   Foreground="{StaticResource PrimaryText}"/>
+
+                                        <TextBox x:Name="NumberOfGuestsTextBox"
+                                                 Height="38"
+                                                 Padding="10,7"
+                                                 VerticalContentAlignment="Center"
+                                                 BorderBrush="{StaticResource InputBorder}"
+                                                 BorderThickness="1"
+                                                 FontSize="14"/>
+
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Search available accommodations -->
+                                <Button x:Name="SearchAccommodationsButton"
+                                        Content="Sök lediga boenden"
+                                        Width="180"
+                                        Height="38"
+                                        Margin="0,20,0,0"
+                                        HorizontalAlignment="Left"
+                                        Style="{StaticResource DeepSeaButtonStyle}"
+                                        Click="SearchAccommodations_Click"/>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Available accommodations -->
+                        <Border Margin="0,15,0,0"
+                                Padding="20"
+                                BorderBrush="{StaticResource InputBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+
+                            <StackPanel>
+
+                                <TextBlock Text="3. Välj boende"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <TextBlock Text="Välj ett ledigt boende från sökresultatet."
+                                           Margin="0,5,0,12"
+                                           FontSize="12"
+                                           Foreground="{StaticResource SecondaryText}"/>
+
+                                <DataGrid x:Name="AvailableAccommodationsDataGrid"
+                                          Height="150"
+                                          AutoGenerateColumns="False"
+                                          IsReadOnly="True"
+                                          SelectionMode="Single"
+                                          CanUserAddRows="False"
+                                          SelectionChanged="AvailableAccommodations_SelectionChanged">
+
+                                    <DataGrid.Columns>
+
+                                        <DataGridTextColumn Header="Boendenummer"
+                                                            Binding="{Binding AccommodationNumber}"
+                                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Boendetyp"
+                                                            Binding="{Binding AccommodationType.CategoryCode}"
+                                                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Antal sängar"
+                                                            Binding="{Binding AccommodationType.NumberOfBeds}"
+                                                            Width="*"/>
+
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Booking options -->
+                        <Border Margin="0,15,0,0"
+                                Padding="20"
+                                BorderBrush="{StaticResource InputBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10">
+
+                            <StackPanel>
+
+                                <TextBlock Text="4. Bekräfta bokning"
+                                           FontSize="16"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <CheckBox x:Name="CancellationInsuranceCheckBox"
+                                          Content="Lägg till avbeställningsskydd (300 kr)"
+                                          Margin="0,15,0,0"
+                                          Foreground="{StaticResource PrimaryText}"
+                                          Checked="CancellationInsurance_Changed"
+                                          Unchecked="CancellationInsurance_Changed"/>
+
+                                <TextBlock x:Name="BookingPriceTextBlock"
+                                           Text="Pris beräknas när boende har valts."
+                                           Margin="0,15,0,0"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Footer buttons -->
+                <Grid Grid.Row="2"
+                      Margin="0,20,0,0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="BackButton"
+                            Grid.Column="0"
+                            Content="Tillbaka"
+                            Width="110"
+                            Height="38"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Click="BackButton_Click"/>
+
+                    <Button x:Name="CreateBookingButton"
+                            Grid.Column="1"
+                            Content="Skapa bokning"
+                            Width="150"
+                            Height="38"
+                            IsEnabled="False"
+                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Click="CreateBooking_Click"/>
+
+                </Grid>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
