@@ -14,6 +14,9 @@ namespace PresentationLayer.Views
     {
         // Uses the existing controller to retrieve booking data.
         private readonly BookingController _bookingController;
+
+        // Enables sample data for UI testing only. Keep false for normal use.
+        private readonly bool _usePreviewData = true;
         // Preview data only; no database changes are made.
         private readonly ObservableCollection<GuestStayRow> _previewGuests = new();
         private readonly ObservableCollection<GuestStayRow> _visibleGuests = new();
@@ -67,6 +70,37 @@ namespace PresentationLayer.Views
 
 
             // Real user permissions will be supplied by the business layer.
+
+            // Test payment warnings without enabling real database actions.
+            if (_usePreviewData)
+            {
+                GuestPermissionTextBlock.Text =
+                    "Testvy – ändringar sparas inte i databasen.";
+                GuestPermissionTextBlock.Visibility = Visibility.Visible;
+
+                bool isTodaysArrival =
+                    GuestDatePicker.SelectedDate?.Date == DateTime.Today &&
+                    guest.ArrivalDate.Date == DateTime.Today &&
+                    guest.StayStatus == "Ej incheckad";
+
+                if (isTodaysArrival && guest.PaymentStatus != "Fullbetald")
+                {
+                    GuestFeedbackTextBlock.Text =
+                        "Bokningen är inte fullbetald. Gästen kan inte checkas in.";
+                    GuestFeedbackBorder.Visibility = Visibility.Visible;
+                }
+
+                CheckInButton.IsEnabled =
+                    isTodaysArrival && guest.PaymentStatus == "Fullbetald";
+
+                CheckOutButton.IsEnabled =
+                    GuestDatePicker.SelectedDate?.Date == DateTime.Today &&
+                    guest.DepartureDate.Date == DateTime.Today &&
+                    guest.StayStatus == "Incheckad";
+
+                return;
+            }
+
             GuestPermissionTextBlock.Text =
                 "In- och utcheckning är ännu inte kopplad till sparande och behörighet.";
             GuestPermissionTextBlock.Visibility = Visibility.Visible;
@@ -140,6 +174,38 @@ namespace PresentationLayer.Views
         private void LoadGuests()
         {
             _previewGuests.Clear();
+
+            // Use sample bookings only when preview mode is explicitly enabled.
+            if (_usePreviewData)
+            {
+                Title = "SkiCenter - In- och utcheckning (TESTVY)";
+
+                _previewGuests.Add(new GuestStayRow
+                {
+                    BookingID = 9001,
+                    CustomerName = "Anna Test",
+                    CustomerType = "Privatkund",
+                    AccommodationName = "Teststuga 1",
+                    ArrivalDate = DateTime.Today,
+                    DepartureDate = DateTime.Today.AddDays(7),
+                    PaymentStatus = "Obetald",
+                    StayStatus = "Ej incheckad"
+                });
+
+                _previewGuests.Add(new GuestStayRow
+                {
+                    BookingID = 9002,
+                    CustomerName = "Erik Test",
+                    CustomerType = "Privatkund",
+                    AccommodationName = "Teststuga 2",
+                    ArrivalDate = DateTime.Today,
+                    DepartureDate = DateTime.Today.AddDays(7),
+                    PaymentStatus = "Fullbetald",
+                    StayStatus = "Ej incheckad"
+                });
+
+                return;
+            }
 
             try
             {
