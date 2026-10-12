@@ -57,6 +57,32 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
+        /// Updates an item with new properties.
+        /// </summary>
+        /// <param name="articleNumber"></param>
+        /// <param name="equipmentID"></param>
+        /// <param name="size"></param>
+        /// <param name="status"></param>
+        /// <param name="condition"></param>
+        public void UpdateEquipmentItem(string articleNumber, int equipmentID, string size, EquipmentStatus status, EquipmentCondition condition)
+        {
+            if (string.IsNullOrWhiteSpace(articleNumber)) return;
+
+            var item = _context.Set<EquipmentItem>()
+                .FirstOrDefault(ei => ei.ArticleNumber == articleNumber.Trim());
+
+            if (item != null)
+            {   
+                item.EquipmentID = equipmentID;
+                item.Size = size;
+                item.Status = status;
+                item.Condition = condition;
+
+                _context.Set<EquipmentItem>().Update(item);
+            }
+        }
+
+        /// <summary>
         /// Updates both Status and Condition of a specific article number.
         /// </summary>
         /// <param name="articleNumber"></param>
