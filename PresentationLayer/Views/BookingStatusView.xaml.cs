@@ -1,27 +1,29 @@
-﻿using PresentationLayer.Models;
+﻿using BusinessLayer;
+using BusinessLayer.Controllers;
+using EntityLayer;
+using PresentationLayer.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace PresentationLayer.Views
 {
     public partial class BookingStatusView : Window
     {
         private readonly ObservableCollection<BookingStatusRow> _bookings = new();
-        private readonly ICollectionView _bookingView;
+        private readonly BookingController _bookingController;
 
-        public BookingStatusView()
+        public BookingStatusView(BookingController bookingController)
         {
             InitializeComponent();
 
-            // Preview data only. Replace with data from the business layer later.
-            AddPreviewBookings();
+            _bookingController = bookingController;
 
-            _bookingView = new ListCollectionView(_bookings);
-            _bookingView.Filter = MatchesFilters;
-            BookingsDataGrid.ItemsSource = _bookingView;
+            CollectionViewSource.GetDefaultView(_bookings).Filter = MatchesFilters;
+            BookingsDataGrid.ItemsSource = _bookings;
 
             // Use display values present in the supplied rows.
             PopulateFilters();
@@ -30,61 +32,69 @@ namespace PresentationLayer.Views
             PaymentStatusFilterComboBox.SelectionChanged += Filters_SelectionChanged;
             ResetFiltersButton.Click += ResetFiltersButton_Click;
 
+            BookingsDataGrid.SelectionChanged += BookingsDataGrid_SelectionChanged;
+            BookingsDataGrid.MouseDoubleClick += BookingsDataGrid_MouseDoubleClick;
+            ShowBookingDetailsButton.Click += ShowBookingDetailsButton_Click;
+
+            LoadBookingData();
+            UpdateBookingCount();
+
+        }
+
+        private void LoadBookingData()
+        {
+            _bookings.Clear();
+
+            var bookingsFromDb = _bookingController.GetAllBookings();
+
+            foreach (var b in bookingsFromDb)
+            {
+                // Customer names
+                string customerName = "Okänd";
+                if (b.Customer is PrivateCustomer pc)
+                {
+                    customerName = $"{pc.FirstName} {pc.LastName}".Trim();
+                }
+                else if (b.Customer is CorporateCustomer cc)
+                {
+                    customerName = cc.CompanyName ?? cc.ContactPerson ?? "Företagskund";
+                }
+
+                // Gets dates for booking
+                DateTime? arrival = b.Accommodations?.Select(a => (DateTime?)a.StartDate)
+                    .Concat(b.MeetingRooms?.Select(m => (DateTime?)m.StartDate) ?? Enumerable.Empty<DateTime?>())
+                    .Concat(b.Rentals?.Select(r => (DateTime?)r.StartDate) ?? Enumerable.Empty<DateTime?>())
+                    .Min();
+
+                DateTime? departure = b.Accommodations?.Select(a => (DateTime?)a.EndDate)
+                    .Concat(b.MeetingRooms?.Select(m => (DateTime?)m.EndDate) ?? Enumerable.Empty<DateTime?>())
+                    .Concat(b.Rentals?.Select(r => (DateTime?)r.EndDate) ?? Enumerable.Empty<DateTime?>())
+                    .Max();
+
+                // Paymentstatus based on Invoices
+                string paymentStatus = "Obetald";
+                if (b.Invoices != null && b.Invoices.Any())
+                {
+                    paymentStatus = b.Invoices.All(i => i.Status?.ToString() == "Paid" || i.Status?.ToString() == "Betald")
+                        ? "Fullbetald"
+                        : "Delbetald";
+                }
+
+                _bookings.Add(new BookingStatusRow
+                {
+                    BookingID = b.BookingID,
+                    CustomerName = customerName,
+                    ArrivalDate = arrival,
+                    DepartureDate = departure,
+                    BookingStatus = b.BookingStatus.ToString(),
+                    PaymentStatus = paymentStatus
+                });
+            }
+
+            CollectionViewSource.GetDefaultView(_bookings)?.Refresh();
             UpdateBookingCount();
         }
 
-        private void AddPreviewBookings()
-        {
-            _bookings.Add(new BookingStatusRow
-            {
-                BookingID = 2031,
-                CustomerName = "Anna Andersson",
-                ArrivalDate = new DateTime(2027, 1, 24),
-                DepartureDate = new DateTime(2027, 1, 31),
-                BookingStatus = "Bekräftad",
-                PaymentStatus = "Fullbetald"
-            });
-
-            _bookings.Add(new BookingStatusRow
-            {
-                BookingID = 2032,
-                CustomerName = "Fjällteam AB",
-                ArrivalDate = new DateTime(2027, 2, 1),
-                DepartureDate = new DateTime(2027, 2, 7),
-                BookingStatus = "Preliminär",
-                PaymentStatus = "Obetald"
-            });
-
-            _bookings.Add(new BookingStatusRow
-            {
-                BookingID = 2033,
-                CustomerName = "Erik Svensson",
-                ArrivalDate = new DateTime(2027, 2, 10),
-                DepartureDate = new DateTime(2027, 2, 14),
-                BookingStatus = "Bekräftad",
-                PaymentStatus = "Delbetald"
-            });
-
-            _bookings.Add(new BookingStatusRow
-            {
-                BookingID = 2034,
-                CustomerName = "Sara Nilsson",
-                ArrivalDate = new DateTime(2027, 2, 15),
-                DepartureDate = new DateTime(2027, 2, 20),
-                BookingStatus = "Avbokad",
-                PaymentStatus = "Obetald"
-            });
-
-            _bookings.Add(new BookingStatusRow
-            {
-                BookingID = 2035,
-                CustomerName = "Lina Berg",
-                ArrivalDate = null,
-                DepartureDate = null,
-                BookingStatus = "Bekräftad",
-                PaymentStatus = "Obetald"
-            });
-        }
 
         private void PopulateFilters()
         {
@@ -135,8 +145,47 @@ namespace PresentationLayer.Views
         private void Filters_SelectionChanged(
             object sender, SelectionChangedEventArgs e)
         {
-            _bookingView.Refresh();
+            CollectionViewSource.GetDefaultView(_bookings)?.Refresh();
             UpdateBookingCount();
+
+            if (BookingsDataGrid.Items.Count > 0)
+            {
+                BookingsDataGrid.ScrollIntoView(BookingsDataGrid.Items[0]);
+            }
+        }
+
+        private void BookingsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ShowBookingDetailsButton.IsEnabled = BookingsDataGrid.SelectedItem is BookingStatusRow;
+        }
+
+        private void BookingsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (BookingsDataGrid.SelectedItem is BookingStatusRow)
+            {
+                OpenSelectedBookingDetails();
+            }
+        }
+
+        private void ShowCustomerBookingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var customerController = new CustomerController(new DataLayer.UnitOfWork(new DataLayer.SkiCenterDbContext()));
+            var customerBookingsView = new CustomerBookingsView(_bookingController, customerController)
+            {
+                Owner = this
+            };
+
+            customerBookingsView.ShowDialog();
+        }
+
+        private void ShowBookingDetailsButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenSelectedBookingDetails();
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         private void ResetFiltersButton_Click(object sender, RoutedEventArgs e)
@@ -145,9 +194,42 @@ namespace PresentationLayer.Views
             PaymentStatusFilterComboBox.SelectedIndex = 0;
         }
 
+        private void OpenSelectedBookingDetails()
+        {
+            if (BookingsDataGrid.SelectedItem is not BookingStatusRow selectedRow)
+            {
+                MessageBox.Show("Välj en bokning i listan först.");
+                return;
+            }
+
+            // Gets the booking with all its contents
+            Booking fullBooking = _bookingController.GetSpecificBooking(selectedRow.BookingID);
+
+            if (fullBooking == null)
+            {
+                MessageBox.Show("Kunde inte hämta bokningsdetaljerna från databasen.",
+                                "Fel",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                return;
+            }
+
+            // Open the detail window
+            var detailsView = new BookingDetailsView(fullBooking)
+            {
+                Owner = this
+            };
+
+            detailsView.ShowDialog();
+
+            // Reload in case of changes when in the view
+            LoadBookingData();
+        }
+
         private void UpdateBookingCount()
         {
-            int count = _bookingView.Cast<BookingStatusRow>().Count();
+            var view = CollectionViewSource.GetDefaultView(_bookings);
+            int count = view.Cast<BookingStatusRow>().Count();
 
             BookingCountTextBlock.Text = count switch
             {

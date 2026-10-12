@@ -46,6 +46,16 @@ namespace DataLayer
                 .WithMany()
                 .HasForeignKey(sp => sp.ChangedByStaffID)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Maps to the existing 'CreditLimit' column instead of PrivateCustomer.CreditLimit.
+            modelBuilder.Entity<PrivateCustomer>()
+                .Property(p => p.CreditLimit)
+                .HasColumnName("CreditLimit");
+
+            // Maps to the existing 'CreditLimit' column instead of CorporateCustomer.CreditLimit.
+            modelBuilder.Entity<CorporateCustomer>()
+                .Property(c => c.CreditLimit)
+                .HasColumnName("CreditLimit");
         }
 
         /// <summary>
