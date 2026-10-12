@@ -16,7 +16,7 @@ namespace PresentationLayer.Views
         private readonly BookingController _bookingController;
 
         // Enables sample data for UI testing only. Keep false for normal use.
-        private readonly bool _usePreviewData = true;
+        private readonly bool _usePreviewData = false;
         // Preview data only; no database changes are made.
         private readonly ObservableCollection<GuestStayRow> _previewGuests = new();
         private readonly ObservableCollection<GuestStayRow> _visibleGuests = new();
