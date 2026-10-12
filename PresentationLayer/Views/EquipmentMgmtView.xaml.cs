@@ -54,7 +54,7 @@ namespace PresentationLayer.Views
         // Fills ComboBoxes with data
         private void PopulateComboBoxes()
         {
-            // 1. Skick (Conditions)
+            // Conditions
             EquipmentConditionComboBox.Items.Clear();
             foreach (var condition in Enum.GetValues(typeof(EquipmentCondition)))
             {
@@ -63,7 +63,7 @@ namespace PresentationLayer.Views
             EquipmentConditionComboBox.SelectedIndex = 0;
 
 
-            // 2. Modeller & Kategorier
+            // Models and categories
             var result = _skiShopController.GetAllEquipmentWithStock();
             _equipmentModels.Clear();
             foreach (var eq in result)
@@ -87,13 +87,13 @@ namespace PresentationLayer.Views
             }
 
 
-            // 3. Status i formuläret
+            // Status in the form
             EquipmentStatusComboBox.ItemsSource = null;
             EquipmentStatusComboBox.ItemsSource = Enum.GetValues(typeof(EquipmentStatus));
             EquipmentStatusComboBox.SelectedIndex = 0;
 
 
-            // 4. Status i sökfiltret
+            // Status in the filter view
             var filterStatuses = new List<object> { "Alla statusar" };
             filterStatuses.AddRange(Enum.GetValues(typeof(EquipmentStatus)).Cast<object>());
             StatusFilterComboBox.ItemsSource = null;
@@ -305,6 +305,8 @@ namespace PresentationLayer.Views
             }
 
             LoadEquipmentData();
+            ResetForm();
+            EquipmentFormPanel.Visibility = Visibility.Visible;
             ShowFeedback(isNewItem ? "Utrustningen har lagts till." : "Utrustningen har uppdaterats.", true);
         }
 
