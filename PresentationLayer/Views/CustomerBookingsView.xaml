@@ -197,7 +197,7 @@
                                             </StackPanel>
 
                                             <TextBlock Grid.Column="1"
-                                                       Text="{Binding Status}"
+                                                       Text="{Binding BookingStatus}"
                                                        FontWeight="SemiBold"
                                                        Foreground="{StaticResource SecondaryText}"/>
 
