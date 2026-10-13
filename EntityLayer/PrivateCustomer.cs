@@ -11,9 +11,6 @@ namespace EntityLayer
         [Required]
         public string LastName { get; set; }
 
-        [Required]
-        public decimal CreditLimit { get; set; }
-
         // Describes what should be mapped to DisplayName
         [NotMapped]
         public override string DisplayName => $"{FirstName} {LastName}";

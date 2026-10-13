@@ -27,7 +27,7 @@ namespace PresentationLayer.Views
         {
             [SystemModule.CustomerRegistration] = new("Registrera kund", "Lägg till privat- eller företagskunder", typeof(CustomerRegistrationView)),
             [SystemModule.EquipmentManagement] = new("Utrustning", "Hantera skidutrustning och lager", typeof(EquipmentMgmtView)),
-            [SystemModule.Rentals] = new("Uthyrning", "Hyr ut och ta emot utrustning", null),
+            [SystemModule.Rentals] = new("Uthyrning", "Lägg till utrustning på en bokning", typeof(EquipmentRentalView)),
             [SystemModule.Bookings] = new("Bokningar", "Skapa och hantera bokningar", typeof(CustomerBookingsView)),
             [SystemModule.Accommodation] = new("Boende", "Lägenheter, stugor och konferensrum", null),
             [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", null),

@@ -67,6 +67,7 @@ namespace PresentationLayer
             services.AddTransient<CustomerBookingsView>();
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<SeasonPriceView>();
+            services.AddTransient<EquipmentRentalView>();
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();

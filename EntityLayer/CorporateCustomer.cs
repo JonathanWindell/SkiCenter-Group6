@@ -10,7 +10,6 @@ namespace EntityLayer
         public string OrganisationNumber { get; set; }
         [Required]
         public string ContactPerson { get; set; }
-        public decimal CreditLimit { get; set; }
         public decimal DiscountRate { get; set; }
         public bool IsApproved { get; set; } // Decided by marketing manager
 
