@@ -480,7 +480,7 @@
                         Width="110"
                         Height="38"
                         Margin="0,20,0,0"
-                        HorizontalAlignment="Right"
+                        HorizontalAlignment="Left"
                         Style="{StaticResource DeepSeaButtonStyle}"
                         Click="BackButton_Click"/>
 

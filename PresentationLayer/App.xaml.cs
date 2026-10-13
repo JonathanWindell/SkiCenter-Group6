@@ -67,7 +67,12 @@ namespace PresentationLayer
             services.AddTransient<CustomerBookingsView>();
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<SeasonPriceView>();
+<<<<<<< HEAD
             services.AddTransient<GuestCheckInOutView>();
+=======
+            services.AddTransient<BookingDetailsView>();
+            services.AddTransient<BookingStatusView>();
+>>>>>>> 9e19834 (Connected BookingView to Db)
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
