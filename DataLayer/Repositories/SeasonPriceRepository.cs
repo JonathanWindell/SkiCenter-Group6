@@ -29,7 +29,6 @@ namespace DataLayer.Repositories
             {
                 return null;
             }
-
             string type = priceType.Trim();
 
             return _context.Set<SeasonPrice>()
@@ -135,7 +134,6 @@ namespace DataLayer.Repositories
             {
                 return Enumerable.Empty<SeasonPrice>();
             }
-
             string type = priceType.Trim();
 
             return _context.Set<SeasonPrice>()

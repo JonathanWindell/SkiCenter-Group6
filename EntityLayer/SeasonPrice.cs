@@ -49,6 +49,7 @@ namespace EntityLayer
             AccommodationTypeID = accommodationTypeID;
             PriceType = priceType;
             WeekNumber = weekNumber;
+            PriceType = priceType;
             Price = price;
             ValidFrom = validFrom;
             ChangedByStaffID = changedByStaffID;

@@ -23,6 +23,7 @@ namespace DataLayer.Repositories
 
             return _context.Set<EquipmentItem>()
                 .Include(ei => ei.Equipment)
+                    .ThenInclude(e => e.Prices)
                 .FirstOrDefault(ei => ei.ArticleNumber == articleNumber.Trim());
         }
 

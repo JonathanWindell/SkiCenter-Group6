@@ -26,8 +26,8 @@ namespace EntityLayer
             OrganisationNumber = orgNumber;
             ContactPerson = contactPerson;
             IsApproved = false;
-            CreditLimit = 0;
-            DiscountRate = 0;
+            CreditLimit = 0m;
+            DiscountRate = 0m;
         }
     }
 }

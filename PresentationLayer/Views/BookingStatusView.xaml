@@ -273,15 +273,34 @@
                 </DataGrid>
             </Border>
 
-            <!-- Enabled later when a booking is selected and navigation is connected. -->
+            <!-- Back button -->
+            <Button Grid.Row="4"
+                        Content="Tillbaka"
+                        Width="110"
+                        Height="38"
+                        Margin="0,20,0,0"
+                        HorizontalAlignment="Left"
+                        Style="{StaticResource DeepSeaButtonStyle}"
+                        Click="BackButton_Click"/>
+
+            <Button x:Name="ShowCustomerBookingsButton"
+                    Grid.Row="4"
+                    Content="Sök på bokning"
+                    Width="140"
+                    Height="38"
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Center"
+                    RenderTransformOrigin="0.5,0.5"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="ShowCustomerBookingsButton_Click"/>
+
             <Button x:Name="ShowBookingDetailsButton"
                     Grid.Row="4"
                     Content="Visa bokningsdetaljer"
                     Width="190"
                     Height="38"
-                    Margin="0,18,0,0"
+                    Margin="0,20,0,0"
                     HorizontalAlignment="Right"
-                    IsEnabled="False"
                     RenderTransformOrigin="0.5,0.5"
                     Style="{StaticResource DeepSeaButtonStyle}">
 

@@ -31,7 +31,7 @@ namespace BusinessLayer.Controllers
         /// <summary>
         /// Gets equipment filtered by its category.
         /// </summary>
-        /// /// <param name="category"/param>
+        /// <param name="category"></param>
         public IEnumerable<Equipment> GetEquipmentByCategory(string category)
         {
             if (string.IsNullOrWhiteSpace(category))
@@ -59,7 +59,7 @@ namespace BusinessLayer.Controllers
         /// <summary>
         /// Gets all available items of a specific model.
         /// </summary>
-        /// /// <param name="equipmentID"/param>
+        /// <param name="equipmentID"></param>
         public IEnumerable<EquipmentItem> GetAvailableItems(int equipmentID)
         {
             if (equipmentID <= 0)
@@ -73,9 +73,9 @@ namespace BusinessLayer.Controllers
         /// <summary>
         /// Updates an item by its article number, updates status and condition. 
         /// </summary>
-        /// /// <param name="articleNumber"/param>
-        /// /// <param name="status"/param>
-        /// /// <param name="condition"/param>
+        /// <param name="articleNumber"/param>
+        /// <param name="status"/param>
+        /// <param name="condition"/param>
         public bool UpdateEquipmentItem(string articleNumber, int equipmentID, string size, EquipmentStatus status, EquipmentCondition condition)
         {
             if (equipmentID <= 0 || string.IsNullOrWhiteSpace(articleNumber) || string.IsNullOrWhiteSpace(size))
@@ -190,8 +190,8 @@ namespace BusinessLayer.Controllers
         /// <summary>
         /// Creates a new rental with scanned articles and changes their status to rented.
         /// </summary>
-        /// /// <param name="rental"/param>
-        /// /// <param name="scannedArticleNumbers"/param>
+        /// <param name="rental"></param>
+        /// <param name="scannedArticleNumbers"></param>
         public bool CreateRental(Rental rental, IEnumerable<string> scannedArticleNumbers)
         {
             if (rental == null || scannedArticleNumbers == null || !scannedArticleNumbers.Any())
@@ -227,6 +227,17 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
+            // Snowmobiles require that the caller has set LicenseVerified
+            if (RequiresDriverLicense(rental.EquipmentItems) && !rental.LicenseVerified)
+            {
+                return false;
+            }
+
+            // Store the rental's price so it can be shown on the invoice later
+            int days = CountRentalDays(rental.StartDate, rental.EndDate);
+            rental.TotalPrice = rental.EquipmentItems
+                .Sum(item => CalculateRentalPrice(item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days) ?? 0m);
+
             rental.Status = "Active";
             _unitOfWork.Rental.Add(rental);
 
@@ -236,7 +247,7 @@ namespace BusinessLayer.Controllers
         /// <summary>
         /// Returns a rental or scanned articles and make them available again.
         /// </summary>
-        /// /// <param name="rentalID"/param>
+        /// <param name="rentalID"></param>
         public bool ReturnRental(int rentalID)
         {
             var rental = _unitOfWork.Rental.GetRentalWithItems(rentalID);

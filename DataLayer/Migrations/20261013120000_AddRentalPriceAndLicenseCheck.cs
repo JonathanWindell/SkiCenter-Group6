@@ -11,7 +11,7 @@ namespace DataLayer.Migrations
     /// driver's license was verified (required for snowmobile rentals).
     /// </summary>
     [DbContext(typeof(SkiCenterDbContext))]
-    [Migration("20261012120000_AddRentalPriceAndLicenseCheck")]
+    [Migration("20261013120000_AddRentalPriceAndLicenseCheck")]
     public partial class AddRentalPriceAndLicenseCheck : Migration
     {
         /// <inheritdoc />

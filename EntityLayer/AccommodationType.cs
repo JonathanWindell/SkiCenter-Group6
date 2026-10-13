@@ -19,10 +19,10 @@ namespace EntityLayer
         public int NumberOfBeds { get; set; }
 
         // Many to Many relations. One type of accomodation can have multiple accomodations. 
-        public virtual ICollection<Accommodation> Accommodations { get; set; }
+        public virtual ICollection<Accommodation> Accommodations { get; set; } = new List<Accommodation>();
 
         // Many to Many relations. One type of accomodation has different prices on different weeks. 
-        public virtual ICollection<SeasonPrice> SeasonPrices { get; set; }
+        public virtual ICollection<SeasonPrice> SeasonPrices { get; set; } = new List<SeasonPrice>();
 
         // Parameterless constructor for EF 
         public AccommodationType() { }

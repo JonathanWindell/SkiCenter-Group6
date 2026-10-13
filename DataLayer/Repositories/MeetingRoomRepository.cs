@@ -17,7 +17,7 @@ namespace DataLayer.Repositories
         /// Gets all MeetingRooms based on status.
         /// </summary>
         /// <param name="status"></param>
-        public IEnumerable<MeetingRoom> GetMeetingRoomsByStatus(meetingRoomStatus status)
+        public IEnumerable<MeetingRoom> GetMeetingRoomsByStatus(MeetingRoomStatus status)
         {
             return _context.Set<MeetingRoom>()
                 .Where(m => m.Status == status)

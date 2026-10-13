@@ -16,13 +16,16 @@ namespace EntityLayer
         public override string DisplayName => $"{FirstName} {LastName}";
 
         // Parameterless constructor for EF 
-        public PrivateCustomer() { }
+        public PrivateCustomer() 
+        {
+            CreditLimit = 12000;
+        }
 
         public PrivateCustomer(string firstName, string lastName, string address, string email, string phoneNumber, decimal creditLimit) : base(address, email, phoneNumber)
         {
             FirstName = firstName;
             LastName = lastName;
-            CreditLimit = creditLimit;
+            CreditLimit = 12000;
         }
     }
 }
