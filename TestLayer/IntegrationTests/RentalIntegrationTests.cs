@@ -35,13 +35,13 @@ namespace TestLayer.IntegrationTests
         public void SkiRental_BookAvailableSkis()
         {
             // Arrange
-            
+
             // Act
 
             // Assert
-        
+
         }
-        
+
 
         //Integrate Businesslayer
         [Test]

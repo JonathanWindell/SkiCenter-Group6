@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PresentationLayer.Models
+﻿namespace PresentationLayer.Models
 {
     // Holds guest details displayed in the check in/out view.
     public class GuestStayRow

@@ -1,5 +1,5 @@
-﻿using System.Windows;
-using EntityLayer;
+﻿using EntityLayer;
+using System.Windows;
 
 namespace PresentationLayer.Views
 {
