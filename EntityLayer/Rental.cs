@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
@@ -19,7 +20,20 @@ namespace EntityLayer
 
         public string Status { get; set; }
 
-        // Parameterless constructor for EF 
+        // Total price for all items in the rental. Added to the booking's total amount.
+        [Required]
+        public decimal TotalPrice { get; set; }
+
+        // True when staff have verified the customer's driver's license. Required for snowmobile rentals.
+        [Required]
+        public bool LicenseVerified { get; set; }
+
+        // Relation to Booking. Foreign Key. Null for rentals not connected to a booking.
+        [ForeignKey("Booking")]
+        public int? BookingID { get; set; }
+        public virtual Booking? Booking { get; set; }
+
+        // Parameterless constructor for EF
         public Rental() { }
 
         // Relation to EquipmentItems. Many to Many relation
@@ -31,6 +45,7 @@ namespace EntityLayer
             EndDate = endDate;
             ReturnDate = returnDate;
             Status = status;
+            TotalPrice = sum;
         }
     }
 }

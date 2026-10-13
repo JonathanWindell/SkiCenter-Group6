@@ -23,6 +23,7 @@ namespace DataLayer.Repositories
 
             return _context.Set<EquipmentItem>()
                 .Include(ei => ei.Equipment)
+                    .ThenInclude(e => e.Prices)
                 .FirstOrDefault(ei => ei.ArticleNumber == articleNumber.Trim());
         }
 
@@ -53,6 +54,53 @@ namespace DataLayer.Repositories
                 .Include(ei => ei.Equipment)
                 .Where(ei => ei.EquipmentID == equipmentID && ei.Status == EquipmentStatus.Available)
                 .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets all available items, optionally for one category, with their equipment and price list.
+        /// </summary>
+        /// <param name="category">Optional category filter, e.g. "Skoter".</param>
+        public IEnumerable<EquipmentItem> GetAvailableItemsWithPrices(string? category)
+        {
+            IQueryable<EquipmentItem> items = _context.Set<EquipmentItem>()
+                .Include(ei => ei.Equipment)
+                    .ThenInclude(e => e.Prices)
+                .Where(ei => ei.Status == EquipmentStatus.Available);
+
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                string trimmedCategory = category.Trim();
+                items = items.Where(ei => ei.Equipment.Category == trimmedCategory);
+            }
+
+            return items
+                .OrderBy(ei => ei.Equipment.Category)
+                .ThenBy(ei => ei.Equipment.Description)
+                .ThenBy(ei => ei.ArticleNumber)
+                .AsSplitQuery()
+                .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets specific items by their IDs, with equipment and price list. The items are tracked so they can be updated.
+        /// </summary>
+        /// <param name="equipmentItemIDs"></param>
+        public IEnumerable<EquipmentItem> GetItemsByIds(IEnumerable<int> equipmentItemIDs)
+        {
+            List<int> ids = equipmentItemIDs?.Distinct().ToList() ?? new List<int>();
+
+            if (ids.Count == 0)
+            {
+                return Enumerable.Empty<EquipmentItem>();
+            }
+
+            return _context.Set<EquipmentItem>()
+                .Include(ei => ei.Equipment)
+                    .ThenInclude(e => e.Prices)
+                .Where(ei => ids.Contains(ei.EquipmentItemID))
+                .AsSplitQuery()
                 .ToList();
         }
 

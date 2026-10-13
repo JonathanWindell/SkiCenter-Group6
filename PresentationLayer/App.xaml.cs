@@ -58,7 +58,8 @@ namespace PresentationLayer
             services.AddTransient<CustomerBookingsView>();
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<SeasonPriceView>();
-            services.AddTransient<BookingDetailsView>();
+            services.AddTransient<EquipmentRentalView>();
+            services.AddTransient<GuestCheckInOutView>();
             services.AddTransient<BookingStatusView>();
 
             // 2. Register Controllers
@@ -89,12 +90,12 @@ namespace PresentationLayer
             base.OnStartup(e);
 
             // Resolve the main window (LoginView) from the service provider and show it
-            // var loginWindow = Services.GetRequiredService<LoginView>();
-            // loginWindow.Show();
+            var loginWindow = Services.GetRequiredService<LoginView>();
+            loginWindow.Show();
 
-            // Temporarily open the guest view to test controller-loaded bookings.
-            var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
-            guestWindow.Show();
+            // To test the guest view directly without logging in, comment out the two lines above and use:
+            // var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
+            // guestWindow.Show();
 
             /*
             // Only use when data should be written from seeding files. I (Jonathan will fix this during this week)
