@@ -11,21 +11,21 @@ namespace EntityLayer
         [Required]
         public string LastName { get; set; }
 
-        [Required]
-        public decimal CreditLimit { get; set; }
-
         // Describes what should be mapped to DisplayName
         [NotMapped]
         public override string DisplayName => $"{FirstName} {LastName}";
 
         // Parameterless constructor for EF 
-        public PrivateCustomer() { }
+        public PrivateCustomer() 
+        {
+            CreditLimit = 12000;
+        }
 
         public PrivateCustomer(string firstName, string lastName, string address, string email, string phoneNumber, decimal creditLimit) : base(address, email, phoneNumber)
         {
             FirstName = firstName;
             LastName = lastName;
-            CreditLimit = creditLimit;
+            CreditLimit = 12000;
         }
     }
 }

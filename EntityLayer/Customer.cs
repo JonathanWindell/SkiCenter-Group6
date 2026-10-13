@@ -18,6 +18,8 @@ namespace EntityLayer
         [Required]
         public string PhoneNumber { get; private set; }
 
+        public decimal CreditLimit { get; set; }
+
         // One to Many relation between Customer & Booking
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
@@ -28,7 +30,7 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public Customer() { }
 
-        public Customer(string address, string email, string phoneNumber)
+        protected Customer(string address, string email, string phoneNumber)
         {
             Address = address;
             Email = email;

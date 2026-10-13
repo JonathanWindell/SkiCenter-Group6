@@ -1,4 +1,5 @@
-﻿using DataLayer;
+﻿using BusinessLayer;
+using DataLayer;
 
 namespace TestLayer.IntegrationTests
 {
@@ -9,6 +10,9 @@ namespace TestLayer.IntegrationTests
         public class BookingTests
         {
             private SkiCenterDbContext _context;
+            private UnitOfWork _unitOfWork;
+            private BookingController _bookingController;
+
 
             [SetUp]
             public void Setup()
@@ -29,7 +33,7 @@ namespace TestLayer.IntegrationTests
             }
 
             [Test]
-            public void GetBookingsInRange_ValidData_ReturnsTrue()
+            public void CreateBooking_NonValidDates_ReturnsFalse()
             {
                 // Requires bookings in database
             }
