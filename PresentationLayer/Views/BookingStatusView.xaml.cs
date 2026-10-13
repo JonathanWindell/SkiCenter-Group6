@@ -25,9 +25,6 @@ namespace PresentationLayer.Views
             CollectionViewSource.GetDefaultView(_bookings).Filter = MatchesFilters;
             BookingsDataGrid.ItemsSource = _bookings;
 
-            // Use display values present in the supplied rows.
-            PopulateFilters();
-
             BookingStatusFilterComboBox.SelectionChanged += Filters_SelectionChanged;
             PaymentStatusFilterComboBox.SelectionChanged += Filters_SelectionChanged;
             ResetFiltersButton.Click += ResetFiltersButton_Click;
@@ -37,8 +34,8 @@ namespace PresentationLayer.Views
             ShowBookingDetailsButton.Click += ShowBookingDetailsButton_Click;
 
             LoadBookingData();
+            PopulateFilters();
             UpdateBookingCount();
-
         }
 
         private void LoadBookingData()
