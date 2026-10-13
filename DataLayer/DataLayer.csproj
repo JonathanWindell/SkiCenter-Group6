@@ -30,4 +30,8 @@
     <ProjectReference Include="..\EntityLayer\EntityLayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="SQL Queries\" />
+  </ItemGroup>
+
 </Project>

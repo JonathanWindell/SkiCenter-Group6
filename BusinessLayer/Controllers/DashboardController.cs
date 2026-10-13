@@ -43,8 +43,7 @@ namespace BusinessLayer.Controllers
             },
             [staffRole.MarketingManager] = new[]
             {
-                SystemModule.Reports,
-                SystemModule.SeasonPrices
+                SystemModule.Reports
             },
             // System admins have access to every module
             [staffRole.SystemAdmin] = Enum.GetValues<SystemModule>()

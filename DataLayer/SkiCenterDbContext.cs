@@ -36,6 +36,18 @@ namespace DataLayer
             configurationBuilder.Properties<decimal>().HavePrecision(18, 2);
         }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Staff who have changed season prices cannot be deleted, so the price log stays complete.
+            modelBuilder.Entity<SeasonPrice>()
+                .HasOne(sp => sp.ChangedBy)
+                .WithMany()
+                .HasForeignKey(sp => sp.ChangedByStaffID)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+
         /// <summary>
         /// Create DbSet for every entity
         /// </summary>

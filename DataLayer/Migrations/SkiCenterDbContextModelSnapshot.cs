@@ -406,6 +406,10 @@ namespace DataLayer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SeasonPriceID"));
 
                     b.Property<int>("AccommodationTypeID")
+
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ChangedByStaffID")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
@@ -416,12 +420,17 @@ namespace DataLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("WeekNumber")
                         .HasColumnType("int");
 
                     b.HasKey("SeasonPriceID");
 
                     b.HasIndex("AccommodationTypeID");
+
+                    b.HasIndex("ChangedByStaffID");
 
                     b.ToTable("SeasonPrices");
                 });
@@ -694,7 +703,18 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+<<<<<<< HEAD
                     b.Navigation("AccommodationType");
+=======
+                    b.HasOne("EntityLayer.Staff", "ChangedBy")
+                        .WithMany()
+                        .HasForeignKey("ChangedByStaffID")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AccommodationType");
+
+                    b.Navigation("ChangedBy");
+>>>>>>> f80d3ffdccf265d16c66fa617622cf379dabac8c
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLessonBooking", b =>
