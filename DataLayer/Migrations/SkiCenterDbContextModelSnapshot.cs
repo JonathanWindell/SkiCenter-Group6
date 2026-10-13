@@ -44,7 +44,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("AccommodationTypeID");
 
-                    b.ToTable("Accommodations");
+                    b.ToTable("Accommodations", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.AccommodationType", b =>
@@ -68,7 +68,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("AccommodationTypeID");
 
-                    b.ToTable("AccommodationType");
+                    b.ToTable("AccommodationType", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.Booking", b =>
@@ -107,7 +107,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("StaffID");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.BookingAccommodation", b =>
@@ -148,7 +148,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("BookingID");
 
-                    b.ToTable("BookingAccommodations");
+                    b.ToTable("BookingAccommodations", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.BookingMeetingRoom", b =>
@@ -177,7 +177,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("MeetingRoomID");
 
-                    b.ToTable("BookingMeetingRoom");
+                    b.ToTable("BookingMeetingRoom", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.Customer", b =>
@@ -191,6 +191,10 @@ namespace DataLayer.Migrations
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("CreditLimit")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
@@ -207,7 +211,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("CustomerID");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Customer");
 
@@ -232,7 +236,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("EquipmentID");
 
-                    b.ToTable("Equipment");
+                    b.ToTable("Equipment", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.EquipmentItem", b =>
@@ -269,7 +273,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("RentalID");
 
-                    b.ToTable("EquipmentItems");
+                    b.ToTable("EquipmentItems", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.EquipmentPriceMatrix", b =>
@@ -293,7 +297,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("EquipmentID");
 
-                    b.ToTable("EquipmentPriceMatrix");
+                    b.ToTable("EquipmentPriceMatrix", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.Invoice", b =>
@@ -329,7 +333,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("BookingID");
 
-                    b.ToTable("Invoices");
+                    b.ToTable("Invoices", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.MeetingRoom", b =>
@@ -347,19 +351,45 @@ namespace DataLayer.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MeetingRoomNumber")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<string>("MeetingRoomNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("MeetingRoomID");
 
-                    b.ToTable("MeetingRooms");
+                    b.ToTable("MeetingRooms", (string)null);
+                });
+
+            modelBuilder.Entity("EntityLayer.MeetingRoomSeasonPrice", b =>
+                {
+                    b.Property<int>("MeetingRoomSeasonPriceID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MeetingRoomSeasonPriceID"));
+
+                    b.Property<int>("MeetingRoomID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PriceType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WeekNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("MeetingRoomSeasonPriceID");
+
+                    b.HasIndex("MeetingRoomID");
+
+                    b.ToTable("MeetingRoomSeasonPrice", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.Rental", b =>
@@ -390,7 +420,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("BookingID");
 
-                    b.ToTable("Rentals");
+                    b.ToTable("Rentals", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.SeasonPrice", b =>
@@ -427,7 +457,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("ChangedByStaffID");
 
-                    b.ToTable("SeasonPrices");
+                    b.ToTable("SeasonPrices", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLesson", b =>
@@ -450,7 +480,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("SkiLessonID");
 
-                    b.ToTable("SkiLessons");
+                    b.ToTable("SkiLessons", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLessonBooking", b =>
@@ -473,7 +503,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("SkiLessonSessionID");
 
-                    b.ToTable("SkiLessonBooking");
+                    b.ToTable("SkiLessonBooking", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLessonSession", b =>
@@ -506,7 +536,7 @@ namespace DataLayer.Migrations
 
                     b.HasIndex("SkiLessonID");
 
-                    b.ToTable("SkiLessonSession");
+                    b.ToTable("SkiLessonSession", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.Staff", b =>
@@ -538,7 +568,7 @@ namespace DataLayer.Migrations
 
                     b.HasKey("StaffID");
 
-                    b.ToTable("StaffMembers");
+                    b.ToTable("StaffMembers", (string)null);
                 });
 
             modelBuilder.Entity("EntityLayer.CorporateCustomer", b =>
@@ -552,10 +582,6 @@ namespace DataLayer.Migrations
                     b.Property<string>("ContactPerson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("CreditLimit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("DiscountRate")
                         .HasPrecision(18, 2)
@@ -575,10 +601,6 @@ namespace DataLayer.Migrations
                 {
                     b.HasBaseType("EntityLayer.Customer");
 
-                    b.Property<decimal>("CreditLimit")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -586,12 +608,6 @@ namespace DataLayer.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.ToTable("Customers", t =>
-                        {
-                            t.Property("CreditLimit")
-                                .HasColumnName("PrivateCustomer_CreditLimit");
-                        });
 
                     b.HasDiscriminator().HasValue("PrivateCustomer");
                 });
@@ -625,7 +641,7 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("EntityLayer.BookingAccommodation", b =>
                 {
                     b.HasOne("EntityLayer.Accommodation", "Accommodation")
-                        .WithMany()
+                        .WithMany("BookingAccommodations")
                         .HasForeignKey("AccommodationID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -697,6 +713,17 @@ namespace DataLayer.Migrations
                     b.Navigation("Booking");
                 });
 
+            modelBuilder.Entity("EntityLayer.MeetingRoomSeasonPrice", b =>
+                {
+                    b.HasOne("EntityLayer.MeetingRoom", "MeetingRoom")
+                        .WithMany("SeasonPrices")
+                        .HasForeignKey("MeetingRoomID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MeetingRoom");
+                });
+
             modelBuilder.Entity("EntityLayer.Rental", b =>
                 {
                     b.HasOne("EntityLayer.Booking", null)
@@ -752,6 +779,11 @@ namespace DataLayer.Migrations
                     b.Navigation("SkiLesson");
                 });
 
+            modelBuilder.Entity("EntityLayer.Accommodation", b =>
+                {
+                    b.Navigation("BookingAccommodations");
+                });
+
             modelBuilder.Entity("EntityLayer.AccommodationType", b =>
                 {
                     b.Navigation("Accommodations");
@@ -787,6 +819,8 @@ namespace DataLayer.Migrations
             modelBuilder.Entity("EntityLayer.MeetingRoom", b =>
                 {
                     b.Navigation("BookingMeetingRooms");
+
+                    b.Navigation("SeasonPrices");
                 });
 
             modelBuilder.Entity("EntityLayer.Rental", b =>

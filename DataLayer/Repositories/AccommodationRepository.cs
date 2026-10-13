@@ -42,7 +42,7 @@ namespace DataLayer.Repositories
                 .Include(a => a.AccommodationType)
                 .Where(a => !bookedAccommodationIds.Contains(a.AccommodationID) &&
                     a.AccommodationType.NumberOfBeds >= numberOfBeds &&
-                    a.Status == accommodationStatus.Available)
+                    a.Status == AccommodationStatus.Available)
                  .AsNoTracking()
                  .ToList();
         }

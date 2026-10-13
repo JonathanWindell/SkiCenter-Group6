@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
-    public enum accommodationStatus
+    public enum AccommodationStatus
     {
         Available = 0,
         Rented = 1,
@@ -22,17 +22,19 @@ namespace EntityLayer
 
         // "Available", "Cleaning", "Maintenance"
         [Required]
-        public accommodationStatus Status { get; set; }
+        public AccommodationStatus Status { get; set; }
 
         [Required]
         [ForeignKey("AccommodationType")]
         public int AccommodationTypeID { get; set; }
         public virtual AccommodationType AccommodationType { get; set; }
 
+        public virtual ICollection<BookingAccommodation> BookingAccommodations { get; set; } = new List<BookingAccommodation>();
+
         // Parameterless constructor for EF 
         public Accommodation() { }
 
-        public Accommodation(string accommodationNumber, accommodationStatus status)
+        public Accommodation(string accommodationNumber, AccommodationStatus status)
         {
             AccommodationNumber = accommodationNumber;
             Status = status;
