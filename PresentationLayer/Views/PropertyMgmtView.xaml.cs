@@ -21,7 +21,6 @@ namespace PresentationLayer.Views
     {
         private readonly PropertyController _propertyController;
         private readonly ObservableCollection<PropertyRow> _properties = new();
-        private readonly ICollectionView _propertyView;
 
         public PropertyMgmtView(PropertyController propertyController)
         {
@@ -29,15 +28,15 @@ namespace PresentationLayer.Views
 
             _propertyController = propertyController;
 
-            _propertyView = CollectionViewSource.GetDefaultView(_properties);
-            _propertyView.Filter = MatchesFilter;
-            PropertyDataGrid.ItemsSource = _propertyView;
+            CollectionViewSource.GetDefaultView(_properties).Filter = MatchesFilters;
+            PropertyDataGrid.ItemsSource = _properties;
 
             PropertyTypeFilterComboBox.SelectionChanged += FilterComboBox_SelectionChanged;
             PropertyStatusFilterComboBox.SelectionChanged += FilterComboBox_SelectionChanged;
             ResetFiltersButton.Click += ResetFiltersButton_Click;
 
             LoadData();
+            PopulateFilters();
         }
 
         private void LoadData()
@@ -53,8 +52,8 @@ namespace PresentationLayer.Views
                 _properties.Add(new PropertyRow
                 {
                     Id = a.AccommodationID,
-                    PropertyType = "Boende",
-                    PropertyNumber = a.AccommodationNumber,
+                    Type = "Boende",
+                    Number = a.AccommodationNumber,
                     Category = a.AccommodationType?.Description ?? a.AccommodationType?.CategoryCode ?? "Standard",
                     Capacity = a.AccommodationType?.NumberOfBeds ?? 0,
                     OriginalStatus = a.Status.ToString(),
@@ -72,8 +71,8 @@ namespace PresentationLayer.Views
                 _properties.Add(new PropertyRow
                 {
                     Id = m.MeetingRoomID,
-                    PropertyType = "Mötesrum",
-                    PropertyNumber = m.MeetingRoomNumber,
+                    Type = "Mötesrum",
+                    Number = m.MeetingRoomNumber,
                     Category = m.Description,
                     Capacity = m.Capacity,
                     OriginalStatus = m.Status.ToString(),
@@ -82,51 +81,86 @@ namespace PresentationLayer.Views
                 });
             }
 
-            _propertyView.Refresh();
+            CollectionViewSource.GetDefaultView(_properties)?.Refresh();
             UpdateCountText();
         }
 
-        private bool MatchesFilter(object item)
+        private void PopulateFilters()
         {
-            if (item is not PropertyRow row) return false;
-
-            // Filter by type
-            if (PropertyTypeFilterComboBox.SelectedItem is ComboBoxItem typeItem)
+            foreach (string status in _properties
+                         .Select(p => p.Type)
+                         .Where(t => !string.IsNullOrWhiteSpace(t))
+                         .Distinct()
+                         .OrderBy(status => status))
             {
-                string type = typeItem.Content?.ToString() ?? "";
-                if (type != "Alla typer" && row.PropertyType != type)
-                    return false;
+                PropertyTypeFilterComboBox.Items.Add(
+                    new ComboBoxItem { Content = status });
             }
 
-            // Filter by status
-            if (PropertyStatusFilterComboBox.SelectedItem is ComboBoxItem statusItem)
+            foreach (string status in _properties
+                         .Select(p => p.Status)
+                         .Distinct()
+                         .OrderBy(status => status))
             {
-                string status = statusItem.Content?.ToString() ?? "";
-                if (status != "Alla statusar" && !string.Equals(row.Status, status, StringComparison.OrdinalIgnoreCase))
-                    return false;
+                PropertyStatusFilterComboBox.Items.Add(
+                    new ComboBoxItem { Content = status });
             }
+        }
 
-            return true;
+        private bool MatchesFilters(object item)
+        {
+            if (item is not PropertyRow row) 
+                return false;
+
+            string? type =
+                (PropertyTypeFilterComboBox.SelectedItem as ComboBoxItem)
+                ?.Content?.ToString();
+
+            string? status =
+                (PropertyStatusFilterComboBox.SelectedItem as ComboBoxItem)
+                ?.Content?.ToString();
+
+            // Both selected filters must match the same booking.
+            bool matchesType =
+                PropertyTypeFilterComboBox.SelectedIndex <= 0 ||
+                row.Type == type;
+
+            bool matchesStatus =
+                PropertyStatusFilterComboBox.SelectedIndex <= 0 ||
+                row.Status == status;
+
+            return matchesType && matchesStatus;
         }
 
         private void FilterComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _propertyView?.Refresh();
+            CollectionViewSource.GetDefaultView(_properties)?.Refresh();
             UpdateCountText();
+
+            if (PropertyDataGrid.Items.Count > 0)
+            {
+                PropertyDataGrid.ScrollIntoView(PropertyDataGrid.Items[0]);
+            }
         }
 
         private void ResetFiltersButton_Click(object sender, RoutedEventArgs e)
         {
             PropertyTypeFilterComboBox.SelectedIndex = 0;
             PropertyStatusFilterComboBox.SelectedIndex = 0;
-            _propertyView.Refresh();
             UpdateCountText();
         }
 
         private void UpdateCountText()
         {
-            int count = _propertyView?.Cast<object>().Count() ?? 0;
-            PropertyCountTextBlock.Text = $"Antal visade rader: {count}";
+            var view = CollectionViewSource.GetDefaultView(_properties);
+            int count = view.Cast<PropertyRow>().Count();
+
+            PropertyCountTextBlock.Text = count switch
+            {
+                0 => "Inga rader matchar filtren.",
+                1 => "1 rad hittades",
+                _ => $"{count} rader hittades"
+            };
         }
 
 
@@ -145,7 +179,7 @@ namespace PresentationLayer.Views
 
             foreach (var row in changedRows)
             {
-                if (row.PropertyType == "Boende")
+                if (row.Type == "Boende")
                 {
                     if (Enum.TryParse<AccommodationStatus>(row.Status, out var newStatus))
                     {
@@ -153,7 +187,7 @@ namespace PresentationLayer.Views
                             successCount++;
                     }
                 }
-                else if (row.PropertyType == "Mötesrum")
+                else if (row.Type == "Mötesrum")
                 {
                     if (Enum.TryParse<MeetingRoomStatus>(row.Status, out var newStatus))
                     {
@@ -167,6 +201,8 @@ namespace PresentationLayer.Views
 
             // Reload list to reset IsChanged
             LoadData();
+            PopulateFilters();
+            UpdateCountText();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

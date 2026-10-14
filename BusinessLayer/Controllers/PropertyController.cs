@@ -1,13 +1,13 @@
-﻿using DataLayer;
+﻿using DataLayer.Interfaces;
 using EntityLayer;
 
 namespace BusinessLayer.Controllers
 {
     public class PropertyController
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public PropertyController(UnitOfWork unitOfWork)
+        public PropertyController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }

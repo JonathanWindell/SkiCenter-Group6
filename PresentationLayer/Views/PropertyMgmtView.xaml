@@ -66,24 +66,24 @@
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,6"/>
 
-                        <ComboBox x:Name="PropertyTypeFilterComboBox"
+                    <ComboBox x:Name="PropertyTypeFilterComboBox" 
                               Height="36"
                               SelectedIndex="0">
-                            <ComboBoxItem Content="Alla fastighetstyper"/>
-                        </ComboBox>
-                    </StackPanel>
+                        <ComboBoxItem Content="Alla typer"/>
+                    </ComboBox>
+                </StackPanel>
 
                     <StackPanel Grid.Column="2">
-                        <TextBlock Text="Fastighetsstatus"
+                    <TextBlock Text="Status"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,6"/>
 
-                        <ComboBox x:Name="PropertyStatusFilterComboBox"
+                    <ComboBox x:Name="PropertyStatusFilterComboBox" 
                               Height="36"
                               SelectedIndex="0">
-                            <ComboBoxItem Content="Alla fastighetsstatusar"/>
-                        </ComboBox>
-                    </StackPanel>
+                        <ComboBoxItem Content="Alla statusar"/>
+                    </ComboBox>
+                </StackPanel>
 
                     <Button x:Name="ResetFiltersButton"
                         Grid.Column="4"
@@ -133,23 +133,23 @@
                           AlternatingRowBackground="{StaticResource WindowBg}"
                           BorderThickness="0">
 
-                        <DataGrid.Resources>
-                            <!-- Align text with the status labels. -->
-                            <Style x:Key="CenteredCellText" TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center"/>
-                                <Setter Property="Margin" Value="4,0"/>
-                            </Style>
-                        </DataGrid.Resources>
+                    <DataGrid.Resources>
+                        <!-- Align text with the status labels. -->
+                        <Style x:Key="CenteredCellText" TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="4,0"/>
+                        </Style>
+                    </DataGrid.Resources>
 
                         <!-- Booking status tags use both text and colour. -->
-                        <DataGrid.Columns>
+                    <DataGrid.Columns>
 
                         <DataGridTextColumn Header="Typ"
                                             Binding="{Binding Type}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
                         <DataGridTextColumn Header="Nummer"
-                                            Binding="{Binding Name}"
+                                            Binding="{Binding Number}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
                         <DataGridTextColumn Header="Kategori"
@@ -158,10 +158,6 @@
                                             Width="*"/>
                         <DataGridTextColumn Header="Kapacitet"
                                             Binding="{Binding Capacity}"
-                                            ElementStyle="{StaticResource CenteredCellText}"
-                                            Width="*"/>
-                        <DataGridTextColumn Header="Status"
-                                            Binding="{Binding Status}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
 
@@ -176,26 +172,15 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                            
+
                         <DataGridTextColumn Header="Nästa tillgängliga datum"
                                             Binding="{Binding NextAvailableDate,
                                                               StringFormat={}{0:yyyy-MM-dd},
                                                               TargetNullValue=—}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="170"/>
-                        </DataGrid.Columns>
-                            <DataGridTemplateColumn Header="Status" Width="140">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <ComboBox ItemsSource="{Binding AvailableStatuses}"
-                                      SelectedItem="{Binding Status, UpdateSourceTrigger=PropertyChanged}"
-                                      Height="30"
-                                      VerticalContentAlignment="Center"
-                                      Margin="2"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                    </DataGrid>
+                    </DataGrid.Columns>
+                </DataGrid>
                 </Border>
 
                 <!-- Back button -->

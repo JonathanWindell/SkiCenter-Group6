@@ -37,7 +37,7 @@ namespace DataLayer.Repositories
         /// Gets a specific booking with all its associated data.
         /// </summary>
         /// <param name="bookingID"></param>
-        public Booking GetSpecificBooking(int bookingID)
+        public Booking? GetSpecificBooking(int bookingID)
         {
             return _context.Set<Booking>()
                 .Include(b => b.Customer)
