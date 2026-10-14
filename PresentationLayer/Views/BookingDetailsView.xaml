@@ -487,15 +487,43 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Back button -->
-                <Button Grid.Row="2"
-                        Content="Tillbaka"
-                        Width="110"
-                        Height="38"
-                        Margin="0,20,0,0"
-                        HorizontalAlignment="Left"
-                        Style="{StaticResource DeepSeaButtonStyle}"
-                        Click="BackButton_Click"/>
+                <!-- Booking actions -->
+                <Grid Grid.Row="2" Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0"
+                            Content="Tillbaka"
+                            Width="110"
+                            Height="38"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Click="BackButton_Click"/>
+
+                    <Button x:Name="CancelBookingButton"
+                            Grid.Column="1"
+                            Content="Avboka bokning"
+                            Width="160"
+                            Height="38">
+
+                        <Button.Style>
+                            <Style TargetType="Button"
+                                    BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                <Style.Triggers>
+                                    <!-- Clearly show when cancellation is unavailable. -->
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" Value="#E5E7EB"/>
+                                        <Setter Property="Foreground" Value="#6B7280"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                        <Setter Property="Cursor" Value="Arrow"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
 
             </Grid>
         </Border>
