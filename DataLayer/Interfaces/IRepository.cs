@@ -7,7 +7,6 @@
         /// <summary>
         void Add(T entity);
 
-
         /// <summary>
         /// Generic method for deleting entity
         /// <summary>
@@ -22,5 +21,10 @@
         /// Generic method for getting Entity by ID
         /// <summary>
         T GetByID(int id);
+
+        /// <summary>
+        /// Generic method for retrieving all entities.
+        /// </summary>
+        IEnumerable<T> GetAll();
     }
 }

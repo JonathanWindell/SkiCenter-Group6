@@ -1,11 +1,8 @@
 ﻿using BusinessLayer;
 using BusinessLayer.Controllers;
 using DataLayer;
-using DataLayer.Interfaces;
-using DataLayer.Repositories;
 using EntityLayer;
 using Microsoft.EntityFrameworkCore.Storage;
-using NUnit.Framework;
 
 namespace TestLayer.IntegrationTests
 {

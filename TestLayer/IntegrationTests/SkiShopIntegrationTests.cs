@@ -1,11 +1,6 @@
 ﻿using BusinessLayer.Controllers;
 using DataLayer;
-using DataLayer.Repositories;
 using EntityLayer;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace TestLayer.IntegrationTests
 {

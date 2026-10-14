@@ -1,6 +1,5 @@
 ﻿using EntityLayer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace DataLayer
