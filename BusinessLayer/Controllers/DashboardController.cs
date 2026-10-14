@@ -16,7 +16,8 @@ namespace BusinessLayer.Controllers
         SkiSchool,
         SeasonPrices,
         Reports,
-        StaffAdmin
+        StaffAdmin,
+        GuestCheckInOut
     }
 
     /// <summary>
@@ -36,6 +37,7 @@ namespace BusinessLayer.Controllers
             [staffRole.BookingAdmin] = new[]
             {
                 SystemModule.Bookings,
+                SystemModule.GuestCheckInOut,
                 SystemModule.CustomerRegistration,
                 SystemModule.Accommodation,
                 SystemModule.SkiSchool,
