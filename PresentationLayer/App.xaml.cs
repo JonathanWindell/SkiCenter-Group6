@@ -82,9 +82,13 @@ namespace PresentationLayer
         {
             base.OnStartup(e);
 
-            // Resolve and display the login window.
+            // Resolve the main window (LoginView) from the service provider and show it
             var loginWindow = Services.GetRequiredService<LoginView>();
             loginWindow.Show();
+
+            // To test the guest view directly without logging in, comment out the two lines above and use:
+            // var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
+            // guestWindow.Show();
 
             /*
             // Only use when data should be written from seeding files.

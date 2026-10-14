@@ -18,6 +18,7 @@ namespace EntityLayer
         [Required]
         public string PhoneNumber { get; private set; }
 
+        // Credit limit for both private and corporate customers. Stored in one shared column.
         public decimal CreditLimit { get; set; }
 
         // One to Many relation between Customer & Booking
