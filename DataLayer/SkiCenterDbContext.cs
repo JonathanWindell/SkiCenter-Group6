@@ -1,5 +1,6 @@
 ﻿using EntityLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace DataLayer
@@ -40,7 +41,17 @@ namespace DataLayer
         {
             base.OnModelCreating(modelBuilder);
 
-            // Staff who have changed season prices cannot be deleted, so the price log stays complete.
+            // Map both customer types to the existing CreditLimit column.
+            modelBuilder.Entity<PrivateCustomer>()
+                .Property(pc => pc.CreditLimit)
+                .HasColumnName("CreditLimit");
+
+            modelBuilder.Entity<CorporateCustomer>()
+                .Property(cc => cc.CreditLimit)
+                .HasColumnName("CreditLimit");
+
+            // Staff who have changed season prices cannot be deleted,
+            // so the price log stays complete.
             modelBuilder.Entity<SeasonPrice>()
                 .HasOne(sp => sp.ChangedBy)
                 .WithMany()
@@ -58,6 +69,7 @@ namespace DataLayer
                 .HasColumnName("CreditLimit");
         }
 
+
         /// <summary>
         /// Create DbSet for every entity
         /// </summary>
@@ -72,6 +84,7 @@ namespace DataLayer
         public DbSet<MeetingRoom> MeetingRooms { get; set; }
         public DbSet<Equipment> Equipment { get; set; }
         public DbSet<EquipmentItem> EquipmentItems { get; set; }
+        public DbSet<EquipmentPriceMatrix> EquipmentPriceMatrix { get; set; }
         public DbSet<Rental> Rentals { get; set; }
         public DbSet<SkiLesson> SkiLessons { get; set; }
         public DbSet<Invoice> Invoices { get; set; }

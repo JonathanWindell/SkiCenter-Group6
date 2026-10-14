@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    [Table("EquipmentPriceMatrix")]
     public class EquipmentPriceMatrix
     {
         [Key]

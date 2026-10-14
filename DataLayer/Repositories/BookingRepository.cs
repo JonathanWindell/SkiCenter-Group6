@@ -43,6 +43,7 @@ namespace DataLayer.Repositories
                 .Include(b => b.Customer)
                 .Include(b => b.Accommodations)
                     .ThenInclude(ba => ba.Accommodation)
+                    .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.MeetingRooms)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
@@ -100,7 +101,43 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
-        /// Updates a specific booking with a new status. 
+        /// Finds active room bookings by booking ID or accommodation (room) number.
+        /// A booking is active when it is preliminary or confirmed, the guest has not checked out,
+        /// and it has an accommodation stay that has not ended yet.
+        /// </summary>
+        /// <param name="bookingID">Optional booking ID to search for.</param>
+        /// <param name="accommodationNumber">Optional room number to search for, e.g. "LI1".</param>
+        public IEnumerable<Booking> FindActiveBookings(int? bookingID, string? accommodationNumber)
+        {
+            string? roomNumber = string.IsNullOrWhiteSpace(accommodationNumber) ? null : accommodationNumber.Trim();
+
+            if (!bookingID.HasValue && roomNumber == null)
+            {
+                return Enumerable.Empty<Booking>();
+            }
+
+            DateTime today = DateTime.Today;
+
+            return _context.Set<Booking>()
+                .Include(b => b.Customer)
+                .Include(b => b.Accommodations)
+                    .ThenInclude(ba => ba.Accommodation)
+                        .ThenInclude(a => a.AccommodationType)
+                .Include(b => b.Rentals)
+                    .ThenInclude(r => r.EquipmentItems)
+                        .ThenInclude(ei => ei.Equipment)
+                .Where(b => (b.BookingStatus == BookingStatus.Preliminary || b.BookingStatus == BookingStatus.Confirmed)
+                    && b.CheckInStatus != CheckInStatus.CheckedOut
+                    && b.Accommodations.Any(ba => ba.EndDate >= today))
+                .Where(b => (bookingID.HasValue && b.BookingID == bookingID.Value)
+                    || (roomNumber != null && b.Accommodations.Any(ba => ba.Accommodation.AccommodationNumber == roomNumber)))
+                .AsSplitQuery()
+                .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Updates a specific booking with a new status.
         /// </summary>
         /// <param name="bookingID"></param>
         /// <param name="status"></param>
