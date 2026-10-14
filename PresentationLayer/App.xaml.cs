@@ -55,6 +55,7 @@ namespace PresentationLayer
             services.AddTransient<GuestCheckInOutView>();
             services.AddTransient<BookingStatusView>();
             services.AddTransient<EquipmentRentalView>();
+           
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
