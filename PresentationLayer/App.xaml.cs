@@ -55,6 +55,7 @@ namespace PresentationLayer
             services.AddTransient<GuestCheckInOutView>();
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<BookingStatusView>();
+            services.AddTransient<PropertyMgmtView>();
 
 
             // 2. Register Controllers
@@ -64,6 +65,7 @@ namespace PresentationLayer
             services.AddTransient<DashboardController>();
             services.AddTransient<SkiShopController>();
             services.AddTransient<AdminController>();
+            services.AddTransient<PropertyController>();
 
             // 3. Register Repositories
             services.AddTransient<ICustomerRepository, CustomerRepository>();
