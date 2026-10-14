@@ -56,5 +56,14 @@ namespace DataLayer.Repositories
         {
             return _context.Set<T>().Find(id);
         }
+
+        /// <summary>
+        /// Fetches all information.
+        /// </summary>
+        /// <returns>The found entity or null if no match exists.</returns>
+        public IEnumerable<T> GetAll()
+        {
+            return _context.Set<T>().ToList();
+        }
     }
 }

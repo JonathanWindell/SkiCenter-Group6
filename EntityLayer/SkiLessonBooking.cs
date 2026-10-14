@@ -11,13 +11,13 @@ namespace EntityLayer
         // Relation to SkiLessonSession. Foreign Key
         [Required]
         [ForeignKey("SkiLessonSession")]
-        public int SkiLessonSessionID { get; private set; }
+        public int SkiLessonSessionID { get; set; }
         public virtual SkiLessonSession SkiLessonSession { get; set; }
 
         // Relation to Booking. Foreign Key
         [Required]
         [ForeignKey("Booking")]
-        public int BookingID { get; private set; }
+        public int BookingID { get; set; }
         public virtual Booking Booking { get; set; }
     }
 }

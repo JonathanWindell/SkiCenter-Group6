@@ -1,7 +1,7 @@
+using EntityLayer;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using EntityLayer;
 
 namespace PresentationLayer.Views
 {
