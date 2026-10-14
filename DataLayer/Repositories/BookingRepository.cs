@@ -43,6 +43,7 @@ namespace DataLayer.Repositories
                 .Include(b => b.Customer)
                 .Include(b => b.Accommodations)
                     .ThenInclude(ba => ba.Accommodation)
+                    .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.MeetingRooms)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
@@ -50,7 +51,7 @@ namespace DataLayer.Repositories
                 .Include(b => b.Rentals)
                     .ThenInclude(r => r.EquipmentItems)
                         .ThenInclude(ri => ri.Equipment)
-                            .ThenInclude(eq => eq.Prices)
+                            .ThenInclude(e => e.Prices)
                 .Include(b => b.Invoices)
                 .AsSplitQuery()
                 .FirstOrDefault(b => b.BookingID == bookingID);
