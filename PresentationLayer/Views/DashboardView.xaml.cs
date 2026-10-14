@@ -30,10 +30,11 @@ namespace PresentationLayer.Views
             [SystemModule.Rentals] = new("Uthyrning", "Lägg till utrustning på en bokning", typeof(EquipmentRentalView)),
             [SystemModule.Bookings] = new("Bokningar", "Skapa och hantera bokningar", typeof(BookingStatusView)),
             [SystemModule.Accommodation] = new("Boende", "Lägenheter, stugor och konferensrum", typeof(PropertyMgmtView)),
-            [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", null),
+            [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", typeof(SkiSchoolView)),
             [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", typeof(SeasonPriceView)),
             [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", null),
-            [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", null)
+            [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", null),
+            [SystemModule.GuestCheckInOut] = new("In- och utcheckning","Hantera gästers ankomst och avresa", typeof(GuestCheckInOutView))
         };
 
         // Swedish display names for staff roles
