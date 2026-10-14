@@ -57,6 +57,8 @@
                 </BeginStoryboard>
             </EventTrigger>
         </Border.Triggers>
+        
+
 
         <Grid>
             <Grid.RowDefinitions>
@@ -69,17 +71,37 @@
             </Grid.RowDefinitions>
 
             <!-- Page heading. -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,22">
-                <TextBlock Text="In- och utcheckning"
-                           FontSize="28"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryText}"/>
+            <!-- Page heading with Back Button. -->
+            <Grid Grid.Row="0" Margin="0,0,0,22">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Visa ankomster och avresor för valt datum."
-                           FontSize="14"
-                           Margin="0,8,0,0"
-                           Foreground="{StaticResource SecondaryText}"/>
-            </StackPanel>
+                <!-- Tillbaka-knapp längst upp till vänster -->
+                <Button x:Name="BtnBack"
+            Content="← Tillbaka"
+            Width="105"
+            Height="36"
+            Margin="0,0,18,0"
+            VerticalAlignment="Top"
+            Style="{StaticResource DeepSeaButtonStyle}"
+            Click="BtnBack_Click"/>
+
+                <!-- Rubrik och beskrivning -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="In- och utcheckning"
+                   FontSize="28"
+                   FontWeight="Bold"
+                   Foreground="{StaticResource PrimaryText}"/>
+
+                    <TextBlock Text="Visa ankomster och avresor för valt datum."
+                   FontSize="14"
+                   Margin="0,6,0,0"
+                   Foreground="{StaticResource SecondaryText}"/>
+                </StackPanel>
+            </Grid>
+
 
             <!-- Date and arrival/departure filters. -->
             <Grid Grid.Row="1" Margin="0,0,0,18">
