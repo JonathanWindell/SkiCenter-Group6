@@ -1,11 +1,9 @@
-﻿using System;
+﻿using BusinessLayer;
+using EntityLayer;
+using PresentationLayer.Models;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using PresentationLayer.Models;
-using BusinessLayer;
-using EntityLayer;
 
 namespace PresentationLayer.Views
 {
@@ -21,7 +19,7 @@ namespace PresentationLayer.Views
         private readonly ObservableCollection<GuestStayRow> _previewGuests = new();
         private readonly ObservableCollection<GuestStayRow> _visibleGuests = new();
 
-        public GuestCheckInOutView(BookingController bookingController) 
+        public GuestCheckInOutView(BookingController bookingController)
         {
             InitializeComponent();
             _bookingController = bookingController;
@@ -42,7 +40,7 @@ namespace PresentationLayer.Views
             RefreshGuests();
         }
 
-        private void GuestsDataGrid_SelectionChanged( object sender, SelectionChangedEventArgs e)
+        private void GuestsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Keep actions disabled until saving and permissions are connected.
             CheckInButton.IsEnabled = false;
@@ -251,7 +249,7 @@ namespace PresentationLayer.Views
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.ToString());
-               
+
                 _previewGuests.Clear();
 
                 MessageBox.Show(

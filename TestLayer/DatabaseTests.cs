@@ -66,7 +66,6 @@ namespace TestLayer
             _context.SaveChanges();
         }
 
-        /*
         [Test]
         public void AddCorporateCustomer_ShouldSaveToDatabase()
         {
@@ -89,7 +88,6 @@ namespace TestLayer
             _context.Customers.Remove(savedCustomer);
             _context.SaveChanges();
         }
-        */
 
         [Test]
         public void AddStaff_ShouldSaveToDatabase()

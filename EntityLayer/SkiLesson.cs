@@ -11,19 +11,25 @@ namespace EntityLayer
         [Required]
         public string Level { get; set; }
 
+        [Required]
+        public string Days { get; set; }
+
         public int MaxParticipants { get; set; }
 
         [Required]
-        public int DurationHours { get; set; }
+        public decimal Price { get; set; }
 
         // Parameterless constructor for EF 
         public SkiLesson() { }
 
-        public SkiLesson(string level, int maxParticipants, int durationHours, decimal price)
+        public SkiLesson(string level, string days, int maxParticipants, decimal price)
         {
             Level = level;
+            Days = days;
             MaxParticipants = maxParticipants;
-            DurationHours = durationHours;
+            Price = price;
         }
+
+        public virtual ICollection<SkiLessonSession> Sessions { get; set; } = new List<SkiLessonSession>();
     }
 }

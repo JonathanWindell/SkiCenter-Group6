@@ -1,13 +1,4 @@
-﻿using BusinessLayer;
-using BusinessLayer.Controllers;
-using DataLayer;
-using DataLayer.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using PresentationLayer.Views;
-using System.Configuration;
-using System.Data;
-using System.Windows;
+using BusinessLayer;
 using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
@@ -16,47 +7,40 @@ using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
 using System.Windows;
 
-
 namespace PresentationLayer
 {
     /// <summary>
     /// Represents the main application entry point and acts as the Root.
-    /// Responsible for configuring the Dependency Injection (DI) container, registering 
-    /// application dependencies, and executing the startup sequence.
+    /// Responsible for configuring the Dependency Injection (DI) container,
+    /// registering application dependencies, and executing the startup sequence.
     /// </summary>
     public partial class App : Application
     {
-
         private readonly ServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Provides access to the application's built service provider so that objects
-        /// constructed by WPF (via XAML) can still resolve services from the DI container.
+        /// Provides access to the application's built service provider.
         /// </summary>
         public IServiceProvider Services => _serviceProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="App"/> class.
-        /// Sets up the service collection, registers all necessary dependencies, 
-        /// and builds the final service provider used to resolve instances at runtime.
+        /// Initializes the application and configures dependency injection.
         /// </summary>
         public App()
         {
-            // 1. Create a new service collection
+            // Create a new service collection.
             var services = new ServiceCollection();
 
-            // 2. Configure dependencies
+            // Register application dependencies.
             ConfigureServices(services);
 
-            // 3. Build the provider (the container that holds everything)
+            // Build the service provider.
             _serviceProvider = services.BuildServiceProvider();
         }
 
         /// <summary>
-        /// Registers all required views (windows), controllers, repositories, and database contexts 
-        /// into the Dependency Injection container with their appropriate lifespans.
+        /// Registers views, controllers, repositories, and database services.
         /// </summary>
-        /// <param name="services">The collection where application services are registered.</param>
         private void ConfigureServices(IServiceCollection services)
         {
             // 1. Register Views (Windows)
@@ -65,15 +49,17 @@ namespace PresentationLayer
             services.AddTransient<CustomerRegistrationView>();
             services.AddTransient<EquipmentMgmtView>();
             services.AddTransient<CustomerBookingsView>();
+            services.AddTransient<CreateBookingView>();
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<SeasonPriceView>();
-            services.AddTransient<EquipmentRentalView>();
             services.AddTransient<GuestCheckInOutView>();
             services.AddTransient<BookingStatusView>();
+            services.AddTransient<EquipmentRentalView>();
+           
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
-            services.AddTransient<BookingController>(); 
+            services.AddTransient<BookingController>();
             services.AddTransient<CustomerController>();
             services.AddTransient<DashboardController>();
             services.AddTransient<SkiShopController>();
@@ -85,15 +71,13 @@ namespace PresentationLayer
             // 4. Register and initialize DbContext
             services.AddDbContext<SkiCenterDbContext>();
 
-            // Register UnitOfWork so IUnitOfWork can be resolved by controllers and views.
+            // Register UnitOfWork for controllers and views.
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
         /// <summary>
-        /// Create the initial window using the DI container instead of letting WPF
-        /// instantiate it via StartupUri. This preserves constructor injection.
+        /// Opens the login window when the application starts.
         /// </summary>
-        /// <param name="e">Startup event args.</param>
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -105,18 +89,6 @@ namespace PresentationLayer
             // To test the guest view directly without logging in, comment out the two lines above and use:
             // var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
             // guestWindow.Show();
-
-            /*
-            // Only use when data should be written from seeding files. I (Jonathan will fix this during this week)
-            using (var scope = Services.CreateScope())
-            {
-                var context = scope.ServiceProvider.GetRequiredService<SkiCenterDbContext>();
-                DbInitializer.Initialize(context);
-            }
-            */
-
         }
-
     }
-
 }
