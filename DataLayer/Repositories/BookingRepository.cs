@@ -43,6 +43,7 @@ namespace DataLayer.Repositories
                 .Include(b => b.Customer)
                 .Include(b => b.Accommodations)
                     .ThenInclude(ba => ba.Accommodation)
+                    .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.MeetingRooms)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)

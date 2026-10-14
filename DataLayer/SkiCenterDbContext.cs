@@ -40,7 +40,17 @@ namespace DataLayer
         {
             base.OnModelCreating(modelBuilder);
 
-            // Staff who have changed season prices cannot be deleted, so the price log stays complete.
+            // Map both customer types to the existing CreditLimit column.
+            modelBuilder.Entity<PrivateCustomer>()
+                .Property(pc => pc.CreditLimit)
+                .HasColumnName("CreditLimit");
+
+            modelBuilder.Entity<CorporateCustomer>()
+                .Property(cc => cc.CreditLimit)
+                .HasColumnName("CreditLimit");
+
+            // Staff who have changed season prices cannot be deleted,
+            // so the price log stays complete.
             modelBuilder.Entity<SeasonPrice>()
                 .HasOne(sp => sp.ChangedBy)
                 .WithMany()
@@ -57,6 +67,7 @@ namespace DataLayer
                 .Property(c => c.CreditLimit)
                 .HasColumnName("CreditLimit");
         }
+
 
         /// <summary>
         /// Create DbSet for every entity
