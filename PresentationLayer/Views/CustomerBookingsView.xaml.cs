@@ -1,27 +1,36 @@
-﻿using BusinessLayer;
-using BusinessLayer.Controllers;
-using EntityLayer;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using BusinessLayer;
+using BusinessLayer.Controllers;
+using EntityLayer;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PresentationLayer.Views
 {
     /// <summary>
-    /// Interaction logic for CustomerBookingsView.xaml
+    /// Interaction logic for CustomerBookingsView.xaml.
     /// </summary>
     public partial class CustomerBookingsView : Window
     {
         private readonly BookingController _bookingController;
         private readonly CustomerController _customerController;
+        private readonly IServiceProvider _serviceProvider;
+
+        private int? _selectedCustomerId;
 
         public CustomerBookingsView(
             BookingController bookingController,
-            CustomerController customerController)
+            CustomerController customerController,
+            IServiceProvider serviceProvider)
         {
             InitializeComponent();
 
             _bookingController = bookingController;
             _customerController = customerController;
+            _serviceProvider = serviceProvider;
         }
 
         /// <summary>
@@ -34,6 +43,9 @@ namespace PresentationLayer.Views
             NoBookingsMessage.Visibility = Visibility.Collapsed;
             BookingsScrollViewer.Visibility = Visibility.Collapsed;
 
+            _selectedCustomerId = null;
+            BookingsItemsControl.ItemsSource = null;
+
             string searchItem = CustomerSearchTextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(searchItem))
@@ -43,40 +55,53 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            Customer customer = _customerController.SearchCustomer(searchItem);
-
-            if (customer == null)
+            try
             {
-                CustomerSearchMessage.Text = "Ingen kund hittades.";
+                Customer? customer =
+                    _customerController.SearchCustomer(searchItem);
+
+                if (customer == null)
+                {
+                    CustomerSearchMessage.Text = "Ingen kund hittades.";
+                    CustomerSearchMessage.Visibility = Visibility.Visible;
+                    return;
+                }
+
+                // Display the correct name based on customer type.
+                if (customer is PrivateCustomer privateCustomer)
+                {
+                    CustomerNameTextBlock.Text =
+                        $"{privateCustomer.FirstName} {privateCustomer.LastName}";
+                }
+                else if (customer is CorporateCustomer corporateCustomer)
+                {
+                    CustomerNameTextBlock.Text = corporateCustomer.CompanyName;
+                }
+                else
+                {
+                    CustomerNameTextBlock.Text =
+                        $"Kund #{customer.CustomerID}";
+                }
+
+                CustomerEmailTextBlock.Text = customer.Email;
+                CustomerInformationBorder.Visibility = Visibility.Visible;
+
+                _selectedCustomerId = customer.CustomerID;
+
+                LoadCustomerBookings(customer.CustomerID);
+            }
+            catch (Exception ex)
+            {
+                CustomerSearchMessage.Text =
+                    $"Kunde inte söka efter kunden: {ex.Message}";
+
                 CustomerSearchMessage.Visibility = Visibility.Visible;
-                return;
             }
-
-            // Displays the correct customer name depending on customer type.
-            if (customer is PrivateCustomer privateCustomer)
-            {
-                CustomerNameTextBlock.Text =
-                    $"{privateCustomer.FirstName} {privateCustomer.LastName}";
-            }
-            else if (customer is CorporateCustomer corporateCustomer)
-            {
-                CustomerNameTextBlock.Text = corporateCustomer.CompanyName;
-            }
-            else
-            {
-                CustomerNameTextBlock.Text = $"Kund #{customer.CustomerID}";
-            }
-
-            CustomerEmailTextBlock.Text = customer.Email;
-            CustomerInformationBorder.Visibility = Visibility.Visible;
-
-            LoadCustomerBookings(customer.CustomerID);
         }
 
         /// <summary>
         /// Loads all bookings belonging to the selected customer.
         /// </summary>
-        /// <param name="customerId">The ID of the selected customer.</param>
         public void LoadCustomerBookings(int customerId)
         {
             List<Booking> bookings = _bookingController
@@ -97,10 +122,45 @@ namespace PresentationLayer.Views
             }
         }
 
-        // Opens the detailed view for the selected booking.
+        /// <summary>
+        /// Opens the form for creating a new booking.
+        /// </summary>
+        private void CreateNewBooking_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // Resolve the booking window using dependency injection.
+                CreateBookingView createBookingView =
+                    _serviceProvider.GetRequiredService<CreateBookingView>();
+
+                createBookingView.Owner = this;
+
+                // Wait until the booking window is closed.
+                bool? result = createBookingView.ShowDialog();
+
+                // Refresh the booking list after a successful booking.
+                if (result == true && _selectedCustomerId.HasValue)
+                {
+                    LoadCustomerBookings(_selectedCustomerId.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Kunde inte öppna eller uppdatera bokningen.\n{ex.Message}",
+                    "Fel vid bokning",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Opens the detailed view for the selected booking.
+        /// </summary>
         private void ShowAllInformation_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is Booking booking)
+            if (sender is Button button &&
+                button.DataContext is Booking booking)
             {
                 Booking specificBooking =
                     _bookingController.GetSpecificBooking(booking.BookingID);
@@ -115,7 +175,9 @@ namespace PresentationLayer.Views
             }
         }
 
-        // Closes the booking overview and returns to the previous view.
+        /// <summary>
+        /// Closes the booking overview.
+        /// </summary>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
