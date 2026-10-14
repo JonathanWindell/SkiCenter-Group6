@@ -1,5 +1,6 @@
 ﻿using EntityLayer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace DataLayer
@@ -83,6 +84,7 @@ namespace DataLayer
         public DbSet<MeetingRoom> MeetingRooms { get; set; }
         public DbSet<Equipment> Equipment { get; set; }
         public DbSet<EquipmentItem> EquipmentItems { get; set; }
+        public DbSet<EquipmentPriceMatrix> EquipmentPriceMatrix { get; set; }
         public DbSet<Rental> Rentals { get; set; }
         public DbSet<SkiLesson> SkiLessons { get; set; }
         public DbSet<Invoice> Invoices { get; set; }

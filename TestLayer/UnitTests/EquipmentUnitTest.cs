@@ -87,7 +87,7 @@ namespace TestLayer.UnitTests
             var testRental = new Rental
             {
                 RentalID = rentalID,
-                Status = "Active", 
+                Status = "Active",
                 EquipmentItems = new List<EquipmentItem>
         {
             new EquipmentItem
@@ -114,7 +114,7 @@ namespace TestLayer.UnitTests
 
             // Assert
             Assert.That(result, Is.True, "ReturnRental should return true.");
-            Assert.That(testRental.Status, Is.EqualTo("Available")); 
+            Assert.That(testRental.Status, Is.EqualTo("Available"));
 
             // Verify
             _mockEquipmentItemRepo.Verify(repo =>

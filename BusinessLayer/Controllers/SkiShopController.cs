@@ -82,7 +82,7 @@ namespace BusinessLayer.Controllers
             {
                 return false;
             }
-   
+
             _unitOfWork.EquipmentItem.UpdateEquipmentItem(articleNumber, equipmentID, size, status, condition);
             return _unitOfWork.Complete() > 0;
         }
@@ -119,7 +119,7 @@ namespace BusinessLayer.Controllers
                 Size = size.Trim(),
                 EquipmentID = equipmentId
             };
-     
+
             _unitOfWork.EquipmentItem.Add(newItem);
             return _unitOfWork.Complete() > 0;
         }

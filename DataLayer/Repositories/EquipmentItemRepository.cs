@@ -120,7 +120,7 @@ namespace DataLayer.Repositories
                 .FirstOrDefault(ei => ei.ArticleNumber == articleNumber.Trim());
 
             if (item != null)
-            {   
+            {
                 item.EquipmentID = equipmentID;
                 item.Size = size;
                 item.Status = status;
