@@ -25,11 +25,22 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
+        /// Gets all ski lessons with corresponding ski lesson sessions.
+        /// </summary>
+        public IEnumerable<SkiLesson> GetLessonsWithSessions()
+        {
+            return _context.Set<SkiLesson>()
+                .Include(lesson => lesson.Sessions)
+                    .ThenInclude(session => session.Participants)
+                .ToList();
+        }
+
+        /// <summary>
         /// Gets a specific ski lesson by its level and scheduled days.
         /// </summary>
         /// <param name="level">The skill level.</param>
         /// <param name="days">The scheduled days (e.g., mån-ons, tor-fre).</param>
-        public SkiLesson GetLessonByLevelAndDays(string level, string days)
+        public SkiLesson? GetLessonByLevelAndDays(string level, string days)
         {
             return _context.Set<SkiLesson>()
                 .FirstOrDefault(lesson => lesson.Level == level && lesson.Days == days);
@@ -39,7 +50,7 @@ namespace DataLayer.Repositories
         /// Gets a ski lesson by its identifier including all associated sessions and participants.
         /// </summary>
         /// <param name="skiLessonId">The ski lesson identifier.</param>
-        public SkiLesson GetLessonWithSessionsAndBookings(int skiLessonId)
+        public SkiLesson? GetLessonWithSessionsAndBookings(int skiLessonId)
         {
             return _context.Set<SkiLesson>()
                 .Include(lesson => lesson.Sessions)

@@ -37,6 +37,11 @@ namespace DataLayer.Interfaces
         IEnumerable<SkiLessonSession> GetAvailableSessions(int weekNumber, string level);
 
         /// <summary>
+        /// Gets all lessons with coupled ski lesson sessions. 
+        /// </summary>
+        IEnumerable<SkiLesson> GetLessonsWithSessions();
+
+        /// <summary>
         /// Gets the current number of booked participants for a specific session.
         /// </summary>
         /// <param name="sessionId">The session identifier.</param>
