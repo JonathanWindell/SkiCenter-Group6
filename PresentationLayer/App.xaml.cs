@@ -2,15 +2,6 @@
 using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using PresentationLayer.Views;
-using System.Configuration;
-using System.Data;
-using System.Windows;
-using BusinessLayer.Controllers;
-using DataLayer;
-using DataLayer.Interfaces;
 using DataLayer.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
@@ -67,16 +58,14 @@ namespace PresentationLayer
             services.AddTransient<CustomerBookingsView>();
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<SeasonPriceView>();
-<<<<<<< HEAD
             services.AddTransient<GuestCheckInOutView>();
-=======
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<BookingStatusView>();
->>>>>>> 9e19834 (Connected BookingView to Db)
+
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
-            services.AddTransient<BookingController>(); 
+            services.AddTransient<BookingController>();
             services.AddTransient<CustomerController>();
             services.AddTransient<DashboardController>();
             services.AddTransient<SkiShopController>();

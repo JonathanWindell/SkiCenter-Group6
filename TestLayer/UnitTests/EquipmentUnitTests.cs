@@ -2,7 +2,6 @@
 using DataLayer.Interfaces;
 using EntityLayer;
 using Moq;
-using NUnit.Framework;
 
 namespace TestLayer.UnitTests
 {
@@ -89,7 +88,7 @@ namespace TestLayer.UnitTests
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
         }
 
-     
+
         /// <summary>
         /// Test for DeleteEquipmentItem. Verifies that a item with rented status cant be deleted.
         /// </summary>

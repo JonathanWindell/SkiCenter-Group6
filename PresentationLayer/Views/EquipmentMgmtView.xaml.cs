@@ -1,15 +1,9 @@
 ﻿using BusinessLayer.Controllers;
 using EntityLayer;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Globalization;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 
 namespace PresentationLayer.Views
 {
@@ -339,7 +333,7 @@ namespace PresentationLayer.Views
 
             EquipmentFeedbackTextBlock.Text = string.Empty;
         }
-        
+
 
         private void DeleteEquipmentButton_Click(object sender, RoutedEventArgs e)
         {

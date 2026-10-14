@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using BusinessLayer;
+﻿using BusinessLayer;
 using BusinessLayer.Controllers;
 using EntityLayer;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace PresentationLayer.Views
 {

@@ -53,6 +53,7 @@ namespace DataLayer.Repositories
         public IEnumerable<Accommodation> GetAllAccommodations()
         {
             return _context.Set<Accommodation>()
+                .Include(a => a.AccommodationType)
                 .AsNoTracking()
                 .ToList();
         }
