@@ -54,6 +54,7 @@ namespace DataLayer.Repositories
             return _context.Set<Rental>()
                 .Include(r => r.EquipmentItems)
                     .ThenInclude(ei => ei.Equipment)
+                .Where(r => r.Booking != null && r.Booking.CustomerID == customerID)
                 .AsNoTracking()
                 .ToList();
         }
@@ -73,6 +74,7 @@ namespace DataLayer.Repositories
             return _context.Set<Rental>()
                 .Include(r => r.EquipmentItems)
                 .ThenInclude(ei => ei.Equipment)
+                .Where(r => r.BookingID == bookingID)
                 .AsNoTracking()
                 .ToList();
         }

@@ -2,9 +2,9 @@
 
 namespace EntityLayer
 {
-    public enum meetingRoomStatus
+    public enum MeetingRoomStatus
     {
-        Availabe,
+        Available,
         Rented,
         Maintenence,
     }
@@ -16,7 +16,7 @@ namespace EntityLayer
         public int MeetingRoomID { get; set; }
 
         [Required]
-        public int MeetingRoomNumber { get; set; }
+        public string MeetingRoomNumber { get; set; }
 
         [Required]
         public int Capacity { get; set; }
@@ -25,22 +25,21 @@ namespace EntityLayer
         public string Description { get; set; }
 
         [Required]
-        public decimal Price { get; set; }
-
-        [Required]
-        public meetingRoomStatus Status { get; set; }
+        public MeetingRoomStatus Status { get; set; }
 
         // Parameterless constructor for EF 
         public MeetingRoom() { }
 
-        public MeetingRoom(int capacity, string description, decimal price, meetingRoomStatus status)
+        public MeetingRoom(string meetingRoomNumber, int capacity, string description, MeetingRoomStatus status)
         {
+            MeetingRoomNumber = meetingRoomNumber;
             Capacity = capacity;
             Description = description;
-            Price = price;
             Status = status;
         }
 
         public virtual ICollection<BookingMeetingRoom> BookingMeetingRooms { get; set; } = new List<BookingMeetingRoom>();
+
+        public virtual ICollection<MeetingRoomSeasonPrice> SeasonPrices { get; set; } = new List<MeetingRoomSeasonPrice>();
     }
 }

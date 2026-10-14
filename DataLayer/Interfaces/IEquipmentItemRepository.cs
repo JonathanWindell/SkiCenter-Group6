@@ -9,5 +9,7 @@ namespace DataLayer.Interfaces
         void UpdateEquipmentItem(string articleNumber, int equipmentID, string size, EquipmentStatus status, EquipmentCondition condition);
         IEnumerable<EquipmentItem> GetAllEquipmentItems();
         void UpdateStatusAndCondition(string articleNumber, EquipmentStatus status, EquipmentCondition condition);
+        IEnumerable<EquipmentItem> GetAvailableItemsWithPrices(string? category);
+        IEnumerable<EquipmentItem> GetItemsByIds(IEnumerable<int> equipmentItemIDs);
     }
 }

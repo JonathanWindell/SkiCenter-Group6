@@ -283,16 +283,14 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <!-- Footer buttons -->
-                <Grid Grid.Row="4"
-                      Margin="0,20,0,0">
 
+                              <!-- Footer buttons -->
+                <Grid Grid.Row="4" Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Opens the new booking form -->
                     <Button x:Name="CreateNewBookingButton"
                             Grid.Column="0"
                             Content="+ Skapa ny bokning"
@@ -302,7 +300,6 @@
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="CreateNewBooking_Click"/>
 
-                    <!-- Returns to the previous view -->
                     <Button Grid.Column="1"
                             Content="Tillbaka"
                             Width="110"
@@ -310,8 +307,8 @@
                             HorizontalAlignment="Right"
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="BackButton_Click"/>
-
                 </Grid>
+
 
             </Grid>
         </Border>
