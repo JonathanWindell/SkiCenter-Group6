@@ -1,16 +1,28 @@
-using BusinessLayer.Controllers;
-using PresentationLayer.Resources.Animations;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using BusinessLayer.Controllers;
+using EntityLayer;
+using PresentationLayer.Resources.Animations;
 
 namespace PresentationLayer.Views
 {
     public partial class SkiSchoolView : Window
     {
         private readonly SkiSchoolController _skiSchoolController;
-        private readonly Window _parentWindow;
+        private bool _isInitializing = true;
+        private bool _isFetching = false;
 
-        // ViewModel-wrapper för ren presentation i DataGrid
+        public class BookingDropdownItem
+        {
+            public int BookingID { get; set; }
+            public string DisplayText { get; set; }
+            public override string ToString() => DisplayText;
+        }
+
         public class SessionDisplayItem
         {
             public int SessionID { get; set; }
@@ -26,60 +38,82 @@ namespace PresentationLayer.Views
             public string PriceDisplay => $"{Price:N0} kr";
         }
 
-        public SkiSchoolView(SkiSchoolController skiSchoolController, Window parentWindow = null, int? preselectedBookingId = null)
+        public SkiSchoolView(SkiSchoolController skiSchoolController)
         {
             InitializeComponent();
             _skiSchoolController = skiSchoolController ?? throw new ArgumentNullException(nameof(skiSchoolController));
-            _parentWindow = parentWindow;
-
-            if (preselectedBookingId.HasValue && preselectedBookingId.Value > 0)
-            {
-                TxtBookingId.Text = preselectedBookingId.Value.ToString();
-            }
         }
 
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             await WindowAnimations.FadeInWindowAsync(this);
+
             PopulateFilters();
+            LoadActiveBookings();
+
+            _isInitializing = false;
             await LoadSessionsAsync();
         }
 
-        /// <summary>
-        /// Populates dropdown filters with weeks and course levels.
-        /// </summary>
         private void PopulateFilters()
         {
-            // Vintersäsongens veckor
             var weeks = new List<int> { 51, 52 };
             for (int w = 1; w <= 16; w++) weeks.Add(w);
             CmbWeekNumber.ItemsSource = weeks;
-            CmbWeekNumber.SelectedItem = 1; // Standard: Vecka 1
+            CmbWeekNumber.SelectedItem = 1; // Week 1 as default
 
-            // Nivåer
             var levels = new List<string> { "Alla", "Grön", "Blå", "Röd", "Svart", "Privatlektion" };
             CmbLessonLevel.ItemsSource = levels;
             CmbLessonLevel.SelectedItem = "Alla";
         }
 
         /// <summary>
-        /// Loads available sessions from controller and updates UI.
+        /// Populates the booking dropdown with real bookings from the database.
         /// </summary>
+        private void LoadActiveBookings()
+        {
+            try
+            {
+                var bookings = _skiSchoolController.GetActiveBookings().ToList();
+                var items = bookings.Select(b => new BookingDropdownItem
+                {
+                    BookingID = b.BookingID,
+                    DisplayText = $"#{b.BookingID} - {b.Customer?.DisplayName} ({b.BookingStatus})"
+                }).ToList();
+
+                CmbBookings.ItemsSource = items;
+
+                if (items.Any())
+                {
+                    CmbBookings.SelectedIndex = 0;
+                }
+            }
+            catch
+            {
+                // If customer is missing or list is empty
+                TxtSelectedBookingInfo.Text = "Inga aktiva bokningar hittades";
+            }
+        }
+
         private async Task LoadSessionsAsync()
         {
-            if (CmbWeekNumber.SelectedItem == null) return;
+            if (_isFetching || _isInitializing || CmbWeekNumber.SelectedItem == null)
+            {
+                return;
+            }
+
+            _isFetching = true;
 
             int selectedWeek = (int)CmbWeekNumber.SelectedItem;
             string selectedLevel = CmbLessonLevel.SelectedItem?.ToString() ?? "Alla";
 
-            // Starta spinner-animation
             await ElementAnimations.ToggleLoadingAnimationAsync(true, MainContentGrid, LoadingOverlay, SpinnerTransform);
 
             var items = new List<SessionDisplayItem>();
 
-            await Task.Run(() =>
+            try
             {
-                var allLessons = _skiSchoolController.GetAllLessons().ToList();
+                var allLessons = await Task.Run(() => _skiSchoolController.GetAllLessonsWithSessions().ToList());
 
                 foreach (var lesson in allLessons)
                 {
@@ -88,7 +122,6 @@ namespace PresentationLayer.Views
                         continue;
                     }
 
-                    // Hämta pass för vald vecka
                     var matchingSessions = lesson.Sessions
                         .Where(s => s.WeekNumber == selectedWeek)
                         .ToList();
@@ -109,19 +142,21 @@ namespace PresentationLayer.Views
                         });
                     }
                 }
-            });
 
-            DgSessions.ItemsSource = items;
-
-            // Återställ laddningsanimation
-            await ElementAnimations.ToggleLoadingAnimationAsync(false, MainContentGrid, LoadingOverlay, SpinnerTransform);
-
-            ClearSummary();
+                // Sort after level and time windows
+                DgSessions.ItemsSource = items.OrderBy(i => i.Level).ThenBy(i => i.TimeSlot).ToList();
+            }
+            finally
+            {
+                await ElementAnimations.ToggleLoadingAnimationAsync(false, MainContentGrid, LoadingOverlay, SpinnerTransform);
+                _isFetching = false;
+                UpdateSummary();
+            }
         }
 
         private async void Filter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (IsLoaded)
+            if (!_isInitializing)
             {
                 await LoadSessionsAsync();
             }
@@ -132,36 +167,49 @@ namespace PresentationLayer.Views
             await LoadSessionsAsync();
         }
 
-        private void DgSessions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CmbBookings_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (DgSessions.SelectedItem is SessionDisplayItem selected)
+            if (CmbBookings.SelectedItem is BookingDropdownItem selected)
             {
-                TxtSummaryTitle.Text = $"{selected.Level} ({selected.Days})";
-                TxtSummaryTime.Text = $"Vecka {selected.WeekNumber} - {selected.TimeSlot}";
-                TxtSummarySpots.Text = $"{selected.MaxParticipants - selected.BookedCount} platser kvar (av {selected.MaxParticipants})";
-                TxtSummaryPrice.Text = selected.PriceDisplay;
-
-                BtnBookSession.IsEnabled = (selected.BookedCount < selected.MaxParticipants);
+                TxtSelectedBookingInfo.Text = selected.DisplayText;
             }
             else
             {
-                ClearSummary();
+                TxtSelectedBookingInfo.Text = "Ingen bokning vald";
+            }
+            UpdateSummary();
+        }
+
+        private void DgSessions_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateSummary();
+        }
+
+        private void UpdateSummary()
+        {
+            if (DgSessions.SelectedItem is SessionDisplayItem selectedSession)
+            {
+                TxtSummaryTitle.Text = $"{selectedSession.Level} ({selectedSession.Days})";
+                TxtSummaryTime.Text = $"Vecka {selectedSession.WeekNumber} - {selectedSession.TimeSlot}";
+                TxtSummarySpots.Text = $"{selectedSession.MaxParticipants - selectedSession.BookedCount} platser kvar (av {selectedSession.MaxParticipants})";
+                TxtSummaryPrice.Text = selectedSession.PriceDisplay;
+
+                bool hasBooking = CmbBookings.SelectedItem is BookingDropdownItem;
+                bool hasSpots = selectedSession.BookedCount < selectedSession.MaxParticipants;
+
+                BtnBookSession.IsEnabled = hasBooking && hasSpots;
+            }
+            else
+            {
+                TxtSummaryTitle.Text = "Ingen lektion vald";
+                TxtSummaryTime.Text = "-";
+                TxtSummarySpots.Text = "-";
+                TxtSummaryPrice.Text = "-";
+                BtnBookSession.IsEnabled = false;
             }
         }
 
-        private void ClearSummary()
-        {
-            TxtSummaryTitle.Text = "Ingen lektion vald";
-            TxtSummaryTime.Text = "-";
-            TxtSummarySpots.Text = "-";
-            TxtSummaryPrice.Text = "-";
-            BtnBookSession.IsEnabled = false;
-        }
-
-        /// <summary>
-        /// Handles participant booking against the chosen booking ID.
-        /// </summary>
-        private void BtnBookSession_Click(object sender, RoutedEventArgs e)
+        private async void BtnBookSession_Click(object sender, RoutedEventArgs e)
         {
             if (DgSessions.SelectedItem is not SessionDisplayItem selectedSession)
             {
@@ -169,41 +217,35 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            if (!int.TryParse(TxtBookingId.Text.Trim(), out int bookingId) || bookingId <= 0)
+            if (CmbBookings.SelectedItem is not BookingDropdownItem selectedBooking)
             {
-                MessageBox.Show("Ange ett giltigt numeriskt Boknings-ID för att koppla lektionen.", "Valideringsfel", MessageBoxButton.OK, MessageBoxImage.Warning);
-                TxtBookingId.Focus();
+                MessageBox.Show("Välj en bokning i rullgardinsmenyn att koppla lektionen till.", "Bokning saknas", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            bool success = _skiSchoolController.BookParticipant(bookingId, selectedSession.SessionID);
+            bool success = _skiSchoolController.BookParticipant(selectedBooking.BookingID, selectedSession.SessionID);
 
             if (success)
             {
-                MessageBox.Show($"Deltagare har bokats till {selectedSession.Level} (V.{selectedSession.WeekNumber}) på bokning #{bookingId}!",
+                MessageBox.Show($"Deltagare har bokats till {selectedSession.Level} (V.{selectedSession.WeekNumber}) på bokning #{selectedBooking.BookingID}!",
                                 "Bokning genomförd", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                // Uppdatera listan så att lediga platser räknas om
-                _ = LoadSessionsAsync();
+                await LoadSessionsAsync();
             }
             else
             {
-                MessageBox.Show("Det gick inte att genomföra bokningen. Kontrollera att bokningsnumret existerar och att passet inte är fullt.",
+                MessageBox.Show("Det gick inte att genomföra bokningen. Kontrollera att passet inte blev fullbokat.",
                                 "Fel vid bokning", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
-            if (_parentWindow != null)
+            if (this.Owner != null)
             {
-                _parentWindow.Show();
-                this.Close();
+                this.Owner.Show();
             }
-            else
-            {
-                this.Close();
-            }
+            this.Close();
         }
     }
 }

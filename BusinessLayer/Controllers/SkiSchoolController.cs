@@ -39,6 +39,26 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
+        /// Gets all ski lessons including their scheduled sessions and booked participants.
+        /// </summary>
+        public IEnumerable<SkiLesson> GetAllLessonsWithSessions()
+        {
+            // Vi hämtar via repositoryts specifika metod som har Include
+            return _unitOfWork.SkiLesson.GetLessonsWithSessions();
+        }
+
+        /// <summary>
+        /// Gets all active and confirmed bookings that can have ski lessons added.
+        /// </summary>
+        public IEnumerable<Booking> GetActiveBookings()
+        {
+            return _unitOfWork.Booking.GetAllBookings()
+                .Where(b => b.BookingStatus != BookingStatus.Cancelled && b.BookingStatus != BookingStatus.Finished)
+                .OrderByDescending(b => b.BookingID)
+                .ToList();
+        }
+
+        /// <summary>
         /// Gets all available sessions for a given week and level where the group is not fully booked.
         /// </summary>
         /// <param name="weekNumber">The calendar week number.</param>

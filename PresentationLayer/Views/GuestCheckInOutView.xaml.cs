@@ -13,9 +13,6 @@ namespace PresentationLayer.Views
         // Uses the existing controller to retrieve booking data.
         private readonly BookingController _bookingController;
 
-        // Enables sample data for UI testing only. Keep false for normal use.
-        private readonly bool _usePreviewData = false;
-        // Preview data only; no database changes are made.
         private readonly ObservableCollection<GuestStayRow> _previewGuests = new();
         private readonly ObservableCollection<GuestStayRow> _visibleGuests = new();
 
@@ -42,67 +39,49 @@ namespace PresentationLayer.Views
 
         private void GuestsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Keep actions disabled until saving and permissions are connected.
             CheckInButton.IsEnabled = false;
             CheckOutButton.IsEnabled = false;
             GuestFeedbackBorder.Visibility = Visibility.Collapsed;
-
-            SelectedGuestTextBlock.Text = "Välj en bokning i listan.";
-            SelectedGuestDetailsTextBlock.Text = string.Empty;
             GuestPermissionTextBlock.Visibility = Visibility.Collapsed;
-
 
             if (GuestsDataGrid.SelectedItem is not GuestStayRow guest)
             {
                 SelectedGuestTextBlock.Text = "Välj en bokning i listan.";
+                SelectedGuestDetailsTextBlock.Text = string.Empty;
                 return;
             }
 
-            SelectedGuestTextBlock.Text =
-                  $"{guest.BookingID} – {guest.CustomerName}";
-
-            //Show the accommodation name and the arrival/departure dates for the selected guest
+            SelectedGuestTextBlock.Text = $"{guest.BookingID} – {guest.CustomerName}";
             SelectedGuestDetailsTextBlock.Text =
                 $"{guest.CustomerType} · {guest.AccommodationName}\n" +
-                $"Ankomst: {guest.ArrivalDate:yyyy-MM-dd} · " + $"Avresa: {guest.DepartureDate:yyyy-MM-dd}";
+                $"Ankomst: {guest.ArrivalDate:yyyy-MM-dd} · Avresa: {guest.DepartureDate:yyyy-MM-dd}";
 
+            DateTime selectedDate = GuestDatePicker.SelectedDate?.Date ?? DateTime.Today;
 
-            // Real user permissions will be supplied by the business layer.
+            bool isArrivalDay = guest.ArrivalDate.Date == selectedDate;
 
-            // Test payment warnings without enabling real database actions.
-            if (_usePreviewData)
+            // Check in. Guest can be checked in if it¨s arrival day or if status is Not checked in
+            bool canCheckIn = (isArrivalDay && guest.StayStatus == "Ej incheckad") || (guest.StayStatus == "Utcheckad");
+            bool isPaid = true; // Placeholder until Invoice is created and integrated.
+
+            if (canCheckIn)
             {
-                GuestPermissionTextBlock.Text =
-                    "Testvy – ändringar sparas inte i databasen.";
-                GuestPermissionTextBlock.Visibility = Visibility.Visible;
-
-                bool isTodaysArrival =
-                    GuestDatePicker.SelectedDate?.Date == DateTime.Today &&
-                    guest.ArrivalDate.Date == DateTime.Today &&
-                    guest.StayStatus == "Ej incheckad";
-
-                if (isTodaysArrival && guest.PaymentStatus != "Fullbetald")
+                if (!isPaid)
                 {
-                    GuestFeedbackTextBlock.Text =
-                        "Bokningen är inte fullbetald. Gästen kan inte checkas in.";
+                    GuestFeedbackTextBlock.Text = "Bokningen är inte fullbetald. Gästen kan inte checkas in.";
                     GuestFeedbackBorder.Visibility = Visibility.Visible;
                 }
-
-                CheckInButton.IsEnabled =
-                    isTodaysArrival && guest.PaymentStatus == "Fullbetald";
-
-                CheckOutButton.IsEnabled =
-                    GuestDatePicker.SelectedDate?.Date == DateTime.Today &&
-                    guest.DepartureDate.Date == DateTime.Today &&
-                    guest.StayStatus == "Incheckad";
-
-                return;
+                else
+                {
+                    CheckInButton.IsEnabled = true;
+                }
             }
 
-            GuestPermissionTextBlock.Text =
-                "In- och utcheckning är ännu inte kopplad till sparande och behörighet.";
-            GuestPermissionTextBlock.Visibility = Visibility.Visible;
-
+            // Check out. All guests that have status "Checked In" should be able to be checked out. 
+            if (guest.StayStatus == "Incheckad")
+            {
+                CheckOutButton.IsEnabled = true;
+            }
         }
 
         private void CheckInButton_Click(object sender, RoutedEventArgs e)
@@ -110,26 +89,33 @@ namespace PresentationLayer.Views
             if (GuestsDataGrid.SelectedItem is not GuestStayRow guest)
                 return;
 
-            // Recheck the preview rules before changing the status.
-            if (GuestDatePicker.SelectedDate?.Date != DateTime.Today ||
-                guest.ArrivalDate.Date != DateTime.Today ||
-                guest.StayStatus != "Ej incheckad" ||
-                guest.PaymentStatus != "Fullbetald")
-                return;
+            // Changes the question depending in if it's the first time checking in or if precious mistakes has been made. 
+            string message = guest.StayStatus == "Utcheckad"
+                ? $"Gästen är redan utcheckad. Vill du checka in {guest.CustomerName} igen?\n\nBokning {guest.BookingID} · {guest.AccommodationName}"
+                : $"Checka in {guest.CustomerName}?\n\nBokning {guest.BookingID} · {guest.AccommodationName}";
 
-            // Confirm the guest and accommodation before checking in to reduce mistakes
             MessageBoxResult answer = MessageBox.Show(
-                $"Checka in {guest.CustomerName}?\n\n" +
-                $"Bokning {guest.BookingID} · {guest.AccommodationName}",
+                message,
                 "Bekräfta incheckning",
                 MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
+                MessageBoxImage.Question);
 
             if (answer != MessageBoxResult.Yes)
                 return;
 
-            UpdatePreviewStatus(guest, "Incheckad");
+            // Forces database update
+            bool success = _bookingController.UpdateCheckInStatus(guest.BookingID, CheckInStatus.CheckedIn);
+
+            if (success)
+            {
+                MessageBox.Show($"Bokning #{guest.BookingID} ({guest.CustomerName}) är nu incheckad!", "Incheckad", MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadGuests();
+                RefreshGuests();
+            }
+            else
+            {
+                MessageBox.Show("Kunde inte genomföra incheckningen i databasen.", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void CheckOutButton_Click(object sender, RoutedEventArgs e)
@@ -137,74 +123,39 @@ namespace PresentationLayer.Views
             if (GuestsDataGrid.SelectedItem is not GuestStayRow guest)
                 return;
 
-            if (GuestDatePicker.SelectedDate?.Date != DateTime.Today ||
-                guest.DepartureDate.Date != DateTime.Today ||
-                guest.StayStatus != "Incheckad")
+            // Verify that Guest is checked in
+            if (guest.StayStatus != "Incheckad")
                 return;
 
             MessageBoxResult answer = MessageBox.Show(
-                $"Vill du checka ut {guest.CustomerName}?",
+                $"Vill du checka ut {guest.CustomerName}?\n\n" +
+                $"Bokning {guest.BookingID} · {guest.AccommodationName}",
                 "Bekräfta utcheckning",
                 MessageBoxButton.YesNo,
-                MessageBoxImage.Question,
-                MessageBoxResult.No);
+                MessageBoxImage.Question);
 
             if (answer != MessageBoxResult.Yes)
                 return;
 
-            UpdatePreviewStatus(guest, "Utcheckad");
-        }
+            // Forces update against database.
+            bool success = _bookingController.UpdateCheckInStatus(guest.BookingID, CheckInStatus.CheckedOut);
 
-        private void UpdatePreviewStatus(GuestStayRow guest, string status)
-        {
-            // Update the preview table only; nothing is saved to the database.
-            guest.StayStatus = status;
-            GuestsDataGrid.Items.Refresh();
-
-            CheckInButton.IsEnabled = false;
-            CheckOutButton.IsEnabled = false;
-            GuestFeedbackBorder.Visibility = Visibility.Collapsed;
-
-            SelectedGuestTextBlock.Text =
-                $"Bokning {guest.BookingID} – {status.ToLowerInvariant()} i testvyn.";
+            if (success)
+            {
+                MessageBox.Show($"Bokning #{guest.BookingID} ({guest.CustomerName}) är nu utcheckad!", "Utcheckad", MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadGuests();
+                RefreshGuests();
+            }
+            else
+            {
+                MessageBox.Show("Kunde inte genomföra utcheckningen i databasen.", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void LoadGuests()
         {
             _previewGuests.Clear();
-
-            // Use sample bookings only when preview mode is explicitly enabled.
-            if (_usePreviewData)
-            {
-                Title = "SkiCenter - In- och utcheckning (TESTVY)";
-
-                _previewGuests.Add(new GuestStayRow
-                {
-                    BookingID = 9001,
-                    CustomerName = "Anna Test",
-                    CustomerType = "Privatkund",
-                    AccommodationName = "Teststuga 1",
-                    ArrivalDate = DateTime.Today,
-                    DepartureDate = DateTime.Today.AddDays(7),
-                    PaymentStatus = "Obetald",
-                    StayStatus = "Ej incheckad"
-                });
-
-                _previewGuests.Add(new GuestStayRow
-                {
-                    BookingID = 9002,
-                    CustomerName = "Erik Test",
-                    CustomerType = "Privatkund",
-                    AccommodationName = "Teststuga 2",
-                    ArrivalDate = DateTime.Today,
-                    DepartureDate = DateTime.Today.AddDays(7),
-                    PaymentStatus = "Fullbetald",
-                    StayStatus = "Ej incheckad"
-                });
-
-                return;
-            }
-
+          
             try
             {
                 // Load bookings through the existing business controller.
@@ -272,7 +223,7 @@ namespace PresentationLayer.Views
 
         private void RefreshGuests()
         {
-            _visibleGuests.Clear(); //holds only the guests that matches the filter
+            _visibleGuests.Clear(); // holds only the guests that matches the filter
 
             CheckInButton.IsEnabled = false;
             CheckOutButton.IsEnabled = false;
@@ -321,6 +272,15 @@ namespace PresentationLayer.Views
             GuestCountTextBlock.Text = bookingCount == 0
                 ? "Inga ankomster eller avresor för valt datum."
                 : $"{bookingCount} bokningar";
+        }
+
+        private void BtnBack_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.Owner != null)
+            {
+                this.Owner.Show();
+            }
+            this.Close();
         }
     }
 }

@@ -1,17 +1,13 @@
 ﻿<Window x:Class="PresentationLayer.Views.SkiSchoolView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
         Title="SkiCenter - Skidskola &amp; Lektioner" 
-        Height="720" Width="1080"
+        Height="740" Width="1120"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBg}"
         Loaded="Window_Loaded">
 
     <Window.Resources>
-        <!-- Lokal stil för kortbehållare -->
         <Style x:Key="CardBorderStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource CardBg}"/>
             <Setter Property="CornerRadius" Value="15"/>
@@ -25,35 +21,23 @@
             </Setter>
         </Style>
 
-        <!-- Stil för textrutor och comboboxar -->
-        <Style TargetType="TextBox">
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="8,0"/>
-            <Setter Property="BorderBrush" Value="{StaticResource InputBorder}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize" Value="14"/>
-        </Style>
-
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="36"/>
+            <Setter Property="Height" Value="38"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Padding" Value="10,0"/>
             <Setter Property="BorderBrush" Value="{StaticResource InputBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="13"/>
         </Style>
     </Window.Resources>
 
     <Grid>
-        <!-- HUVUDINNEHÅLL (Fadeas ut vid laddning) -->
         <Grid x:Name="MainContentGrid" Margin="25">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-
-            <!-- 1. Huvudrubrik & Tillbakaknapp -->
+            
             <Grid Grid.Row="0" Margin="0,0,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -61,22 +45,23 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="BtnBack" Content="← Tillbaka" Width="110" Height="36"
+                <Button x:Name="BtnBack" Content="← Tillbaka" Width="110" Height="38"
                         Style="{StaticResource DeepSeaButtonStyle}"
                         Click="BtnBack_Click"/>
 
                 <StackPanel Grid.Column="1" Margin="20,0,0,0" VerticalAlignment="Center">
                     <TextBlock Text="Skidskola &amp; Lektioner" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryText}"/>
-                    <TextBlock Text="Boka grupplektioner och privatlektioner för gäster" FontSize="14" Foreground="{StaticResource SecondaryText}"/>
+                    <TextBlock Text="Boka grupp- och privatlektioner för gäster" FontSize="14" Foreground="{StaticResource SecondaryText}"/>
                 </StackPanel>
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Koppla till Boknings-ID:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}"/>
-                    <TextBox x:Name="TxtBookingId" Width="100" TextAlignment="Center"/>
+                <!-- Dropdown for active bookings -->
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock Text="Välj aktuell bokning:" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,4"/>
+                    <ComboBox x:Name="CmbBookings" Width="280" SelectionChanged="CmbBookings_SelectionChanged"/>
                 </StackPanel>
             </Grid>
 
-            <!-- 2. Arbetsyta: Vänster filter/lista + Höger detaljvy -->
+            <!-- Main space -->
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2.2*"/>
@@ -84,7 +69,7 @@
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- VÄNSTER: Filtrering & Tabell -->
+                <!-- Left column: Filter & DataGrid -->
                 <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -113,7 +98,7 @@
                                 <ComboBox x:Name="CmbLessonLevel" SelectionChanged="Filter_SelectionChanged"/>
                             </StackPanel>
 
-                            <Button x:Name="BtnRefresh" Grid.Column="4" Content="Uppdatera" Width="100" Height="36" 
+                            <Button x:Name="BtnRefresh" Grid.Column="4" Content="Uppdatera" Width="100" Height="38" 
                                     VerticalAlignment="Bottom"
                                     Style="{StaticResource DeepSeaButtonStyle}" 
                                     Click="BtnRefresh_Click"/>
@@ -121,7 +106,7 @@
 
                         <Separator Grid.Row="1" Background="{StaticResource InputBorder}" Opacity="0.5"/>
 
-                        <!-- DataGrid över lediga pass -->
+                        <!-- DataGrid -->
                         <DataGrid x:Name="DgSessions" Grid.Row="2" 
                                   AutoGenerateColumns="False" 
                                   IsReadOnly="True"
@@ -134,9 +119,9 @@
                                   BorderThickness="0"
                                   SelectionChanged="DgSessions_SelectionChanged">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Vecka" Binding="{Binding WeekNumber}" Width="70"/>
-                                <DataGridTextColumn Header="Nivå" Binding="{Binding Level}" Width="110"/>
-                                <DataGridTextColumn Header="Dagar" Binding="{Binding Days}" Width="100"/>
+                                <DataGridTextColumn Header="Vecka" Binding="{Binding WeekNumber}" Width="65"/>
+                                <DataGridTextColumn Header="Nivå" Binding="{Binding Level}" Width="105"/>
+                                <DataGridTextColumn Header="Dagar" Binding="{Binding Days}" Width="95"/>
                                 <DataGridTextColumn Header="Tid" Binding="{Binding TimeSlot}" Width="110"/>
                                 <DataGridTextColumn Header="Platser" Binding="{Binding AvailabilityDisplay}" Width="90"/>
                                 <DataGridTextColumn Header="Pris (SEK)" Binding="{Binding PriceDisplay}" Width="*"/>
@@ -145,7 +130,7 @@
                     </Grid>
                 </Border>
 
-                <!-- HÖGER: Sammanfattning & Bokning -->
+                <!-- Right column: Details & Booking -->
                 <Border Grid.Column="2" Style="{StaticResource CardBorderStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
@@ -157,8 +142,11 @@
                         <TextBlock Grid.Row="0" Text="Vald lektion" FontSize="18" FontWeight="Bold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,15"/>
 
                         <StackPanel Grid.Row="1">
+                            <TextBlock Text="KOPPLAD BOKNING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,3"/>
+                            <TextBlock x:Name="TxtSelectedBookingInfo" Text="Ingen bokning vald" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,15"/>
+
                             <TextBlock Text="NIVÅ &amp; PERIOD" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,3"/>
-                            <TextBlock x:Name="TxtSummaryTitle" Text="Ingen lektion vald" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,15"/>
+                            <TextBlock x:Name="TxtSummaryTitle" Text="Ingen lektion vald" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,15"/>
 
                             <TextBlock Text="TIDSLUCKA" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,3"/>
                             <TextBlock x:Name="TxtSummaryTime" Text="-" FontSize="14" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,15"/>
@@ -168,14 +156,8 @@
 
                             <TextBlock Text="PRIS PER DELTAGARE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,3"/>
                             <TextBlock x:Name="TxtSummaryPrice" Text="-" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBtn}" Margin="0,0,0,15"/>
-
-                            <Border Background="#F8FAFF" BorderBrush="{StaticResource InputBorder}" BorderThickness="1" CornerRadius="8" Padding="12">
-                                <TextBlock Text="Observera att en lektion debiteras direkt på angivet Boknings-ID och sparas i bokningens totalbelopp." 
-                                           FontSize="12" Foreground="{StaticResource PrimaryText}" TextWrapping="Wrap"/>
-                            </Border>
                         </StackPanel>
 
-                        <!-- Bokningsknapp -->
                         <Button x:Name="BtnBookSession" Grid.Row="2" Content="Boka lektion" Height="44"
                                 Style="{StaticResource DeepSeaButtonStyle}"
                                 IsEnabled="False"
@@ -185,7 +167,7 @@
             </Grid>
         </Grid>
 
-        <!-- LADDNINGS-OVERLAY (Aktiveras via ToggleLoadingAnimationAsync) -->
+        <!-- Loading Overlay -->
         <Grid x:Name="LoadingOverlay" Opacity="0" IsHitTestVisible="False" Background="#401E1B4B">
             <Border Background="White" CornerRadius="12" Padding="25" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel HorizontalAlignment="Center">
@@ -195,7 +177,7 @@
                             <RotateTransform x:Name="SpinnerTransform" Angle="0"/>
                         </Path.RenderTransform>
                     </Path>
-                    <TextBlock Text="Hämtar lektioner..." Margin="0,15,0,0" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}"/>
+                    <TextBlock Text="Hämtar data..." Margin="0,15,0,0" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}"/>
                 </StackPanel>
             </Border>
         </Grid>

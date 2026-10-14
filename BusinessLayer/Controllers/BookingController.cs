@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace BusinessLayer
 {
-    public class BookingController // WIP
+    public class BookingController 
     {
         private readonly IUnitOfWork _unitOfWork;
 
@@ -396,8 +396,74 @@ namespace BusinessLayer
             return booking;
         }
 
-        // WIP, MISSING FUNCTIONS
+        /// <summary>
+        /// Updates the check-in status of a specific booking.
+        /// </summary>
+        /// <param name="bookingId">The unique booking identifier.</param>
+        /// <param name="newStatus">The new check-in status to apply.</param>
+        /// <returns>True if the status was successfully updated; otherwise, false.</returns>
+        public bool UpdateCheckInStatus(int bookingId, CheckInStatus newStatus)
+        {
+            if (bookingId <= 0)
+            {
+                return false;
+            }
 
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId)
+                          ?? _unitOfWork.Booking.GetByID(bookingId);
+
+            if (booking == null)
+            {
+                return false;
+            }
+
+            booking.CheckInStatus = newStatus;
+
+            // If Guest checks in
+            if (newStatus == CheckInStatus.CheckedIn)
+            {
+                booking.BookingStatus = BookingStatus.Confirmed;
+            }
+            // When Guest checks out
+            else if (newStatus == CheckInStatus.CheckedOut)
+            {
+                booking.BookingStatus = BookingStatus.Finished;
+            }
+
+            _unitOfWork.Booking.Update(booking);
+            return _unitOfWork.Complete() > 0;
+        }
+
+        /*
+        /// <summary>
+        /// Checks whether a booking is fully paid based on its invoices.
+        /// </summary>
+        /// <param name="bookingId">The unique booking identifier.</param>
+        /// <returns>True if all invoices are paid or no invoices exist; otherwise, false.</returns>
+        public bool IsBookingFullyPaid(int bookingId)
+        {
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId)
+                          ?? _unitOfWork.Booking.GetByID(bookingId);
+
+            if (booking == null)
+            {
+                return false;
+            }
+
+            // Företagskunder faktureras i efterhand och tillåts checka in
+            if (booking.Customer is CorporateCustomer)
+            {
+                return true;
+            }
+
+            if (booking.Invoices == null || !booking.Invoices.Any())
+            {
+                return true;
+            }
+
+            return booking.Invoices.All(inv => inv.IsPaid);
+        }
+        */
 
     }
 }
