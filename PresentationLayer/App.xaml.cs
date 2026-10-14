@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-﻿using BusinessLayer;
-=======
 using System.Windows;
 using BusinessLayer;
->>>>>>> 5e2b8c8cf9914c8150dab78cb96460f42f3a2d30
 using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
