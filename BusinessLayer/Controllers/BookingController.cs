@@ -372,9 +372,7 @@ namespace BusinessLayer
                     AccommodationID = accommodation.AccommodationID,
                     StartDate = startDate,
                     EndDate = endDate,
-                    DiscountRate = discountRate,
-                    DiscountAmount = discountAmount,
-                    FinalPrice = finalAccommodationPrice
+                    
                 };
 
             // Create the booking.

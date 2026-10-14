@@ -9,9 +9,7 @@ namespace EntityLayer
         public int BookingAccommodationID { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public decimal DiscountRate { get; set; }
-        public decimal DiscountAmount { get; set; }
-        public decimal FinalPrice { get; set; }
+    
 
         // Relation to Customer. Foreign Key
         [ForeignKey("Booking")]
@@ -30,9 +28,6 @@ namespace EntityLayer
         {
             StartDate = startDate;
             EndDate = endDate;
-            DiscountRate = discountRate;
-            DiscountAmount = discountAmount;
-            FinalPrice = finalPrice;
         }
     }
 }
