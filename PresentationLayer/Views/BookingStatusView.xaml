@@ -64,11 +64,12 @@
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Bokningsstatus"
                                Foreground="{StaticResource PrimaryText}"
-                               Margin="0,0,0,6"/>
+                               Margin="0,0,0,5"/>
 
                     <ComboBox x:Name="BookingStatusFilterComboBox"
                               Height="36"
-                              SelectedIndex="0">
+                              SelectedIndex="0"
+                              VerticalContentAlignment="Center">
                         <ComboBoxItem Content="Alla bokningsstatusar"/>
                     </ComboBox>
                 </StackPanel>
@@ -76,11 +77,12 @@
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Betalningsstatus"
                                Foreground="{StaticResource PrimaryText}"
-                               Margin="0,0,0,6"/>
+                               Margin="0,0,0,5"/>
 
                     <ComboBox x:Name="PaymentStatusFilterComboBox"
                               Height="36"
-                              SelectedIndex="0">
+                              SelectedIndex="0"
+                              VerticalContentAlignment="Center">
                         <ComboBoxItem Content="Alla betalningsstatusar"/>
                     </ComboBox>
                 </StackPanel>

@@ -87,24 +87,25 @@ namespace PresentationLayer.Views
 
         private void PopulateFilters()
         {
-            foreach (string status in _properties
-                         .Select(p => p.Type)
-                         .Where(t => !string.IsNullOrWhiteSpace(t))
-                         .Distinct()
-                         .OrderBy(status => status))
-            {
-                PropertyTypeFilterComboBox.Items.Add(
-                    new ComboBoxItem { Content = status });
-            }
+            PropertyTypeFilterComboBox.Items.Clear();
+            PropertyTypeFilterComboBox.Items.Add(new ComboBoxItem { Content = "Alla typer" });
+            PropertyTypeFilterComboBox.Items.Add(new ComboBoxItem { Content = "Boende" });
+            PropertyTypeFilterComboBox.Items.Add(new ComboBoxItem { Content = "Mötesrum" });
+            PropertyTypeFilterComboBox.SelectedIndex = 0;
 
-            foreach (string status in _properties
-                         .Select(p => p.Status)
-                         .Distinct()
-                         .OrderBy(status => status))
+            PropertyStatusFilterComboBox.Items.Clear();
+            PropertyStatusFilterComboBox.Items.Add(new ComboBoxItem { Content = "Alla statusar" });
+
+            // Gets unique statusnames from enum
+            var allStatuses = Enum.GetNames<AccommodationStatus>()
+                .Union(Enum.GetNames<MeetingRoomStatus>())
+                .Distinct();
+
+            foreach (var status in allStatuses)
             {
-                PropertyStatusFilterComboBox.Items.Add(
-                    new ComboBoxItem { Content = status });
+                PropertyStatusFilterComboBox.Items.Add(new ComboBoxItem { Content = status });
             }
+            PropertyStatusFilterComboBox.SelectedIndex = 0;
         }
 
         private bool MatchesFilters(object item)
@@ -177,32 +178,10 @@ namespace PresentationLayer.Views
 
             int successCount = 0;
 
-            foreach (var row in changedRows)
-            {
-                if (row.Type == "Boende")
-                {
-                    if (Enum.TryParse<AccommodationStatus>(row.Status, out var newStatus))
-                    {
-                        if (_propertyController.UpdateAccommodationStatus(row.Id, newStatus))
-                            successCount++;
-                    }
-                }
-                else if (row.Type == "Mötesrum")
-                {
-                    if (Enum.TryParse<MeetingRoomStatus>(row.Status, out var newStatus))
-                    {
-                        if (_propertyController.UpdateMeetingRoomStatus(row.Id, newStatus))
-                            successCount++;
-                    }
-                }
-            }
-
             MessageBox.Show($"{successCount} av {changedRows.Count} rader sparades!", "Status uppdaterad", MessageBoxButton.OK, MessageBoxImage.Information);
 
             // Reload list to reset IsChanged
             LoadData();
-            PopulateFilters();
-            UpdateCountText();
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)

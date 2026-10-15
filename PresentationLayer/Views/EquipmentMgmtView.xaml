@@ -193,6 +193,16 @@
                         </DataGrid>
                     </Border>
 
+                    <!-- Back button -->
+                    <Button Grid.Row="4"
+                    Content="Tillbaka"
+                    Width="110"
+                    Height="38"
+                    Margin="0,20,0,0"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="BackButton_Click"/>
+
                     <StackPanel Grid.Row="1"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Right"
