@@ -37,6 +37,16 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        /// <summary>
+        /// Gets all meeting rooms registered in the system.
+        /// </summary>
+        public IEnumerable<MeetingRoom> GetAllMeetingRooms()
+        {
+            return _context.Set<MeetingRoom>()
+                .AsNoTracking()
+                .ToList();
+        }
+
         // MISSING 2 FUNCTIONS, WIP
     }
 }
