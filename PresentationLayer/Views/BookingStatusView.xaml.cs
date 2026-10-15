@@ -3,7 +3,6 @@ using BusinessLayer.Controllers;
 using EntityLayer;
 using PresentationLayer.Models;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -168,9 +167,9 @@ namespace PresentationLayer.Views
         {
             var customerController = new CustomerController(new DataLayer.UnitOfWork(new DataLayer.SkiCenterDbContext()));
             var customerBookingsView = new CustomerBookingsView(
-    _bookingController,
-    customerController,
-    ((App)System.Windows.Application.Current).Services)
+                                            _bookingController,
+                                            customerController,
+                                            ((App)System.Windows.Application.Current).Services)
             {
                 Owner = this
             };

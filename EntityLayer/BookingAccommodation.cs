@@ -9,7 +9,6 @@ namespace EntityLayer
         public int BookingAccommodationID { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-    
 
         // Relation to Customer. Foreign Key
         [ForeignKey("Booking")]

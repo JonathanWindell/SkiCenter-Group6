@@ -1,6 +1,3 @@
-﻿
-using System;
-using System.Windows;
 using BusinessLayer;
 using BusinessLayer.Controllers;
 using DataLayer;
@@ -8,6 +5,7 @@ using DataLayer.Interfaces;
 using DataLayer.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
+using System.Windows;
 
 namespace PresentationLayer
 {
@@ -55,7 +53,12 @@ namespace PresentationLayer
             services.AddTransient<BookingDetailsView>();
             services.AddTransient<SeasonPriceView>();
             services.AddTransient<GuestCheckInOutView>();
+            services.AddTransient<BookingDetailsView>();
             services.AddTransient<BookingStatusView>();
+            services.AddTransient<PropertyMgmtView>();
+            services.AddTransient<EquipmentRentalView>();
+            services.AddTransient<SkiSchoolView>();
+
 
             // 2. Register Controllers
             services.AddTransient<LoginController>();
@@ -63,7 +66,9 @@ namespace PresentationLayer
             services.AddTransient<CustomerController>();
             services.AddTransient<DashboardController>();
             services.AddTransient<SkiShopController>();
+            services.AddTransient<SkiSchoolController>();
             services.AddTransient<AdminController>();
+            services.AddTransient<PropertyController>();
 
             // 3. Register Repositories
             services.AddTransient<ICustomerRepository, CustomerRepository>();
@@ -89,19 +94,6 @@ namespace PresentationLayer
             // To test the guest view directly without logging in, comment out the two lines above and use:
             // var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
             // guestWindow.Show();
-
-            /*
-            // Only use when data should be written from seeding files.
-            // Jonathan will handle database initialization.
-
-            using (var scope = Services.CreateScope())
-            {
-                var context = scope.ServiceProvider
-                    .GetRequiredService<SkiCenterDbContext>();
-
-                DbInitializer.Initialize(context);
-            }
-            */
         }
     }
 }

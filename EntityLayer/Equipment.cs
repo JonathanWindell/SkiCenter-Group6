@@ -18,8 +18,8 @@ namespace EntityLayer
         public string DisplayName => $"{Category} - {Description}";
 
         // Many to Many relations
-        public virtual ICollection<EquipmentItem> EquipmentItems { get; set; }
-        public virtual ICollection<EquipmentPriceMatrix> Prices { get; set; }
+        public virtual ICollection<EquipmentItem> EquipmentItems { get; set; } = new List<EquipmentItem>();
+        public virtual ICollection<EquipmentPriceMatrix> Prices { get; set; } = new List<EquipmentPriceMatrix>();
 
         // Parameterless constructor for EF 
         public Equipment() { }

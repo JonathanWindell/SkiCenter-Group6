@@ -121,6 +121,31 @@ namespace PresentationLayer.Views
 
             await WindowAnimations.ExpandWindowAsync(MainBorder, targetWidth, targetHeight);
 
+            OpenDashboard();
+        }
+
+        /// <summary>
+        /// TEMP: Test button. Logs in as the system admin test account and opens the dashboard
+        /// directly, without the loading and window animations. Remove before release.
+        /// </summary>
+        private void btnQuickLoginSysAdmin_Click(object sender, RoutedEventArgs e)
+        {
+            (Staff? staff, string statusMsg) = _loginController.Login("SystemAdmin@Test.se", "testpassword");
+
+            if (staff == null)
+            {
+                MessageBox.Show($"Quick login misslyckades: {statusMsg}");
+                return;
+            }
+
+            OpenDashboard();
+        }
+
+        /// <summary>
+        /// Opens the dashboard at the same screen position and closes the login window.
+        /// </summary>
+        private void OpenDashboard()
+        {
             DashboardView dashboard = _serviceProvider.GetRequiredService<DashboardView>();
             dashboard.WindowStartupLocation = WindowStartupLocation.Manual;
 
