@@ -465,5 +465,108 @@ namespace BusinessLayer
         }
         */
 
+
+        /// <summary>
+        /// Cancels a booking while keeping it in the customer's history.
+        /// Does not process refunds or send confirmation emails.
+        /// </summary>
+        public Booking CancelBooking(int bookingID)
+        {
+            if (bookingID <= 0)
+            {
+                throw new ArgumentException("Ogiltigt bokningsnummer.");
+            }
+
+            Booking booking =
+                _unitOfWork.Booking.GetSpecificBooking(bookingID);
+
+            if (booking == null)
+            {
+                throw new InvalidOperationException(
+                    "Bokningen kunde inte hittas.");
+            }
+
+            if (booking.BookingStatus == BookingStatus.Cancelled)
+            {
+                throw new InvalidOperationException(
+                    "Bokningen är redan avbokad.");
+            }
+
+            if (booking.BookingStatus == BookingStatus.Finished ||
+                booking.CheckInStatus != CheckInStatus.NotCheckedIn)
+            {
+                throw new InvalidOperationException(
+                    "En påbörjad eller avslutad bokning kan inte avbokas.");
+            }
+
+            BookingStatus previousStatus = booking.BookingStatus;
+
+            try
+            {
+                // Change the status instead of deleting the booking.
+                booking.BookingStatus = BookingStatus.Cancelled;
+                _unitOfWork.Complete();
+
+                return booking;
+            }
+            catch
+            {
+                // Restore the tracked status if saving fails.
+                booking.BookingStatus = previousStatus;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the protected cancellation refund for accommodation bookings.
+        /// Returns null when the applicable refund rule cannot be determined.
+        /// </summary>
+        public decimal? GetCancellationRefund(
+            Booking booking,
+            DateTime cancellationDate)
+        {
+            if (booking == null)
+            {
+                throw new ArgumentNullException(nameof(booking));
+            }
+
+            // No refund applies when cancellation protection was not purchased.
+            if (!booking.HasCancellationInsurance)
+            {
+                return 0m;
+            }
+
+            // An arrival date is needed to check protection eligibility.
+            if (!booking.Accommodations.Any())
+            {
+                return null;
+            }
+
+            DateTime arrivalDate = booking.Accommodations
+                .Min(stay => stay.StartDate)
+                .Date;
+
+            // Protection applies up to and including five days before arrival.
+            if (cancellationDate.Date > arrivalDate.AddDays(-5))
+            {
+                return null;
+            }
+
+            const decimal protectionFee = 300m;
+
+            if (booking.TotalAmount < protectionFee)
+            {
+                throw new InvalidOperationException(
+                    "Bokningsbeloppet är lägre än avgiften för avbeställningsskyddet.");
+            }
+
+            // The protection fee is excluded from the refundable amount.
+            return Math.Round(
+                (booking.TotalAmount - protectionFee) * 0.80m,
+                2,
+                MidpointRounding.AwayFromZero);
+        }
+
+
     }
 }

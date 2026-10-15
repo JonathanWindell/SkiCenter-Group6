@@ -1,0 +1,68 @@
+﻿<Window x:Class="PresentationLayer.Views.CancelBookingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SkiCenter - Avboka bokning"
+        Width="540"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource WindowBg}">
+
+    <Border Background="{StaticResource CardBg}"
+            CornerRadius="15"
+            Padding="28"
+            Margin="16">
+
+        <StackPanel>
+            <TextBlock Text="Avboka bokning?"
+                       FontSize="24"
+                       FontWeight="Bold"
+                       Foreground="{StaticResource PrimaryText}"
+                       Margin="0,0,0,16"/>
+
+            <!-- Details identify the booking being cancelled. -->
+            <TextBlock x:Name="BookingSummaryTextBlock"
+                       TextWrapping="Wrap"
+                       Foreground="{StaticResource PrimaryText}"
+                       Margin="0,0,0,20"/>
+
+            <!-- Financial consequences are supplied by the booking view. -->
+            <Border Background="{StaticResource WindowBg}"
+                    BorderBrush="{StaticResource InputBorder}"
+                    BorderThickness="1"
+                    CornerRadius="10"
+                    Padding="16"
+                    Margin="0,0,0,20">
+
+                <TextBlock x:Name="RefundInformationTextBlock"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource PrimaryText}"/>
+            </Border>
+
+            <TextBlock Text="Vill du avboka den här bokningen?"
+                       Foreground="{StaticResource PrimaryText}"
+                       Margin="0,0,0,20"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="12"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="KeepBookingButton"
+                        Grid.Column="0"
+                        Content="Behåll bokning"
+                        Height="40"
+                        IsCancel="True"
+                        Style="{StaticResource DeepSeaButtonStyle}"/>
+
+                <Button x:Name="ConfirmCancellationButton"
+                        Grid.Column="2"
+                        Content="Avboka bokning"
+                        Height="40"
+                        Style="{StaticResource DeepSeaButtonStyle}"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

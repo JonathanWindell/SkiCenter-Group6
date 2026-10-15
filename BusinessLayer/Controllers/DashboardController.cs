@@ -37,6 +37,7 @@ namespace BusinessLayer.Controllers
             [staffRole.BookingAdmin] = new[]
             {
                 SystemModule.Bookings,
+                SystemModule.GuestCheckInOut,
                 SystemModule.CustomerRegistration,
                 SystemModule.Accommodation,
                 SystemModule.SkiSchool,
