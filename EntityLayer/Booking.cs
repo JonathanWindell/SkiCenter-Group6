@@ -41,6 +41,18 @@ namespace EntityLayer
         [Required]
         public decimal TotalAmount { get; set; }
 
+        // Accommodation price before discount, saved when the booking is created. Used for invoicing.
+        [Required]
+        public decimal AccommodationListPrice { get; set; }
+
+        // Discount rate applied to the accommodation, e.g. 0.08 for 8%.
+        [Required]
+        public decimal DiscountRate { get; set; }
+
+        // Discount amount deducted from the accommodation price.
+        [Required]
+        public decimal DiscountAmount { get; set; }
+
         // Parameterless constructor for EF 
         public Booking() { }
 
