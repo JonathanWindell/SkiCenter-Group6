@@ -2,6 +2,10 @@
 using DataLayer;
 using EntityLayer;
 using Microsoft.EntityFrameworkCore;
+using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TestLayer.IntegrationTests
 {
@@ -34,10 +38,10 @@ namespace TestLayer.IntegrationTests
         {
             if (_context != null)
             {
-                // Rensa ChangeTracker så inga krockar uppstår mellan instanser från olika kontexter
+                // Clear ChangeTracker to prevent state collision
                 _context.ChangeTracker.Clear();
 
-                // 1. Ta bort lektionsbokningar först (child)
+                // 1. Remove lesson bookings (child)
                 foreach (var lb in _createdLessonBookings)
                 {
                     var existing = _context.Set<SkiLessonBooking>().Find(lb.SkiLessonBookingID);
@@ -48,7 +52,7 @@ namespace TestLayer.IntegrationTests
                 }
                 _context.SaveChanges();
 
-                // 2. Ta bort testbokningar
+                // 2. Remove test bookings
                 foreach (var b in _createdBookings)
                 {
                     var existing = _context.Set<Booking>().Find(b.BookingID);
@@ -59,7 +63,7 @@ namespace TestLayer.IntegrationTests
                 }
                 _context.SaveChanges();
 
-                // 3. Ta bort testkunder
+                // 3. Remove test customers (parent)
                 foreach (var c in _createdCustomers)
                 {
                     var existing = _context.Set<Customer>().Find(c.CustomerID);
@@ -127,10 +131,12 @@ namespace TestLayer.IntegrationTests
             // Assert: Verify operation result
             Assert.That(result, Is.True, "BookParticipant should return true when spots are available.");
 
+            SkiLessonBooking persistedLessonBooking;
+
             // Assert: Verify database persistence in a detached query
             using (var verifyContext = new SkiCenterDbContext())
             {
-                var persistedLessonBooking = verifyContext.Set<SkiLessonBooking>()
+                persistedLessonBooking = verifyContext.Set<SkiLessonBooking>()
                     .FirstOrDefault(b => b.BookingID == booking.BookingID && b.SkiLessonSessionID == session.SkiLessonSessionID);
 
                 Assert.That(persistedLessonBooking, Is.Not.Null, "The ski lesson booking record must be saved in the database.");
@@ -140,6 +146,31 @@ namespace TestLayer.IntegrationTests
                 Assert.That(updatedBooking, Is.Not.Null);
                 Assert.That(updatedBooking.TotalAmount, Is.EqualTo(initialAmount + expectedLessonPrice),
                     "The parent booking total amount should reflect the added lesson price.");
+            }
+
+            // Cleanup: Explicit removal within the test in reverse relational order
+            var lessonBookingToRemove = _context.Set<SkiLessonBooking>().Find(persistedLessonBooking.SkiLessonBookingID);
+            if (lessonBookingToRemove != null)
+            {
+                _context.Set<SkiLessonBooking>().Remove(lessonBookingToRemove);
+                _context.SaveChanges();
+                _createdLessonBookings.Remove(persistedLessonBooking);
+            }
+
+            var bookingToRemove = _context.Set<Booking>().Find(booking.BookingID);
+            if (bookingToRemove != null)
+            {
+                _context.Set<Booking>().Remove(bookingToRemove);
+                _context.SaveChanges();
+                _createdBookings.Remove(booking);
+            }
+
+            var customerToRemove = _context.Set<Customer>().Find(customer.CustomerID);
+            if (customerToRemove != null)
+            {
+                _context.Set<Customer>().Remove(customerToRemove);
+                _context.SaveChanges();
+                _createdCustomers.Remove(customer);
             }
         }
 
@@ -182,6 +213,8 @@ namespace TestLayer.IntegrationTests
 
             Assert.That(session, Is.Not.Null, "A private lesson session with capacity 2 must exist.");
 
+            var addedFillers = new List<SkiLessonBooking>();
+
             // Fill session to max number of participants
             while (session.Participants.Count < session.SkiLesson.MaxParticipants)
             {
@@ -192,6 +225,7 @@ namespace TestLayer.IntegrationTests
                 };
                 session.Participants.Add(filler);
                 _createdLessonBookings.Add(filler);
+                addedFillers.Add(filler);
             }
             _context.SaveChanges();
 
@@ -200,6 +234,34 @@ namespace TestLayer.IntegrationTests
 
             // Assert
             Assert.That(result, Is.False, "Cannot book a participant into a session that is already at full capacity.");
+
+            // Cleanup: Explicit removal within the test in reverse relational order
+            foreach (var filler in addedFillers)
+            {
+                var fillerToRemove = _context.Set<SkiLessonBooking>().Find(filler.SkiLessonBookingID);
+                if (fillerToRemove != null)
+                {
+                    _context.Set<SkiLessonBooking>().Remove(fillerToRemove);
+                }
+                _createdLessonBookings.Remove(filler);
+            }
+            _context.SaveChanges();
+
+            var bookingToRemove = _context.Set<Booking>().Find(booking.BookingID);
+            if (bookingToRemove != null)
+            {
+                _context.Set<Booking>().Remove(bookingToRemove);
+                _context.SaveChanges();
+                _createdBookings.Remove(booking);
+            }
+
+            var customerToRemove = _context.Set<Customer>().Find(customer.CustomerID);
+            if (customerToRemove != null)
+            {
+                _context.Set<Customer>().Remove(customerToRemove);
+                _context.SaveChanges();
+                _createdCustomers.Remove(customer);
+            }
         }
 
         /// <summary>
@@ -256,6 +318,23 @@ namespace TestLayer.IntegrationTests
 
                 var checkBooking = verifyContext.Set<Booking>().Find(booking.BookingID);
                 Assert.That(checkBooking.TotalAmount, Is.EqualTo(0m), "Total amount should revert to the base price.");
+            }
+
+            // Cleanup: Explicit removal within the test (createdBooking is already removed by CancelParticipant)
+            var bookingToRemove = _context.Set<Booking>().Find(booking.BookingID);
+            if (bookingToRemove != null)
+            {
+                _context.Set<Booking>().Remove(bookingToRemove);
+                _context.SaveChanges();
+                _createdBookings.Remove(booking);
+            }
+
+            var customerToRemove = _context.Set<Customer>().Find(customer.CustomerID);
+            if (customerToRemove != null)
+            {
+                _context.Set<Customer>().Remove(customerToRemove);
+                _context.SaveChanges();
+                _createdCustomers.Remove(customer);
             }
         }
     }

@@ -145,7 +145,7 @@ namespace PresentationLayer.Views
                 var sortedItems = items.OrderBy(i => i.Level).ThenBy(i => i.TimeSlot).ToList();
                 DgSessions.ItemsSource = sortedItems;
 
-                // Återvälj samma rad om användaren nyss bokade/avbokade
+                // Re-choose same row as user just had. 
                 if (previouslySelectedSessionId.HasValue)
                 {
                     DgSessions.SelectedItem = sortedItems.FirstOrDefault(i => i.SessionID == previouslySelectedSessionId.Value);
@@ -201,7 +201,7 @@ namespace PresentationLayer.Views
 
                 if (CmbBookings.SelectedItem is BookingDropdownItem selectedBooking)
                 {
-                    // Räkna hur många platser just denna bokning har på det valda passet
+                    // Count how many spots left on booked ski lesson session.
                     int customerSpots = selectedSession.Participants.Count(p => p.BookingID == selectedBooking.BookingID);
                     TxtCustomerBookedSpots.Text = $"{customerSpots} st";
 
@@ -259,7 +259,7 @@ namespace PresentationLayer.Views
             if (CmbBookings.SelectedItem is not BookingDropdownItem selectedBooking)
                 return;
 
-            // Hämta en av kundens bokade platser på detta pass för att avboka den
+            // Fetch the customers booked spots to cancel.
             var participantRecord = selectedSession.Participants
                 .FirstOrDefault(p => p.BookingID == selectedBooking.BookingID);
 

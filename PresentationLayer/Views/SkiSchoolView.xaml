@@ -182,7 +182,7 @@
             </Grid>
         </Grid>
 
-        <!-- Loadin overlay.  -->
+        <!-- Loading overlay.  -->
         <Grid x:Name="LoadingOverlay" Opacity="0" IsHitTestVisible="False" Background="#401E1B4B">
             <Border Background="White" CornerRadius="12" Padding="25" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel HorizontalAlignment="Center">
