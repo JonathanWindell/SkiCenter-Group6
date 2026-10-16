@@ -118,6 +118,7 @@ namespace BusinessLayer.Controllers
 
             // Add lesson price to the booking total amount
             booking.TotalAmount += lesson.Price;
+            booking.SkiLessons.Add(lessonBooking);
             _unitOfWork.Booking.Update(booking);
 
             // If a specific repository exists for SkiLessonBooking, add through it; otherwise via session
