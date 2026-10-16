@@ -155,7 +155,7 @@ namespace PresentationLayer.Views
         private void LoadGuests()
         {
             _previewGuests.Clear();
-          
+
             try
             {
                 // Load bookings through the existing business controller.

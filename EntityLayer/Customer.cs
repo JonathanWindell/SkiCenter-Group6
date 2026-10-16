@@ -16,7 +16,7 @@ namespace EntityLayer
         public string Email { get; set; }
 
         [Required]
-        public string PhoneNumber { get; private set; }
+        public string PhoneNumber { get; set; }
 
         // Credit limit for both private and corporate customers. Stored in one shared column.
         public decimal CreditLimit { get; set; }

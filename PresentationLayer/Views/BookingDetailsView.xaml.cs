@@ -1,9 +1,9 @@
+using BusinessLayer;
 using EntityLayer;
+using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
-using BusinessLayer;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace PresentationLayer.Views
 {
@@ -28,7 +28,7 @@ namespace PresentationLayer.Views
                 booking.CheckInStatus == CheckInStatus.NotCheckedIn;
         }
 
-        private void CancelBookingButton_Click( object sender, RoutedEventArgs e)
+        private void CancelBookingButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
