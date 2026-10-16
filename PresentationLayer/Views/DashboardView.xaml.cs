@@ -34,7 +34,8 @@ namespace PresentationLayer.Views
             [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", typeof(SeasonPriceView)),
             [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", null),
             [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", null),
-            [SystemModule.GuestCheckInOut] = new("In- och utcheckning", "Hantera gästers ankomst och avresa", typeof(GuestCheckInOutView))
+            [SystemModule.GuestCheckInOut] = new("In- och utcheckning", "Hantera gästers ankomst och avresa", typeof(GuestCheckInOutView)),
+            [SystemModule.InvoiceExport] = new("Faktureringsunderlag", "Exportera avslutade bokningar som JSON", typeof(InvoiceExportView))
         };
 
         // Swedish display names for staff roles

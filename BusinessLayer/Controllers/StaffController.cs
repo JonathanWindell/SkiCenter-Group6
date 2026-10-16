@@ -72,5 +72,14 @@ namespace BusinessLayer.Controllers
             return false; //Deny Access;
         }
 
+        /// <summary>
+        /// Verifies that the role may generate invoicing exports.
+        /// Allowed for MarketingManager, and for SystemAdmin who can access every view.
+        /// </summary>
+        public static bool CanExportInvoices(staffRole currentRole)
+        {
+            return currentRole == staffRole.MarketingManager || currentRole == staffRole.SystemAdmin;
+        }
+
     }
 }
