@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace BusinessLayer
 {
-    public class BookingController 
+    public class BookingController
     {
         private readonly IUnitOfWork _unitOfWork;
 

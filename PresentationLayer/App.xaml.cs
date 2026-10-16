@@ -3,6 +3,7 @@ using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
 using DataLayer.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
 using System.Windows;
@@ -94,6 +95,14 @@ namespace PresentationLayer
             // To test the guest view directly without logging in, comment out the two lines above and use:
             // var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
             // guestWindow.Show();
+
+            // Only use when data should be written from seeding files.
+            // Jonathan will handle database initialization.
+
+
+
+
+
         }
     }
 }
