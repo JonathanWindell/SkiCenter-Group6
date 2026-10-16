@@ -118,22 +118,32 @@
                     Padding="1">
 
                     <DataGrid x:Name="PropertyDataGrid"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="False"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserResizeRows="False"
-                          SelectionMode="Single"
-                          SelectionUnit="FullRow"
-                          HeadersVisibility="Column"
-                          RowHeight="42"
-                          ColumnHeaderHeight="40"
-                          GridLinesVisibility="Horizontal"
-                          HorizontalGridLinesBrush="{StaticResource InputBorder}"
-                          Background="{StaticResource CardBg}"
-                          Foreground="{StaticResource PrimaryText}"
-                          AlternatingRowBackground="{StaticResource WindowBg}"
-                          BorderThickness="0">
+                              AutoGenerateColumns="False"
+                              IsReadOnly="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserResizeRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              HeadersVisibility="Column"
+                              RowHeight="42"
+                              ColumnHeaderHeight="40"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{StaticResource InputBorder}"
+                              Background="{StaticResource CardBg}"
+                              Foreground="{StaticResource PrimaryText}"
+                              AlternatingRowBackground="{StaticResource WindowBg}"
+                              BorderThickness="0">
+                        <DataGrid.RowStyle>
+                            <!-- Changes the color of changed row before writing to Db. -->
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
 
                     <DataGrid.Resources>
                         <!-- Align text with the status labels. -->
@@ -174,13 +184,6 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Header="Nästa tillgängliga datum"
-                                            Binding="{Binding NextAvailableDate,
-                                                              StringFormat={}{0:yyyy-MM-dd},
-                                                              TargetNullValue=—}"
-                                            ElementStyle="{StaticResource CenteredCellText}"
-                                            Width="170"/>
                     </DataGrid.Columns>
                 </DataGrid>
                 </Border>
