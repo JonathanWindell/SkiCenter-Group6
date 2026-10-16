@@ -122,6 +122,7 @@ namespace PresentationLayer.Views
         /// <summary>
         /// Opens the form for creating a new booking.
         /// </summary>
+        public bool HasCreatedAnyBooking { get; private set; } = false;
         private void CreateNewBooking_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -136,9 +137,14 @@ namespace PresentationLayer.Views
                 bool? result = createBookingView.ShowDialog();
 
                 // Refresh the booking list after a successful booking.
-                if (result == true && _selectedCustomerId.HasValue)
+                if (result == true)
                 {
-                    LoadCustomerBookings(_selectedCustomerId.Value);
+                    HasCreatedAnyBooking = true;
+
+                    if (_selectedCustomerId.HasValue)
+                    {
+                        LoadCustomerBookings(_selectedCustomerId.Value);
+                    }
                 }
             }
             catch (Exception ex)
@@ -177,6 +183,7 @@ namespace PresentationLayer.Views
         /// </summary>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
+            this.DialogResult = HasCreatedAnyBooking;
             Close();
         }
     }

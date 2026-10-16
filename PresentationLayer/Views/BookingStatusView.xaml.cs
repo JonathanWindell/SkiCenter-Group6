@@ -174,7 +174,13 @@ namespace PresentationLayer.Views
                 Owner = this
             };
 
-            customerBookingsView.ShowDialog();
+            bool? result = customerBookingsView.ShowDialog();
+
+            // If booking were added, update the list
+            if (result == true || customerBookingsView.HasCreatedAnyBooking)
+            {
+                LoadBookingData();
+            }
         }
 
         private void ShowBookingDetailsButton_Click(object sender, RoutedEventArgs e)

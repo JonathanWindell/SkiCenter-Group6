@@ -171,6 +171,11 @@ namespace PresentationLayer.Views
             return matchesCategory && matchesStatus;
         }
 
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         private void AddEquipmentButton_Click(object sender, RoutedEventArgs e)
         {
             ResetForm();

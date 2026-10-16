@@ -6,7 +6,7 @@ namespace EntityLayer
     {
         Available,
         Rented,
-        Maintenence,
+        Maintenance,
     }
 
     public class MeetingRoom
