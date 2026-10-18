@@ -567,6 +567,32 @@ namespace BusinessLayer
                 MidpointRounding.AwayFromZero);
         }
 
+        /// <summary>
+        /// Confirms all preliminary bookings for an approved corporate customer.
+        /// </summary>
+        public int ConfirmPreliminaryBookingsForCustomer(int customerId)
+        {
+            if (customerId <= 0) return 0;
 
+            // Gets the preliminary bookings of the customer
+            var preliminaryBookings = _unitOfWork.Booking.GetBookingsByCustomer(customerId)
+                .Where(b => b.BookingStatus == BookingStatus.Preliminary)
+                .ToList();
+
+            int confirmedCount = 0;
+            foreach (var booking in preliminaryBookings)
+            {
+                booking.BookingStatus = BookingStatus.Confirmed;
+                _unitOfWork.Booking.Update(booking);
+                confirmedCount++;
+            }
+
+            if (confirmedCount > 0)
+            {
+                _unitOfWork.Complete();
+            }
+
+            return confirmedCount;
+        }
     }
 }
