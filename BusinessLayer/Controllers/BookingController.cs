@@ -7,6 +7,9 @@ namespace BusinessLayer
 {
     public class BookingController
     {
+        // Price for cancellation insurance on a booking
+        public const decimal CancellationInsurancePrice = 300m;
+
         private readonly IUnitOfWork _unitOfWork;
 
         public BookingController(IUnitOfWork unitOfWork)
@@ -360,7 +363,7 @@ namespace BusinessLayer
                 accommodationPrice - discountAmount;
 
             decimal insurancePrice =
-                hasCancellationInsurance ? 300m : 0m;
+                hasCancellationInsurance ? CancellationInsurancePrice : 0m;
 
             decimal totalAmount =
                 finalAccommodationPrice + insurancePrice;
@@ -383,6 +386,10 @@ namespace BusinessLayer
                 CheckInStatus = CheckInStatus.NotCheckedIn,
                 HasCancellationInsurance = hasCancellationInsurance,
                 TotalAmount = totalAmount,
+                // Saved so invoicing can show the list price and the applied discount
+                AccommodationListPrice = accommodationPrice,
+                DiscountRate = discountRate,
+                DiscountAmount = discountAmount,
                 Accommodations = new List<BookingAccommodation>
                 {
                     bookingAccommodation

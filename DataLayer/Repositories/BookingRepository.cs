@@ -101,6 +101,42 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
+        /// Gets completed (finished) bookings whose checkout date is within the period,
+        /// with everything needed for invoicing: customer, accommodations, rentals, ski lessons and meeting rooms.
+        /// </summary>
+        /// <param name="fromDate">First checkout date to include.</param>
+        /// <param name="toDate">Last checkout date to include.</param>
+        public IEnumerable<Booking> GetFinishedBookingsForInvoicing(DateTime fromDate, DateTime toDate)
+        {
+            DateTime from = fromDate.Date;
+            DateTime to = toDate.Date;
+
+            return _context.Set<Booking>()
+                .Include(b => b.Customer)
+                .Include(b => b.Accommodations)
+                    .ThenInclude(ba => ba.Accommodation)
+                        .ThenInclude(a => a.AccommodationType)
+                .Include(b => b.Rentals)
+                    .ThenInclude(r => r.EquipmentItems)
+                        .ThenInclude(ei => ei.Equipment)
+                            .ThenInclude(e => e.Prices)
+                .Include(b => b.SkiLessons)
+                    .ThenInclude(sl => sl.SkiLessonSession)
+                        .ThenInclude(sls => sls.SkiLesson)
+                .Include(b => b.MeetingRooms)
+                    .ThenInclude(bm => bm.meetingRoom)
+                        .ThenInclude(m => m.SeasonPrices)
+                .Where(b => b.BookingStatus == BookingStatus.Finished
+                    && b.Accommodations.Any()
+                    && b.Accommodations.Max(ba => ba.EndDate) >= from
+                    && b.Accommodations.Max(ba => ba.EndDate) < to.AddDays(1))
+                .OrderBy(b => b.BookingID)
+                .AsSplitQuery()
+                .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
         /// Finds active room bookings by booking ID or accommodation (room) number.
         /// A booking is active when it is preliminary or confirmed, the guest has not checked out,
         /// and it has an accommodation stay that has not ended yet.

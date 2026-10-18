@@ -17,7 +17,8 @@ namespace BusinessLayer.Controllers
         SeasonPrices,
         Reports,
         StaffAdmin,
-        GuestCheckInOut
+        GuestCheckInOut,
+        InvoiceExport
     }
 
     /// <summary>
@@ -41,12 +42,12 @@ namespace BusinessLayer.Controllers
                 SystemModule.CustomerRegistration,
                 SystemModule.Accommodation,
                 SystemModule.SkiSchool,
-                SystemModule.EquipmentManagement,
-                SystemModule.GuestCheckInOut,
+                SystemModule.EquipmentManagement
             },
             [staffRole.MarketingManager] = new[]
             {
-                SystemModule.Reports
+                SystemModule.Reports,
+                SystemModule.InvoiceExport
             },
             // System admins have access to every module
             [staffRole.SystemAdmin] = Enum.GetValues<SystemModule>()
