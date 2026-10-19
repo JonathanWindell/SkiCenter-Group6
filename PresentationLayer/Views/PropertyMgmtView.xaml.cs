@@ -169,6 +169,26 @@ namespace PresentationLayer.Views
 
             int successCount = 0;
 
+            foreach (var row in changedRows)
+            {
+                if (row.Type == "Boende")
+                {
+                    if (Enum.TryParse<AccommodationStatus>(row.Status, out var newAccStatus))
+                    {
+                        if (_propertyController.UpdateAccommodationStatus(row.Id, newAccStatus))
+                            successCount++;
+                    }
+                }
+                else if (row.Type == "Mötesrum")
+                {
+                    if (Enum.TryParse<MeetingRoomStatus>(row.Status, out var newMeetingStatus))
+                    {
+                        if (_propertyController.UpdateMeetingRoomStatus(row.Id, newMeetingStatus))
+                            successCount++;
+                    }
+                }
+            }
+
             MessageBox.Show($"{successCount} av {changedRows.Count} rader sparades!", "Status uppdaterad", MessageBoxButton.OK, MessageBoxImage.Information);
 
             // Reload list to reset IsChanged

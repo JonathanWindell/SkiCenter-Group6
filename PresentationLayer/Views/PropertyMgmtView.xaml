@@ -51,7 +51,7 @@
                            Foreground="{StaticResource SecondaryText}"/>
             </StackPanel>
 
-            <!-- Booking and payment statuses are filtered separately. -->
+            <!-- Types and statuses are filtered separately. -->
                 <Grid Grid.Row="1" Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -98,7 +98,7 @@
                                BasedOn="{StaticResource DeepSeaButtonStyle}">
                                 <Setter Property="Background" Value="#E5E7EB"/>
                                 <Setter Property="Foreground"
-                                    Value="{StaticResource PrimaryText}"/>
+                                        Value="{StaticResource PrimaryText}"/>
                             </Style>
                         </Button.Style>
                     </Button>
@@ -110,7 +110,7 @@
                        Foreground="{StaticResource SecondaryText}"
                        Margin="0,0,0,10"/>
 
-                <!-- Read-only booking list. Bindings will be added after checking the model. -->
+                <!-- List of accommodations and meeting rooms. -->
                 <Border Grid.Row="3"
                     CornerRadius="10"
                     BorderBrush="{StaticResource InputBorder}"
@@ -118,22 +118,32 @@
                     Padding="1">
 
                     <DataGrid x:Name="PropertyDataGrid"
-                          AutoGenerateColumns="False"
-                          IsReadOnly="False"
-                          CanUserAddRows="False"
-                          CanUserDeleteRows="False"
-                          CanUserResizeRows="False"
-                          SelectionMode="Single"
-                          SelectionUnit="FullRow"
-                          HeadersVisibility="Column"
-                          RowHeight="42"
-                          ColumnHeaderHeight="40"
-                          GridLinesVisibility="Horizontal"
-                          HorizontalGridLinesBrush="{StaticResource InputBorder}"
-                          Background="{StaticResource CardBg}"
-                          Foreground="{StaticResource PrimaryText}"
-                          AlternatingRowBackground="{StaticResource WindowBg}"
-                          BorderThickness="0">
+                              AutoGenerateColumns="False"
+                              IsReadOnly="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserResizeRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow"
+                              HeadersVisibility="Column"
+                              RowHeight="42"
+                              ColumnHeaderHeight="40"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="{StaticResource InputBorder}"
+                              Background="{StaticResource CardBg}"
+                              Foreground="{StaticResource PrimaryText}"
+                              AlternatingRowBackground="{StaticResource WindowBg}"
+                              BorderThickness="0">
+                        <DataGrid.RowStyle>
+                            <!-- Changes the font of changed row before writing to Db. -->
+                            <Style TargetType="DataGridRow">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
 
                     <DataGrid.Resources>
                         <!-- Align text with the status labels. -->
@@ -143,7 +153,7 @@
                         </Style>
                     </DataGrid.Resources>
 
-                        <!-- Booking status tags use both text and colour. -->
+                        <!-- Property status tags use both text and colour. -->
                     <DataGrid.Columns>
 
                         <DataGridTextColumn Header="Typ"
@@ -174,13 +184,6 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Header="Nästa tillgängliga datum"
-                                            Binding="{Binding NextAvailableDate,
-                                                              StringFormat={}{0:yyyy-MM-dd},
-                                                              TargetNullValue=—}"
-                                            ElementStyle="{StaticResource CenteredCellText}"
-                                            Width="170"/>
                     </DataGrid.Columns>
                 </DataGrid>
                 </Border>

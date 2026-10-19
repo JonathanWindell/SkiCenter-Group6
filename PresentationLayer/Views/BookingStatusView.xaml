@@ -287,7 +287,7 @@
 
             <Button x:Name="ShowCustomerBookingsButton"
                     Grid.Row="4"
-                    Content="Sök på bokning"
+                    Content="Sök/skapa bokning"
                     Width="140"
                     Height="38"
                     Margin="0,20,0,0"

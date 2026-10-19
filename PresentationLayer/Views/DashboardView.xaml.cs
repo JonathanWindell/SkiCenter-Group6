@@ -35,7 +35,8 @@ namespace PresentationLayer.Views
             [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", null),
             [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", null),
             [SystemModule.GuestCheckInOut] = new("In- och utcheckning", "Hantera gästers ankomst och avresa", typeof(GuestCheckInOutView)),
-            [SystemModule.InvoiceExport] = new("Faktureringsunderlag", "Exportera avslutade bokningar som JSON", typeof(InvoiceExportView))
+            [SystemModule.InvoiceExport] = new("Faktureringsunderlag", "Exportera avslutade bokningar som JSON", typeof(InvoiceExportView)),
+            [SystemModule.MarketingManager] = new("Marknad", "Besluta om rabatter och godkänn företagskunder", typeof(MarketingMgmtView))
         };
 
         // Swedish display names for staff roles
