@@ -149,7 +149,6 @@ namespace PresentationLayer.Views
 
             foreach (var row in rowsToApprove)
             {
-                // 1. Skriver ändringar och sätter IsApproved = true i databasen
                 bool approved = _customerController.ApproveCorporateCustomer(row.CustomerId, row.CreditLimit, row.DiscountRate);
 
                 if (approved)
