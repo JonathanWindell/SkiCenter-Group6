@@ -100,8 +100,8 @@
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               CanUserResizeRows="False"
-                              SelectionMode="Single"
-                              SelectionUnit="FullRow"
+                              SelectionUnit="Cell"
+                              Focusable="False"
                               HeadersVisibility="Column"
                               RowHeight="42"
                               ColumnHeaderHeight="40"
@@ -111,9 +111,29 @@
                               Foreground="{StaticResource PrimaryText}"
                               AlternatingRowBackground="{StaticResource WindowBg}"
                               BorderThickness="0">
+                    
+                    <!-- Disable the default background-->
+                    <DataGrid.CellStyle>
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+
                     <DataGrid.RowStyle>
-                        <!-- Changes the font of changed row before writing to Db. -->
                         <Style TargetType="DataGridRow">
+                            <Style.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{StaticResource PrimaryText}"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent"/>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{StaticResource PrimaryText}"/>
+                            </Style.Resources>
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsChanged}" Value="True">
                                     <Setter Property="FontWeight" Value="SemiBold"/>
@@ -177,9 +197,16 @@
                         </DataGridTemplateColumn>
 
                         <!-- Approve CheckBox -->
-                        <DataGridCheckBoxColumn Header="Godkänn" 
-                            Binding="{Binding IsApproved, UpdateSourceTrigger=PropertyChanged}" 
-                            Width="80"/>
+                        <DataGridTemplateColumn Header="Godkänn" 
+                                                Width="80">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsApproved, UpdateSourceTrigger=PropertyChanged}" 
+                                        HorizontalAlignment="Center" 
+                                        VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>

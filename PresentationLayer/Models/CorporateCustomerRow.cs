@@ -18,8 +18,9 @@ namespace PresentationLayer.Models
         public string ContactPerson { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string Status => IsApproved ? "Godkänd" : "Pending";
 
-        // Ursprungsvärden för att spåra förändringar
+        // Original values to track changes
         public decimal OriginalCreditLimit { get; set; }
         public decimal OriginalDiscountRate { get; set; }
         public bool OriginalIsApproved { get; set; }

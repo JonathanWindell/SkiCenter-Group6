@@ -18,7 +18,8 @@ namespace BusinessLayer.Controllers
         Reports,
         StaffAdmin,
         GuestCheckInOut,
-        InvoiceExport
+        InvoiceExport,
+        MarketingManager
     }
 
     /// <summary>

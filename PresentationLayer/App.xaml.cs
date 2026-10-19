@@ -60,6 +60,7 @@ namespace PresentationLayer
             services.AddTransient<EquipmentRentalView>();
             services.AddTransient<InvoiceExportView>();
             services.AddTransient<SkiSchoolView>();
+            services.AddTransient<MarketingMgmtView>();
 
 
             // 2. Register Controllers
