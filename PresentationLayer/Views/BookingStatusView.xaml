@@ -2,56 +2,87 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SkiCenter - Bokningsöversikt"
-        Width="1050"
+        Width="1000"
         Height="650"
         MinWidth="950"
         MinHeight="620"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBg}">
 
-    <Border Background="{StaticResource CardBg}"
-            CornerRadius="15"
-            Padding="24"
-            Margin="16">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Border.Triggers>
-            <!-- Briefly fade in the content when the view opens. -->
-            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                 From="0"
-                                 To="1"
-                                 Duration="0:0:0.18"/>
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Border.Triggers>
+        <!-- Header matches the ski school view. -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            <Button Content="← Tillbaka"
+                    Width="110"
+                    Height="36"
+                    Margin="0,0,20,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="BackButton_Click"/>
 
-            <!-- Page heading. -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,22">
+            <StackPanel Grid.Column="1">
                 <TextBlock Text="Bokningsöversikt"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
 
                 <TextBlock Text="Se bokningar och filtrera efter boknings- och betalningsstatus."
-                           Margin="0,8,0,0"
+                           Margin="0,4,0,0"
                            FontSize="14"
                            TextWrapping="Wrap"
                            Foreground="{StaticResource SecondaryText}"/>
             </StackPanel>
+        </Grid>
 
-            <!-- Booking and payment statuses are filtered separately. -->
+        <Border Grid.Row="1"
+                Background="{StaticResource CardBg}"
+                CornerRadius="15"
+                Padding="20"
+                BorderBrush="{StaticResource InputBorder}"
+                BorderThickness="1">
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15"
+                                  ShadowDepth="2"
+                                  Opacity="0.08"
+                                  Color="#1E1B4B"/>
+            </Border.Effect>
+
+            <Border.Triggers>
+                <!-- Preserve the existing opening animation. -->
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="Opacity"
+                                From="0"
+                                To="1"
+                                Duration="0:0:0.18"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Booking and payment statuses are filtered separately. -->
             <Grid Grid.Row="1" Margin="0,0,0,18">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -111,13 +142,13 @@
                        Margin="0,0,0,10"/>
 
             <!-- Read-only booking list. Bindings will be added after checking the model. -->
-            <Border Grid.Row="3"
+                <Border Grid.Row="3"
                     CornerRadius="10"
                     BorderBrush="{StaticResource InputBorder}"
                     BorderThickness="1"
                     Padding="1">
 
-                <DataGrid x:Name="BookingsDataGrid"
+                    <DataGrid x:Name="BookingsDataGrid"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
                           CanUserAddRows="False"
@@ -135,182 +166,167 @@
                           AlternatingRowBackground="{StaticResource WindowBg}"
                           BorderThickness="0">
 
-                    <DataGrid.Resources>
-                        <!-- Align text with the status labels. -->
-                        <Style x:Key="CenteredCellText" TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="Margin" Value="4,0"/>
-                        </Style>
-                    </DataGrid.Resources>
+                        <DataGrid.Resources>
+                            <!-- Align text with the status labels. -->
+                            <Style x:Key="CenteredCellText" TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="4,0"/>
+                            </Style>
+                        </DataGrid.Resources>
 
-                    <!-- Booking status tags use both text and colour. -->
-                    <DataGrid.Columns>
+                        <!-- Booking status tags use both text and colour. -->
+                        <DataGrid.Columns>
 
-                        <DataGridTextColumn Header="Boknings-ID"
+                            <DataGridTextColumn Header="Boknings-ID"
                                             Binding="{Binding BookingID}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="110"/>
-                         
 
-                        <DataGridTextColumn Header="Kund"
+
+                            <DataGridTextColumn Header="Kund"
                                             Binding="{Binding CustomerName}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
 
-                        <DataGridTextColumn Header="Ankomst"
+                            <DataGridTextColumn Header="Ankomst"
                                             Binding="{Binding ArrivalDate,
                                                              StringFormat={}{0:yyyy-MM-dd},
                                                              TargetNullValue=—}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="120"/>
 
-                        <DataGridTextColumn Header="Avresa"
+                            <DataGridTextColumn Header="Avresa"
                                             Binding="{Binding DepartureDate,
                                                               StringFormat={}{0:yyyy-MM-dd},
                                                               TargetNullValue=—}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="120"/>
 
-                        <DataGridTemplateColumn Header="Bokningsstatus" Width="150">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border CornerRadius="8"
+                            <DataGridTemplateColumn Header="Bokningsstatus" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="8"
                                         Padding="10,4"
                                         Margin="6"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#E5E7EB"/>
-
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding BookingStatus}"  Value="Bekräftad">
-                                                        <Setter Property="Background" Value="#EDE9FE"/>
-                                                    </DataTrigger>
-
-                                                    <DataTrigger Binding="{Binding BookingStatus}" Value="Preliminär">
-                                                        <Setter Property="Background" Value="#FEF3C7"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-
-                                        <TextBlock Text="{Binding BookingStatus}" FontWeight="SemiBold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="#374151"/>
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#E5E7EB"/>
 
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding BookingStatus}" Value="Bekräftad">
-                                                            <Setter Property="Foreground" Value="#5B21B6"/>
+                                                        <DataTrigger Binding="{Binding BookingStatus}"  Value="Bekräftad">
+                                                            <Setter Property="Background" Value="#EDE9FE"/>
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding BookingStatus}" Value="Preliminär">
-                                                            <Setter Property="Foreground" Value="#92400E"/>
+                                                            <Setter Property="Background" Value="#FEF3C7"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                                            </Border.Style>
 
-                        <!-- Payment status is displayed separately from booking status. -->
-                        <DataGridTemplateColumn Header="Betalningsstatus" Width="150">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border CornerRadius="8"
+                                            <TextBlock Text="{Binding BookingStatus}" FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#374151"/>
+
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding BookingStatus}" Value="Bekräftad">
+                                                                <Setter Property="Foreground" Value="#5B21B6"/>
+                                                            </DataTrigger>
+
+                                                            <DataTrigger Binding="{Binding BookingStatus}" Value="Preliminär">
+                                                                <Setter Property="Foreground" Value="#92400E"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Payment status is displayed separately from booking status. -->
+                            <DataGridTemplateColumn Header="Betalningsstatus" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Border CornerRadius="8"
                                         Padding="10,4"
                                         Margin="6"
                                         HorizontalAlignment="Left"
                                         VerticalAlignment="Center">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#E5E7EB"/>
-
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="Fullbetald">
-                                                        <Setter Property="Background" Value="#DCFCE7"/>
-                                                    </DataTrigger>
-
-                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="Delbetald">
-                                                        <Setter Property="Background" Value="#FEF3C7"/>
-                                                    </DataTrigger>
-
-                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="Obetald">
-                                                        <Setter Property="Background" Value="#FEE2E2"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-
-                                        <TextBlock Text="{Binding PaymentStatus}" FontWeight="SemiBold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="#374151"/>
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Background" Value="#E5E7EB"/>
 
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding PaymentStatus}" Value="Fullbetald">
-                                                            <Setter Property="Foreground" Value="#166534"/>
+                                                            <Setter Property="Background" Value="#DCFCE7"/>
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding PaymentStatus}" Value="Delbetald">
-                                                            <Setter Property="Foreground" Value="#92400E"/>
+                                                            <Setter Property="Background" Value="#FEF3C7"/>
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding PaymentStatus}" Value="Obetald">
-                                                            <Setter Property="Foreground" Value="#991B1B"/>
+                                                            <Setter Property="Background" Value="#FEE2E2"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Border>
+                                            </Border.Style>
 
-            <!-- Back button -->
-            <Button Grid.Row="4"
-                        Content="Tillbaka"
-                        Width="110"
-                        Height="38"
-                        Margin="0,20,0,0"
-                        HorizontalAlignment="Left"
-                        Style="{StaticResource DeepSeaButtonStyle}"
-                        Click="BackButton_Click"/>
+                                            <TextBlock Text="{Binding PaymentStatus}" FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Foreground" Value="#374151"/>
 
-            <Button x:Name="ShowCustomerBookingsButton"
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Fullbetald">
+                                                                <Setter Property="Foreground" Value="#166534"/>
+                                                            </DataTrigger>
+
+                                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Delbetald">
+                                                                <Setter Property="Foreground" Value="#92400E"/>
+                                                            </DataTrigger>
+
+                                                            <DataTrigger Binding="{Binding PaymentStatus}" Value="Obetald">
+                                                                <Setter Property="Foreground" Value="#991B1B"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <Button x:Name="ShowCustomerBookingsButton"
                     Grid.Row="4"
                     Content="Sök/skapa bokning"
                     Width="140"
                     Height="38"
                     Margin="0,20,0,0"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Left"
                     RenderTransformOrigin="0.5,0.5"
                     Style="{StaticResource DeepSeaButtonStyle}"
                     Click="ShowCustomerBookingsButton_Click"/>
 
-            <Button x:Name="ShowBookingDetailsButton"
+                <Button x:Name="ShowBookingDetailsButton"
                     Grid.Row="4"
                     Content="Visa bokningsdetaljer"
                     Width="190"
                     Height="38"
                     Margin="0,20,0,0"
                     HorizontalAlignment="Right"
-                    RenderTransformOrigin="0.5,0.5"
                     Style="{StaticResource DeepSeaButtonStyle}">
 
-                <Button.RenderTransform>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
-                </Button.RenderTransform>
-
-                <Button.Triggers>
+                    <Button.Triggers>
                     <!-- Gently enlarge the button on hover. -->
                     <EventTrigger RoutedEvent="MouseEnter">
                         <BeginStoryboard>
@@ -340,6 +356,7 @@
                     </EventTrigger>
                 </Button.Triggers>
             </Button>
-        </Grid>
-    </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>

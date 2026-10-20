@@ -291,5 +291,11 @@ namespace PresentationLayer.Views
             PriceFeedbackTextBlock.Text = message;
             PriceFeedbackTextBlock.Foreground = isError ? ErrorBrush : SuccessBrush;
         }
+
+        // Close this window and return to the dashboard.
+        private void BackButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

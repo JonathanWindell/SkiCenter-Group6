@@ -9,17 +9,57 @@
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBg}">
 
-    <!-- Scrollar hela fönstret med mushjul eller scrollbar -->
-    <ScrollViewer VerticalScrollBarVisibility="Visible"
-                  HorizontalScrollBarVisibility="Auto">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Grid Margin="40">
+        <!-- Header matches the ski school view. -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Main content card -->
-            <Border Background="{StaticResource CardBg}"
-                    CornerRadius="18"
-                    Padding="35">
+            <Button Content="← Tillbaka"
+                    Width="110"
+                    Height="36"
+                    Margin="0,0,20,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="BackButton_Click"/>
 
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Kundens bokningar"
+                           FontSize="28"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource PrimaryText}"/>
+
+                <TextBlock Text="Sök efter en kund för att se aktuella och tidigare bokningar."
+                           Margin="0,4,0,0"
+                           FontSize="14"
+                           TextWrapping="Wrap"
+                           Foreground="{StaticResource SecondaryText}"/>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="1"
+                Background="{StaticResource CardBg}"
+                CornerRadius="15"
+                Padding="20"
+                BorderBrush="{StaticResource InputBorder}"
+                BorderThickness="1">
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15"
+                                  ShadowDepth="2"
+                                  Opacity="0.08"
+                                  Color="#1E1B4B"/>
+            </Border.Effect>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -28,21 +68,6 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-
-                    <!-- Header -->
-                    <StackPanel Grid.Row="0">
-
-                        <TextBlock Text="Kundens bokningar"
-                                   FontSize="26"
-                                   FontWeight="Bold"
-                                   Foreground="{StaticResource PrimaryText}"/>
-
-                        <TextBlock Text="Sök efter en kund för att se aktuella och tidigare bokningar."
-                                   Margin="0,6,0,0"
-                                   FontSize="13"
-                                   Foreground="{StaticResource SecondaryText}"/>
-
-                    </StackPanel>
 
                     <!-- Customer search -->
                     <Border Grid.Row="1"
@@ -303,20 +328,10 @@
                                 HorizontalAlignment="Left"
                                 Style="{StaticResource DeepSeaButtonStyle}"
                                 Click="CreateNewBooking_Click"/>
-
-                        <!-- Returns to the previous view -->
-                        <Button Grid.Column="1"
-                                Content="Tillbaka"
-                                Width="110"
-                                Height="38"
-                                HorizontalAlignment="Right"
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BackButton_Click"/>
-
                     </Grid>
 
                 </Grid>
-            </Border>
-        </Grid>
-    </ScrollViewer>
+            </ScrollViewer>
+        </Border>
+    </Grid>
 </Window>

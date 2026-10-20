@@ -3,10 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:PresentationLayer.Controls"
         Title="SkiCenter - Statistik"
-        Width="1200"
-        Height="820"
-        MinWidth="1050"
-        MinHeight="700"
+        Width="1000"
+        Height="650"
+        MinWidth="950"
+        MinHeight="620"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBg}">
 
@@ -19,7 +19,7 @@
         <Style x:Key="TileStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource WindowBg}"/>
             <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="Padding" Value="10,6"/>
             <Setter Property="Margin" Value="0,0,12,0"/>
         </Style>
 
@@ -88,7 +88,7 @@
 
     <Border Background="{StaticResource CardBg}"
             CornerRadius="15"
-            Padding="22"
+            Padding="14"
             Margin="16">
 
         <Grid>
@@ -97,11 +97,24 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="190"/>
+                <RowDefinition Height="110"/>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
                 <StackPanel>
+                    <Button Content="← Tillbaka"
+                            Width="110"
+                            Height="36"
+                            HorizontalAlignment="Left"
+                            Margin="0,0,0,8"
+                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Click="BackButton_Click"/>
+                    
                     <TextBlock Text="Statistik"
                                FontSize="26"
                                FontWeight="Bold"
@@ -113,11 +126,12 @@
                 </StackPanel>
 
                 <!-- Printable reports: saved as PDF and opened in the PDF viewer -->
-                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="1">
                     <TextBlock Text="Rapporter som PDF"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Right"
-                               Margin="0,0,0,4"
+                              
+                               Margin="0,8,0,4"
                                Foreground="{StaticResource PrimaryText}"/>
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="StatisticsPdfButton" Content="Statistikrapport" Width="125" Height="30" Margin="0,0,8,0"
@@ -231,7 +245,7 @@
                 </Border>
 
                 <Border Grid.Column="2" BorderBrush="{StaticResource InputBorder}" BorderThickness="1" CornerRadius="12" Padding="14">
-                    <controls:BarChart x:Name="SalesChart" Title="Försäljning per månad (kr exkl. moms)"/>
+                    <controls:BarChart x:Name="SalesChart" Title="Försäljning (kr exkl. moms)"/>
                 </Border>
             </Grid>
 

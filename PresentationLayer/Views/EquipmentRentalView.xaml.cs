@@ -24,6 +24,13 @@ namespace PresentationLayer.Views
         private List<Booking> _bookingResults = new();
         private Booking? _selectedBooking;
 
+
+        // Close the rental window and return to the existing dashboard.
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         /// <summary>
         /// A row in the selected equipment table.
         /// </summary>
@@ -431,5 +438,6 @@ namespace PresentationLayer.Views
         }
 
         #endregion
+      
     }
 }

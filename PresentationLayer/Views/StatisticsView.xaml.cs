@@ -335,5 +335,11 @@ namespace PresentationLayer.Views
             if (value >= 1_000) return $"{(value / 1_000).ToString("0.#", Swedish)} tkr";
             return value.ToString("0", Swedish);
         }
+
+        // Close this window and return to the dashboard.
+        private void BackButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

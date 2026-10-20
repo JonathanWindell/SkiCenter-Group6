@@ -80,75 +80,107 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="{StaticResource CardBg}"
-            CornerRadius="15"
-            Padding="22"
-            Margin="16">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <!-- Header matches the ski school view. -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <Button Content="← Tillbaka"
+                    Width="110"
+                    Height="36"
+                    Margin="0,0,20,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="BackButton_Click"/>
+
+            <StackPanel Grid.Column="1">
                 <TextBlock Text="Säsongspriser"
-                           FontSize="26"
+                           FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
 
                 <TextBlock Text="Aktuella priser per boendetyp, pristyp och vecka. Tidigare priser sparas som historik."
                            FontSize="14"
-                           Margin="0,5,0,0"
+                           TextWrapping="Wrap"
+                           Margin="0,4,0,0"
                            Foreground="{StaticResource SecondaryText}"/>
             </StackPanel>
+        </Grid>
 
-            <!-- Filters -->
-            <Grid Grid.Row="1" Margin="0,0,0,16">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="230"/>
-                    <ColumnDefinition Width="14"/>
-                    <ColumnDefinition Width="150"/>
-                    <ColumnDefinition Width="14"/>
-                    <ColumnDefinition Width="90"/>
-                    <ColumnDefinition Width="14"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="10"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <Border Grid.Row="1"
+                Background="{StaticResource CardBg}"
+                CornerRadius="15"
+                Padding="20"
+                BorderBrush="{StaticResource InputBorder}"
+                BorderThickness="1">
 
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Boendetyp"
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15"
+                                  ShadowDepth="2"
+                                  Opacity="0.08"
+                                  Color="#1E1B4B"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Filters -->
+                <Grid Grid.Row="1" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="230"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Boendetyp"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
-                    <ComboBox x:Name="TypeFilterComboBox"
+                        <ComboBox x:Name="TypeFilterComboBox"
                               Height="34"
                               VerticalContentAlignment="Center"/>
-                </StackPanel>
+                    </StackPanel>
 
-                <StackPanel Grid.Column="2">
-                    <TextBlock Text="Pristyp"
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Pristyp"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
-                    <ComboBox x:Name="PriceTypeFilterComboBox"
+                        <ComboBox x:Name="PriceTypeFilterComboBox"
                               Height="34"
                               VerticalContentAlignment="Center"/>
-                </StackPanel>
+                    </StackPanel>
 
-                <StackPanel Grid.Column="4">
-                    <TextBlock Text="Vecka"
+                    <StackPanel Grid.Column="4">
+                        <TextBlock Text="Vecka"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
-                    <TextBox x:Name="WeekFilterTextBox"
+                        <TextBox x:Name="WeekFilterTextBox"
                              Height="34"
                              Padding="6,3"
                              VerticalContentAlignment="Center"
                              BorderBrush="{StaticResource InputBorder}"/>
-                </StackPanel>
+                    </StackPanel>
 
-                <Button x:Name="FilterButton"
+                    <Button x:Name="FilterButton"
                         Grid.Column="6"
                         Content="Filtrera"
                         Width="100"
@@ -156,7 +188,7 @@
                         VerticalAlignment="Bottom"
                         Style="{StaticResource DeepSeaButtonStyle}"/>
 
-                <Button x:Name="ClearFilterButton"
+                    <Button x:Name="ClearFilterButton"
                         Grid.Column="8"
                         Content="Rensa"
                         Width="100"
@@ -164,130 +196,133 @@
                         VerticalAlignment="Bottom"
                         Style="{StaticResource SecondaryButtonStyle}"/>
 
-                <TextBlock x:Name="FilterErrorTextBlock"
+                    <TextBlock x:Name="FilterErrorTextBlock"
                            Grid.Column="9"
                            Margin="14,0,0,8"
                            VerticalAlignment="Bottom"
                            TextWrapping="Wrap"
                            Foreground="#DC2626"/>
-            </Grid>
+                </Grid>
 
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="16"/>
-                    <ColumnDefinition Width="330"/>
-                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="330"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Current prices -->
-                <Border Grid.Column="0"
+                    <!-- Current prices -->
+                    <Border Grid.Column="0"
                         CornerRadius="12"
                         BorderBrush="{StaticResource InputBorder}"
                         BorderThickness="1"
                         Background="{StaticResource CardBg}"
                         Padding="1">
-                    <DataGrid x:Name="PriceDataGrid" Style="{StaticResource PriceGridStyle}">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Vecka"
+                        <DataGrid x:Name="PriceDataGrid" Style="{StaticResource PriceGridStyle}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Vecka"
                                                 Binding="{Binding WeekNumber}"
                                                 Width="0.6*"/>
-                            <DataGridTextColumn Header="Boendetyp"
+                                <DataGridTextColumn Header="Boendetyp"
                                                 Binding="{Binding AccommodationType.CategoryCode}"
                                                 Width="0.8*"/>
-                            <DataGridTextColumn Header="Pristyp"
+                                <DataGridTextColumn Header="Pristyp"
                                                 Binding="{Binding PriceType}"
                                                 Width="*"/>
-                            <DataGridTextColumn Header="Pris (kr)"
+                                <DataGridTextColumn Header="Pris (kr)"
                                                 Binding="{Binding Price, StringFormat=N2}"
                                                 Width="*"/>
-                            <DataGridTextColumn Header="Gäller från"
+                                <DataGridTextColumn Header="Gäller från"
                                                 Binding="{Binding ValidFrom, StringFormat=yyyy-MM-dd HH:mm}"
                                                 Width="1.2*"/>
-                            <DataGridTemplateColumn Header="Ändrad av"
+                                <DataGridTemplateColumn Header="Ändrad av"
                                                     CellTemplate="{StaticResource ChangedByCellTemplate}"
                                                     Width="1.2*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Border>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
 
-                <!-- Edit panel -->
-                <Border Grid.Column="2"
+                    <!-- Edit panel -->
+                    <Border Grid.Column="2"
                         Background="{StaticResource CardBg}"
                         BorderBrush="{StaticResource InputBorder}"
                         BorderThickness="1"
                         CornerRadius="12"
                         Padding="14">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0">
-                            <TextBlock Text="Ändra pris"
+                            <StackPanel Grid.Row="0">
+                                <TextBlock Text="Ändra pris"
                                        FontSize="20"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource PrimaryText}"
                                        Margin="0,0,0,8"/>
 
-                            <TextBlock x:Name="SelectedPriceTextBlock"
+                                <TextBlock x:Name="SelectedPriceTextBlock"
                                        Text="Välj en rad i tabellen."
                                        TextWrapping="Wrap"
                                        Foreground="{StaticResource SecondaryText}"
                                        Margin="0,0,0,10"/>
 
-                            <TextBlock Text="Nytt pris (kr) *"
+                                <TextBlock Text="Nytt pris (kr) *"
                                        Foreground="{StaticResource PrimaryText}"
                                        Margin="0,0,0,4"/>
 
-                            <TextBox x:Name="NewPriceTextBox"
+                                <TextBox x:Name="NewPriceTextBox"
                                      Height="32"
                                      Padding="6,3"
                                      VerticalContentAlignment="Center"
                                      BorderBrush="{StaticResource InputBorder}"
                                      IsEnabled="False"/>
 
-                            <TextBlock x:Name="PriceFeedbackTextBlock"
+                                <TextBlock x:Name="PriceFeedbackTextBlock"
                                        TextWrapping="Wrap"
                                        Margin="0,6,0,8"/>
 
-                            <Button x:Name="SavePriceButton"
+                                <Button x:Name="SavePriceButton"
                                     Content="Spara nytt pris"
                                     Height="36"
                                     IsEnabled="False"
                                     Style="{StaticResource DeepSeaButtonStyle}"/>
-                        </StackPanel>
+                            </StackPanel>
 
-                        <TextBlock Grid.Row="1"
+                            <TextBlock Grid.Row="1"
                                    Text="Prishistorik"
                                    FontSize="16"
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource PrimaryText}"
                                    Margin="0,18,0,6"/>
 
-                        <Border Grid.Row="2"
+                            <Border Grid.Row="2"
                                 CornerRadius="8"
                                 BorderBrush="{StaticResource InputBorder}"
                                 BorderThickness="1"
                                 Padding="1">
-                            <DataGrid x:Name="HistoryDataGrid" Style="{StaticResource PriceGridStyle}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Pris (kr)"
+                                <DataGrid x:Name="HistoryDataGrid" Style="{StaticResource PriceGridStyle}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Pris (kr)"
                                                         Binding="{Binding Price, StringFormat=N2}"
                                                         Width="*"/>
-                                    <DataGridTextColumn Header="Gäller från"
+                                        <DataGridTextColumn Header="Gäller från"
                                                         Binding="{Binding ValidFrom, StringFormat=yyyy-MM-dd HH:mm}"
                                                         Width="1.3*"/>
-                                    <DataGridTemplateColumn Header="Ändrad av"
+                                        <DataGridTemplateColumn Header="Ändrad av"
                                                             CellTemplate="{StaticResource ChangedByCellTemplate}"
                                                             Width="1.3*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Border>
-                    </Grid>
-                </Border>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </Grid>
+                
             </Grid>
-        </Grid>
-    </Border>
+        </Border>
+    </Grid>
 </Window>
+    

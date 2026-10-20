@@ -2,56 +2,88 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Hantera boenden och mötesrum" 
-        Width="1050"
+        Width="1000"
         Height="650"
         MinWidth="950"
         MinHeight="620"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBg}">
 
-    <Border Background="{StaticResource CardBg}"
-            CornerRadius="15"
-            Padding="24"
-            Margin="16">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Border.Triggers>
-            <!-- Briefly fade in the content when the view opens. -->
-            <EventTrigger RoutedEvent="FrameworkElement.Loaded">
-                <BeginStoryboard>
-                    <Storyboard>
-                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                 From="0"
-                                 To="1"
-                                 Duration="0:0:0.18"/>
-                    </Storyboard>
-                </BeginStoryboard>
-            </EventTrigger>
-        </Border.Triggers>
+        <!-- Header matches the ski school view. -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+            <Button Content="← Tillbaka"
+                    Width="110"
+                    Height="36"
+                    Margin="0,0,20,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="BackButton_Click"/>
 
-            <!-- Page heading. -->
-            <StackPanel Grid.Row="0" Margin="0,0,0,22">
+            <StackPanel Grid.Column="1">
                 <TextBlock Text="Boende- och mötesrumsöversikt"
                            FontSize="28"
                            FontWeight="Bold"
+                           TextWrapping="Wrap"
                            Foreground="{StaticResource PrimaryText}"/>
 
                 <TextBlock Text="Se boenden och mötesrum, och hantera deras status."
-                           Margin="0,8,0,0"
+                           Margin="0,4,0,0"
                            FontSize="14"
                            TextWrapping="Wrap"
                            Foreground="{StaticResource SecondaryText}"/>
             </StackPanel>
+        </Grid>
 
-            <!-- Types and statuses are filtered separately. -->
+        <Border Grid.Row="1"
+                Background="{StaticResource CardBg}"
+                CornerRadius="15"
+                Padding="20"
+                BorderBrush="{StaticResource InputBorder}"
+                BorderThickness="1">
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15"
+                                  ShadowDepth="2"
+                                  Opacity="0.08"
+                                  Color="#1E1B4B"/>
+            </Border.Effect>
+
+            <Border.Triggers>
+                <!-- Preserve the existing opening animation. -->
+                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation
+                                Storyboard.TargetProperty="Opacity"
+                                From="0"
+                                To="1"
+                                Duration="0:0:0.18"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Border.Triggers>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Types and statuses are filtered separately. -->
                 <Grid Grid.Row="1" Margin="0,0,0,18">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -66,26 +98,26 @@
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,6"/>
 
-                    <ComboBox x:Name="PropertyTypeFilterComboBox" 
+                        <ComboBox x:Name="PropertyTypeFilterComboBox" 
                               Height="36"
                               SelectedIndex="0"
                               VerticalContentAlignment="Center">
-                        <ComboBoxItem Content="Alla typer"/>
-                    </ComboBox>
-                </StackPanel>
+                            <ComboBoxItem Content="Alla typer"/>
+                        </ComboBox>
+                    </StackPanel>
 
                     <StackPanel Grid.Column="2">
-                    <TextBlock Text="Status"
+                        <TextBlock Text="Status"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,6"/>
 
-                    <ComboBox x:Name="PropertyStatusFilterComboBox" 
+                        <ComboBox x:Name="PropertyStatusFilterComboBox" 
                               Height="36"
                               SelectedIndex="0"
                               VerticalContentAlignment="Center">
-                        <ComboBoxItem Content="Alla statusar"/>
-                    </ComboBox>
-                </StackPanel>
+                            <ComboBoxItem Content="Alla statusar"/>
+                        </ComboBox>
+                    </StackPanel>
 
                     <Button x:Name="ResetFiltersButton"
                         Grid.Column="4"
@@ -145,58 +177,48 @@
                             </Style>
                         </DataGrid.RowStyle>
 
-                    <DataGrid.Resources>
-                        <!-- Align text with the status labels. -->
-                        <Style x:Key="CenteredCellText" TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center"/>
-                            <Setter Property="Margin" Value="4,0"/>
-                        </Style>
-                    </DataGrid.Resources>
+                        <DataGrid.Resources>
+                            <!-- Align text with the status labels. -->
+                            <Style x:Key="CenteredCellText" TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="Margin" Value="4,0"/>
+                            </Style>
+                        </DataGrid.Resources>
 
                         <!-- Property status tags use both text and colour. -->
-                    <DataGrid.Columns>
+                        <DataGrid.Columns>
 
-                        <DataGridTextColumn Header="Typ"
+                            <DataGridTextColumn Header="Typ"
                                             Binding="{Binding Type}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
-                        <DataGridTextColumn Header="Nummer"
+                            <DataGridTextColumn Header="Nummer"
                                             Binding="{Binding Number}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
-                        <DataGridTextColumn Header="Kategori"
+                            <DataGridTextColumn Header="Kategori"
                                             Binding="{Binding Category}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
-                        <DataGridTextColumn Header="Kapacitet"
+                            <DataGridTextColumn Header="Kapacitet"
                                             Binding="{Binding Capacity}"
                                             ElementStyle="{StaticResource CenteredCellText}"
                                             Width="*"/>
 
-                        <DataGridTemplateColumn Header="Status" Width="140">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox ItemsSource="{Binding AvailableStatuses}"
+                            <DataGridTemplateColumn Header="Status" Width="140">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox ItemsSource="{Binding AvailableStatuses}"
                                       SelectedItem="{Binding Status, UpdateSourceTrigger=PropertyChanged}"
                                       Height="30"
                                       VerticalContentAlignment="Center"
                                       Margin="2"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Border>
-
-                <!-- Back button -->
-                <Button Grid.Row="4"
-                    Content="Tillbaka"
-                    Width="110"
-                    Height="38"
-                    Margin="0,20,0,0"
-                    HorizontalAlignment="Left"
-                    Style="{StaticResource DeepSeaButtonStyle}"
-                    Click="BackButton_Click"/>
 
                 <Button x:Name="ChangePropertyStatusButton"
                     Grid.Row="4"
@@ -205,13 +227,9 @@
                     Height="38"
                     Margin="0,20,0,0"
                     HorizontalAlignment="Center"
-                    RenderTransformOrigin="0.5,0.5"
                     Style="{StaticResource DeepSeaButtonStyle}"
                     Click="ChangePropertyStatusButton_Click">
-                    <Button.RenderTransform>
-                        <ScaleTransform ScaleX="1" ScaleY="1"/>
-                    </Button.RenderTransform>
-
+                
                     <Button.Triggers>
                         <!-- Gently enlarge the button on hover. -->
                         <EventTrigger RoutedEvent="MouseEnter">
@@ -242,6 +260,7 @@
                         </EventTrigger>
                     </Button.Triggers>
                 </Button>
-        </Grid>
-    </Border>
+            </Grid>
+        </Border>
+    </Grid>
 </Window>
