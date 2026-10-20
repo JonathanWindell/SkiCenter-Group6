@@ -100,16 +100,37 @@
                 <RowDefinition Height="190"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0" Margin="0,0,0,12">
-                <TextBlock Text="Statistik"
-                           FontSize="26"
-                           FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryText}"/>
-                <TextBlock Text="Beläggning och försäljning per månad, jämfört med samma månader föregående år."
-                           FontSize="14"
-                           Margin="0,5,0,0"
-                           Foreground="{StaticResource SecondaryText}"/>
-            </StackPanel>
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <StackPanel>
+                    <TextBlock Text="Statistik"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource PrimaryText}"/>
+                    <TextBlock Text="Beläggning och försäljning per månad, jämfört med samma månader föregående år."
+                               FontSize="14"
+                               Margin="0,5,0,0"
+                               Foreground="{StaticResource SecondaryText}"/>
+                </StackPanel>
+
+                <!-- Printable reports: saved as PDF and opened in the PDF viewer -->
+                <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                    <TextBlock Text="Rapporter som PDF"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Right"
+                               Margin="0,0,0,4"
+                               Foreground="{StaticResource PrimaryText}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="StatisticsPdfButton" Content="Statistikrapport" Width="125" Height="30" Margin="0,0,8,0"
+                                Style="{StaticResource DeepSeaButtonStyle}"/>
+                        <Button x:Name="CustomerRegisterPdfButton" Content="Kundregister" Width="110" Height="30" Margin="0,0,8,0"
+                                Style="{StaticResource DeepSeaButtonStyle}"/>
+                        <Button x:Name="EquipmentRegisterPdfButton" Content="Utrustningsregister" Width="135" Height="30" Margin="0,0,8,0"
+                                Style="{StaticResource DeepSeaButtonStyle}"/>
+                        <Button x:Name="PriceListPdfButton" Content="Prislistor" Width="95" Height="30"
+                                Style="{StaticResource DeepSeaButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
 
             <!-- Filters -->
             <Grid Grid.Row="1" Margin="0,0,0,14">
