@@ -48,7 +48,20 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
-        /// Gets all equipment including articles with stock count. 
+        /// Gets all equipment with its price list, for the printable price list.
+        /// </summary>
+        public IEnumerable<Equipment> GetAllEquipmentWithPrices()
+        {
+            return _context.Set<Equipment>()
+                .Include(e => e.Prices)
+                .OrderBy(e => e.Category)
+                .ThenBy(e => e.Description)
+                .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Gets all equipment including articles with stock count.
         /// </summary>
         public IEnumerable<Equipment> GetAllEquipmentWithStock()
         {

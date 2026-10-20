@@ -1,9 +1,13 @@
 using BusinessLayer.Controllers;
 using BusinessLayer.Models;
 using EntityLayer;
+using Microsoft.Win32;
 using PresentationLayer.Controls;
 using PresentationLayer.Models;
+using ServiceLayer.Pdf;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -18,14 +22,29 @@ namespace PresentationLayer.Views
         private static readonly CultureInfo Swedish = CultureInfo.GetCultureInfo("sv-SE");
 
         private readonly StatisticsController _statisticsController;
+        private readonly ListReportController _listReportController;
+        private readonly PdfReportService _pdfReportService;
 
-        public StatisticsView(StatisticsController statisticsController)
+        // The statistics currently shown, used for the statistics PDF
+        private StatisticsReport? _currentReport;
+
+        public StatisticsView(StatisticsController statisticsController, ListReportController listReportController, PdfReportService pdfReportService)
         {
             InitializeComponent();
             _statisticsController = statisticsController;
+            _listReportController = listReportController;
+            _pdfReportService = pdfReportService;
 
             ShowStatisticsButton.Click += (_, _) => LoadStatistics();
             CompareCheckBox.Click += (_, _) => LoadStatistics();
+
+            StatisticsPdfButton.Click += StatisticsPdfButton_Click;
+            CustomerRegisterPdfButton.Click += (_, _) => SaveReport(
+                "Kundregister", () => _listReportController.CreateCustomerRegister(), _pdfReportService.CreateCustomerRegisterPdf);
+            EquipmentRegisterPdfButton.Click += (_, _) => SaveReport(
+                "Skidutrustningsregister", () => _listReportController.CreateEquipmentRegister(), _pdfReportService.CreateEquipmentRegisterPdf);
+            PriceListPdfButton.Click += (_, _) => SaveReport(
+                "Prislistor", () => _listReportController.CreatePriceList(), _pdfReportService.CreatePriceListPdf);
 
             Loaded += StatisticsView_Loaded;
         }
@@ -125,11 +144,13 @@ namespace PresentationLayer.Views
 
             if (!result.success || result.report == null)
             {
+                _currentReport = null;
                 MessageTextBlock.Text = result.message;
                 return;
             }
 
             StatisticsReport report = result.report;
+            _currentReport = report;
 
             ShowTiles(report, compare);
             ShowCharts(report, compare);
@@ -208,6 +229,82 @@ namespace PresentationLayer.Views
                     };
                 })
                 .ToList();
+        }
+
+        /// <summary>
+        /// Saves the statistics currently shown, with the same filters, as a PDF.
+        /// </summary>
+        private void StatisticsPdfButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentReport == null)
+            {
+                MessageTextBlock.Text = "Visa statistik innan rapporten skapas.";
+                return;
+            }
+
+            StatisticsReport statistics = _currentReport;
+            bool compare = CompareCheckBox.IsChecked == true;
+
+            SaveReport("Statistikrapport", () => _listReportController.CreateStatisticsReport(statistics, compare), _pdfReportService.CreateStatisticsPdf);
+        }
+
+        /// <summary>
+        /// Creates a report, asks where to save the PDF, saves it and opens it in the PDF viewer.
+        /// </summary>
+        private void SaveReport<TReport>(string reportName, Func<(bool success, string message, TReport? report)> createReport, Func<TReport, byte[]> createPdf)
+            where TReport : class
+        {
+            MessageTextBlock.Text = string.Empty;
+
+            (bool success, string message, TReport? report) result;
+
+            try
+            {
+                result = createReport();
+            }
+            catch (Exception ex)
+            {
+                MessageTextBlock.Text = $"Kunde inte hämta data till rapporten: {ex.Message}";
+                return;
+            }
+
+            if (!result.success || result.report == null)
+            {
+                MessageTextBlock.Text = result.message;
+                return;
+            }
+
+            var dialog = new SaveFileDialog
+            {
+                Title = $"Spara {reportName.ToLower(Swedish)}",
+                Filter = "PDF-fil (*.pdf)|*.pdf",
+                FileName = $"{reportName}_{DateTime.Today:yyyy-MM-dd}.pdf"
+            };
+
+            if (dialog.ShowDialog(this) != true)
+            {
+                return;
+            }
+
+            try
+            {
+                File.WriteAllBytes(dialog.FileName, createPdf(result.report));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Rapporten kunde inte sparas: {ex.Message}");
+                return;
+            }
+
+            try
+            {
+                // Open the saved report in the default PDF viewer
+                Process.Start(new ProcessStartInfo(dialog.FileName) { UseShellExecute = true });
+            }
+            catch (Exception)
+            {
+                MessageBox.Show($"Rapporten är sparad men kunde inte öppnas:\n{dialog.FileName}");
+            }
         }
 
         private static string MonthLabel(DateTime month) => Swedish.TextInfo.ToTitleCase(month.ToString("MMMM yyyy", Swedish));

@@ -7,5 +7,7 @@ namespace DataLayer.Interfaces
         IEnumerable<Equipment> GetByCategory(string category);
 
         IEnumerable<Equipment> GetAllEquipmentWithStock();
+
+        IEnumerable<Equipment> GetAllEquipmentWithPrices();
     }
 }
