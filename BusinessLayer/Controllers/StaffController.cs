@@ -81,5 +81,14 @@ namespace BusinessLayer.Controllers
             return currentRole == staffRole.MarketingManager || currentRole == staffRole.SystemAdmin;
         }
 
+        /// <summary>
+        /// Verifies that the role may view the statistics dashboard.
+        /// Allowed for MarketingManager, and for SystemAdmin who can access every view.
+        /// </summary>
+        public static bool CanViewStatistics(staffRole currentRole)
+        {
+            return currentRole == staffRole.MarketingManager || currentRole == staffRole.SystemAdmin;
+        }
+
     }
 }

@@ -101,6 +101,39 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
+        /// Gets all bookings that are not cancelled and whose stay overlaps the period,
+        /// with everything needed for occupancy and sales statistics.
+        /// </summary>
+        /// <param name="fromDate">First day of the period.</param>
+        /// <param name="toDateExclusive">The day after the last day of the period.</param>
+        public IEnumerable<Booking> GetBookingsForStatistics(DateTime fromDate, DateTime toDateExclusive)
+        {
+            DateTime from = fromDate.Date;
+            DateTime to = toDateExclusive.Date;
+
+            return _context.Set<Booking>()
+                .Include(b => b.Customer)
+                .Include(b => b.Accommodations)
+                    .ThenInclude(ba => ba.Accommodation)
+                        .ThenInclude(a => a.AccommodationType)
+                .Include(b => b.Rentals)
+                    .ThenInclude(r => r.EquipmentItems)
+                        .ThenInclude(ei => ei.Equipment)
+                            .ThenInclude(e => e.Prices)
+                .Include(b => b.SkiLessons)
+                    .ThenInclude(sl => sl.SkiLessonSession)
+                        .ThenInclude(sls => sls.SkiLesson)
+                .Include(b => b.MeetingRooms)
+                    .ThenInclude(bm => bm.meetingRoom)
+                        .ThenInclude(m => m.SeasonPrices)
+                .Where(b => b.BookingStatus != BookingStatus.Cancelled
+                    && b.Accommodations.Any(ba => ba.StartDate < to && ba.EndDate > from))
+                .AsSplitQuery()
+                .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
         /// Gets completed (finished) bookings whose checkout date is within the period,
         /// with everything needed for invoicing: customer, accommodations, rentals, ski lessons and meeting rooms.
         /// </summary>

@@ -111,7 +111,7 @@ namespace BusinessLayer.Controllers
             DateTime checkOut = booking.Accommodations.Any() ? booking.Accommodations.Max(ba => ba.EndDate).Date : booking.BookingDate.Date;
 
             List<InvoiceLine> rentalLines = booking.Rentals.SelectMany(BuildRentalLines).ToList();
-            List<InvoiceLine> lessonLines = booking.SkiLessons.Select(BuildSkiLessonLine).ToList();
+            List<InvoiceLine> lessonLines = booking.SkiLessons.Select(sl => BuildSkiLessonLine(sl, checkIn)).ToList();
             List<InvoiceLine> meetingRoomLines = booking.MeetingRooms.Select(BuildMeetingRoomLine).ToList();
 
             decimal insurance = booking.HasCancellationInsurance ? BookingController.CancellationInsurancePrice : 0m;
@@ -144,7 +144,10 @@ namespace BusinessLayer.Controllers
                     "nätter",
                     listPrice,
                     discount,
-                    VatRates.Accommodation));
+                    VatRates.Accommodation,
+                    checkIn,
+                    // The last night, since the checkout day itself is not stayed
+                    checkOut > checkIn ? checkOut.AddDays(-1) : checkIn));
 
                 if (discount > 0)
                 {
@@ -160,7 +163,8 @@ namespace BusinessLayer.Controllers
 
             if (insurance > 0)
             {
-                lines.Add(CreateLine("Avbeställningsskydd", string.Empty, "Avbeställningsskydd", 1, "st", insurance, 0m, VatRates.CancellationInsurance));
+                lines.Add(CreateLine("Avbeställningsskydd", string.Empty, "Avbeställningsskydd", 1, "st", insurance, 0m,
+                    VatRates.CancellationInsurance, checkIn, checkIn));
             }
 
             lines.AddRange(rentalLines);
@@ -217,7 +221,9 @@ namespace BusinessLayer.Controllers
                     "dagar",
                     p.price!.Value,
                     0m,
-                    VatRates.EquipmentRental));
+                    VatRates.EquipmentRental,
+                    rental.StartDate.Date,
+                    rental.EndDate.Date));
             }
 
             string articles = string.Join(", ", rental.EquipmentItems.Select(i => i.ArticleNumber));
@@ -225,14 +231,18 @@ namespace BusinessLayer.Controllers
             return new[]
             {
                 CreateLine("Utrustning", articles, $"Uthyrning {rental.RentalID} {period}", days, "dagar",
-                    rental.TotalPrice, 0m, VatRates.EquipmentRental)
+                    rental.TotalPrice, 0m, VatRates.EquipmentRental, rental.StartDate.Date, rental.EndDate.Date)
             };
         }
 
-        private static InvoiceLine BuildSkiLessonLine(SkiLessonBooking lessonBooking)
+        /// <summary>
+        /// Ski lessons are dated to the Monday of the session's week, in the year of the stay.
+        /// </summary>
+        private static InvoiceLine BuildSkiLessonLine(SkiLessonBooking lessonBooking, DateTime checkIn)
         {
             SkiLessonSession? session = lessonBooking.SkiLessonSession;
             SkiLesson? lesson = session?.SkiLesson;
+            DateTime lessonDate = GetLessonDate(session?.WeekNumber ?? 0, checkIn);
 
             return CreateLine(
                 "Skidskola",
@@ -242,7 +252,29 @@ namespace BusinessLayer.Controllers
                 "st",
                 lesson?.Price ?? 0m,
                 0m,
-                VatRates.SkiLesson);
+                VatRates.SkiLesson,
+                lessonDate,
+                lessonDate);
+        }
+
+        private static DateTime GetLessonDate(int weekNumber, DateTime checkIn)
+        {
+            int year = ISOWeek.GetYear(checkIn);
+
+            if (weekNumber < 1 || weekNumber > ISOWeek.GetWeeksInYear(year))
+            {
+                return checkIn;
+            }
+
+            DateTime monday = ISOWeek.ToDateTime(year, weekNumber, DayOfWeek.Monday);
+
+            // A stay over new year can have a lesson in week 1 of the next year
+            if (monday < checkIn.AddDays(-7) && weekNumber <= ISOWeek.GetWeeksInYear(year + 1))
+            {
+                monday = ISOWeek.ToDateTime(year + 1, weekNumber, DayOfWeek.Monday);
+            }
+
+            return monday;
         }
 
         /// <summary>
@@ -272,11 +304,14 @@ namespace BusinessLayer.Controllers
                 "dygn",
                 price,
                 0m,
-                VatRates.MeetingRoom);
+                VatRates.MeetingRoom,
+                start,
+                end);
         }
 
         private static InvoiceLine CreateLine(string articleType, string articleNumber, string description,
-            int quantity, string unit, decimal listPriceInclVat, decimal discountInclVat, decimal vatRate)
+            int quantity, string unit, decimal listPriceInclVat, decimal discountInclVat, decimal vatRate,
+            DateTime serviceStartDate, DateTime serviceEndDate)
         {
             decimal amountInclVat = listPriceInclVat - discountInclVat;
             (decimal amountExclVat, decimal vatAmount) = VatRates.SplitVat(amountInclVat, vatRate);
@@ -288,6 +323,8 @@ namespace BusinessLayer.Controllers
                 Description = description,
                 Quantity = quantity,
                 Unit = unit,
+                ServiceStartDate = serviceStartDate,
+                ServiceEndDate = serviceEndDate,
                 ListPriceInclVat = listPriceInclVat,
                 DiscountInclVat = discountInclVat,
                 AmountInclVat = amountInclVat,

@@ -17,5 +17,7 @@ namespace DataLayer.Interfaces
         IEnumerable<Booking> FindActiveBookings(int? bookingID, string? accommodationNumber);
 
         IEnumerable<Booking> GetFinishedBookingsForInvoicing(DateTime fromDate, DateTime toDate);
+
+        IEnumerable<Booking> GetBookingsForStatistics(DateTime fromDate, DateTime toDateExclusive);
     }
 }
