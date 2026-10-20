@@ -6,6 +6,7 @@ using DataLayer.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
+using ServiceLayer.Pdf;
 using System.Windows;
 
 namespace PresentationLayer
@@ -59,6 +60,7 @@ namespace PresentationLayer
             services.AddTransient<PropertyMgmtView>();
             services.AddTransient<EquipmentRentalView>();
             services.AddTransient<InvoiceExportView>();
+            services.AddTransient<StatisticsView>();
             services.AddTransient<SkiSchoolView>();
             services.AddTransient<MarketingMgmtView>();
 
@@ -72,6 +74,11 @@ namespace PresentationLayer
             services.AddTransient<SkiSchoolController>();
             services.AddTransient<AdminController>();
             services.AddTransient<ReportController>();
+            services.AddTransient<StatisticsController>();
+            services.AddTransient<ListReportController>();
+
+            // Services
+            services.AddTransient<PdfReportService>();
             services.AddTransient<PropertyController>();
 
             // 3. Register Repositories

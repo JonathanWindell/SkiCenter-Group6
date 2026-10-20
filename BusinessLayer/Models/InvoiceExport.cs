@@ -67,6 +67,10 @@ namespace BusinessLayer.Models
         public int Quantity { get; set; }
         public string Unit { get; set; } = string.Empty;
 
+        // First and last day the article was used, e.g. the rental period. Used for statistics per month.
+        public DateTime ServiceStartDate { get; set; }
+        public DateTime ServiceEndDate { get; set; }
+
         // Price before discount, including VAT
         public decimal ListPriceInclVat { get; set; }
         public decimal DiscountInclVat { get; set; }

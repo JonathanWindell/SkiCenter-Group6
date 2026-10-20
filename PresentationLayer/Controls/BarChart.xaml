@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="PresentationLayer.Controls.BarChart"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title and legend -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <TextBlock x:Name="TitleTextBlock"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource PrimaryText}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <Rectangle Width="10" Height="10" Fill="{StaticResource PrimaryBtn}" RadiusX="2" RadiusY="2"/>
+                <TextBlock x:Name="CurrentLegendTextBlock" Text="Vald period" Margin="5,0,12,0" FontSize="12"
+                           Foreground="{StaticResource PrimaryText}"/>
+                <Rectangle x:Name="PreviousLegendRectangle" Width="10" Height="10" Fill="#A5B4FC" RadiusX="2" RadiusY="2"/>
+                <TextBlock x:Name="PreviousLegendTextBlock" Text="Föregående år" Margin="5,0,0,0" FontSize="12"
+                           Foreground="{StaticResource PrimaryText}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Bars are generated in code -->
+        <Grid x:Name="ChartGrid" Grid.Row="1"/>
+
+        <TextBlock x:Name="EmptyTextBlock"
+                   Grid.Row="1"
+                   Text="Ingen data att visa."
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="{StaticResource SecondaryText}"
+                   Visibility="Collapsed"/>
+    </Grid>
+</UserControl>
