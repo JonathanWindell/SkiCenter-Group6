@@ -52,6 +52,13 @@ namespace EntityLayer
         // Discount amount deducted from the accommodation price.
         [Required]
         public decimal DiscountAmount { get; set; }
+        [NotMapped]
+        public decimal FinalAccommodationPrice =>
+        AccommodationListPrice > 0
+            ? AccommodationListPrice - DiscountAmount
+            : TotalAmount
+            - (HasCancellationInsurance ? 300m : 0m)
+            - (Rentals?.Sum(r => r.TotalPrice) ?? 0m);
 
         // Parameterless constructor for EF 
         public Booking() { }

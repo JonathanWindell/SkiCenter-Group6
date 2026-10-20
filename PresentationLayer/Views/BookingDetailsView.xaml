@@ -165,18 +165,19 @@
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Rabatt: "/>
-                                                <Run Text="{Binding DiscountRate}"/>
+                                                <Run Text="{Binding Booking.DiscountRate}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Rabattbelopp: "/>
-                                                <Run Text="{Binding DiscountAmount,
+                                                <Run Text="{Binding Booking.DiscountAmount,
                                                     StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Slutpris: "/>
-                                                <Run Text="{Binding FinalPrice,
+                                                <Run Text="{Binding Booking.FinalAccommodationPrice,
+                                                    Mode=OneWay,
                                                     StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
@@ -295,9 +296,9 @@
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,15">
-                                                <Run Text="Summa: "/>
-                                                <Run Text="{Binding Sum,
-                                                    StringFormat={}{0:N0} kr}"/>
+                                                <Run Text="Pris för hyresperioden: "/>
+                                                <Run Text="{Binding TotalPrice,
+    StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <!-- Equipment items -->
@@ -334,12 +335,6 @@
                                                             <TextBlock Margin="0,5,0,0">
                                                                 <Run Text="Status: "/>
                                                                 <Run Text="{Binding Status}"/>
-                                                            </TextBlock>
-
-                                                            <TextBlock Margin="0,5,0,0">
-                                                                <Run Text="Pris per dag: "/>
-                                                                <Run Text="{Binding PricePerDay,
-                                                                    StringFormat={}{0:N0} kr}"/>
                                                             </TextBlock>
 
                                                         </StackPanel>
