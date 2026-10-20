@@ -24,10 +24,15 @@ namespace PresentationLayer.Views
         private List<Booking> _bookingResults = new();
         private Booking? _selectedBooking;
 
+        private readonly List<ReturnQueueRow> _returnQueue = new();
+        private EquipmentItem? _scannedReturnItem;
+
         /// <summary>
         /// A row in the selected equipment table.
         /// </summary>
         private record SelectedItemRow(int EquipmentItemID, string ArticleNumber, string Name, string PriceText);
+
+        private record ReturnQueueRow(int EquipmentItemID, string ArticleNumber, string Description, EquipmentCondition Condition, bool IsDamaged, string StatusText);
 
         public EquipmentRentalView(SkiShopController skiShopController)
         {
@@ -44,6 +49,14 @@ namespace PresentationLayer.Views
             EndDatePicker.SelectedDateChanged += (_, _) => UpdateRentalSummary();
             LicenseVerifiedCheckBox.Checked += (_, _) => ResetLicenseHighlight();
             ConfirmRentalButton.Click += ConfirmRentalButton_Click;
+
+            SearchReturnItemButton.Click += SearchReturnItemButton_Click;
+            AddScannedItemToListButton.Click += AddScannedItemToListButton_Click;
+            RemoveFromReturnQueueButton.Click += RemoveFromReturnQueueButton_Click;
+            ConfirmAllReturnsButton.Click += ConfirmAllReturnsButton_Click;
+
+            ReturnConditionComboBox.ItemsSource = Enum.GetValues(typeof(EquipmentCondition));
+            ReturnConditionComboBox.SelectedItem = EquipmentCondition.BarelyUsed;
 
             Loaded += (_, _) => LoadAvailableItems();
         }
@@ -431,5 +444,148 @@ namespace PresentationLayer.Views
         }
 
         #endregion
+
+        #region Return flow
+        private void SearchReturnItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            ReturnSearchFeedbackTextBlock.Text = string.Empty;
+            DelayWarningBorder.Visibility = Visibility.Collapsed;
+            _scannedReturnItem = null;
+
+            string barcode = ReturnArticleTextBox.Text.Trim();
+            if (string.IsNullOrEmpty(barcode))
+            {
+                ReturnSearchFeedbackTextBlock.Text = "Ange ett artikelnummer.";
+                ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+                AddScannedItemToListButton.IsEnabled = false;
+                return;
+            }
+
+            if (_returnQueue.Any(r => r.ArticleNumber.Equals(barcode, StringComparison.OrdinalIgnoreCase)))
+            {
+                ReturnSearchFeedbackTextBlock.Text = "Artikeln ligger redan i listan till höger.";
+                ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+                AddScannedItemToListButton.IsEnabled = false;
+                return;
+            }
+
+            var item = _skiShopController.GetRentedItemByBarcode(barcode);
+            if (item == null)
+            {
+                ReturnSearchFeedbackTextBlock.Text = "Ingen uthyrd artikel med det artikelnumret hittades.";
+                ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+                AddScannedItemToListButton.IsEnabled = false;
+                return;
+            }
+
+            _scannedReturnItem = item;
+
+            ScannedItemTitleTextBlock.Text = $"{item.ArticleNumber} – {item.Equipment?.DisplayName ?? item.Equipment?.Description}";
+            ScannedItemCategoryTextBlock.Text = $"Kategori: {item.Equipment?.Category} | Storlek: {item.Size}";
+
+            var rental = _skiShopController.GetActiveRentalForItem(item.EquipmentItemID);
+            if (rental != null)
+            {
+                ScannedItemRentalInfoTextBlock.Text = $"Bokning #{rental.BookingID} | Planerad retur: {rental.ReturnDate:yyyy-MM-dd}";
+
+                if (DateTime.Today > rental.ReturnDate.Date)
+                {
+                    int delayDays = (DateTime.Today - rental.ReturnDate.Date).Days;
+                    DelayWarningTextBlock.Text = $"OBS: Försenad med {delayDays} dag(ar)!";
+                    DelayWarningBorder.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                ScannedItemRentalInfoTextBlock.Text = "Ingen aktiv uthyrningspost hittades.";
+            }
+
+            ReturnConditionComboBox.SelectedItem = item.Condition;
+            ReturnIsDamagedCheckBox.IsChecked = false;
+
+            ScannedItemDetailBorder.Visibility = Visibility.Visible;
+            AddScannedItemToListButton.IsEnabled = true;
+        }
+
+        // Moves the article from the left window to the queue in the right window
+        private void AddScannedItemToListButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_scannedReturnItem == null) return;
+
+            var condition = (EquipmentCondition)(ReturnConditionComboBox.SelectedItem ?? EquipmentCondition.BarelyUsed);
+            bool isDamaged = ReturnIsDamagedCheckBox.IsChecked == true;
+
+            _returnQueue.Add(new ReturnQueueRow(
+                _scannedReturnItem.EquipmentItemID,
+                _scannedReturnItem.ArticleNumber,
+                _scannedReturnItem.Equipment?.DisplayName ?? _scannedReturnItem.Equipment?.Description ?? "Utrustning",
+                condition,
+                isDamaged,
+                isDamaged ? "Skadad" : "OK"));
+
+            ReturnArticleTextBox.Clear();
+            ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+            AddScannedItemToListButton.IsEnabled = false;
+            _scannedReturnItem = null;
+            ReturnArticleTextBox.Focus();
+
+            RefreshReturnQueue();
+        }
+
+        // Removes selected row from the return queue
+        private void RemoveFromReturnQueueButton_Click(object sender, RoutedEventArgs e)
+        {
+            HashSet<int> removeIds = ReturnQueueDataGrid.SelectedItems
+                .OfType<ReturnQueueRow>()
+                .Select(row => row.EquipmentItemID)
+                .ToHashSet();
+
+            _returnQueue.RemoveAll(item => removeIds.Contains(item.EquipmentItemID));
+            RefreshReturnQueue();
+        }
+
+        // Updates the return table and text of articles
+        private void RefreshReturnQueue()
+        {
+            ReturnQueueDataGrid.ItemsSource = null;
+            ReturnQueueDataGrid.ItemsSource = _returnQueue.ToList();
+
+            ReturnQueueSummaryTextBlock.Text = _returnQueue.Count == 0
+                ? "Ingen utrustning i listan."
+                : $"{_returnQueue.Count} artikel/artiklar redo för inlämning.";
+
+            ConfirmAllReturnsButton.IsEnabled = _returnQueue.Count > 0;
+        }
+
+        // Final approval of all articles in the list
+        private void ConfirmAllReturnsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_returnQueue.Count == 0) return;
+
+            var payload = _returnQueue.Select(r => (r.EquipmentItemID, r.Condition, r.IsDamaged)).ToList();
+
+            var result = _skiShopController.ReturnMultipleEquipmentItems(payload);
+
+            if (result.Success)
+            {
+                MessageBox.Show(
+                    $"{_returnQueue.Count} artikel/artiklar har återlämnats och sparats i systemet.",
+                    "Återlämning klar",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                _returnQueue.Clear();
+                RefreshReturnQueue();
+
+                LoadAvailableItems();
+            }
+            else
+            {
+                MessageBox.Show($"Kunde inte slutföra återlämningen:\n{result.Message}", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        #endregion
     }
 }
+

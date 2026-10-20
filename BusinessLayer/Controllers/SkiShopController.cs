@@ -43,17 +43,18 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
-        /// Gets a specific category when staff scans/input the article number.
+        /// Gets a specific article when staff scans/input the article number, only fetches rented.
         /// </summary>
         /// /// <param name="articleNumber"/param>
-        public EquipmentItem FindItemByBarcode(string articleNumber)
+        public EquipmentItem? GetRentedItemByBarcode(string articleNumber)
         {
             if (string.IsNullOrWhiteSpace(articleNumber))
             {
                 return null;
             }
 
-            return _unitOfWork.EquipmentItem.GetByBarcode(articleNumber);
+            var item = _unitOfWork.EquipmentItem.GetByBarcode(articleNumber.Trim());
+            return item?.Status == EquipmentStatus.Rented ? item : null;
         }
 
         /// <summary>
@@ -245,7 +246,7 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
-        /// Returns a rental or scanned articles and make them available again.
+        /// Returns a rental or scanned articles and make them available again. OLD FUNCTION, keep?
         /// </summary>
         /// <param name="rentalID"></param>
         public bool ReturnRental(int rentalID)
@@ -460,6 +461,72 @@ namespace BusinessLayer.Controllers
                 $"{items.Count} utrustning(ar) har lagts till på bokning {bookingID} för {days} dag(ar). " +
                 $"{totalPrice:N2} kr har lagts till på bokningen. Nytt totalbelopp: {booking.TotalAmount:N2} kr.",
                 totalPrice);
+        }
+
+        /// <summary>
+        /// Gets the active rental for the selected item.
+        /// </summary>
+        public Rental? GetActiveRentalForItem(int equipmentItemID)
+        {
+            if (equipmentItemID <= 0)
+            {
+                return null;
+            }
+
+            return _unitOfWork.Rental.GetActiveRentals()
+                .FirstOrDefault(r => r.EquipmentItems.Any(i => i.EquipmentItemID == equipmentItemID));
+        }
+
+        /// <summary>
+        /// Makes a return of the articles inside a list, updates condition and sets a complete rental return to "Returned".
+        /// </summary>
+        public (bool Success, string Message) ReturnMultipleEquipmentItems(
+            IEnumerable<(int EquipmentItemID, EquipmentCondition Condition, bool IsDamaged)> returns)
+        {
+            var returnList = returns?.ToList() ?? new List<(int, EquipmentCondition, bool)>();
+            if (returnList.Count == 0)
+            {
+                return (false, "Inga artiklar att återlämna.");
+            }
+
+            var affectedRentals = new HashSet<Rental>();
+
+            foreach (var (itemId, condition, isDamaged) in returnList)
+            {
+                var item = _unitOfWork.EquipmentItem.GetByID(itemId);
+                if (item == null || item.Status != EquipmentStatus.Rented)
+                {
+                    continue;
+                }
+
+                item.Status = isDamaged ? EquipmentStatus.Damaged : EquipmentStatus.Available;
+                item.Condition = condition;
+                _unitOfWork.EquipmentItem.Update(item);
+
+                var rental = GetActiveRentalForItem(item.EquipmentItemID);
+                if (rental != null)
+                {
+                    affectedRentals.Add(rental);
+                }
+            }
+
+            foreach (var rental in affectedRentals)
+            {
+                bool allReturned = rental.EquipmentItems.All(i => i.Status != EquipmentStatus.Rented);
+                if (allReturned)
+                {
+                    rental.Status = "Returned";
+                    rental.ReturnDate = DateTime.Now;
+                    _unitOfWork.Rental.Update(rental);
+                }
+            }
+
+            if (_unitOfWork.Complete() <= 0)
+            {
+                return (false, "Kunde inte spara återlämningen till databasen.");
+            }
+
+            return (true, $"{returnList.Count} artikel/artiklar har återlämnats.");
         }
 
         private static string StatusText(EquipmentStatus status)
