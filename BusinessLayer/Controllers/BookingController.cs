@@ -601,5 +601,70 @@ namespace BusinessLayer
 
             return confirmedCount;
         }
+
+        /// <summary>
+        /// Calulates total price for each service with VatRates.
+        /// </summary>
+        public (decimal TotalInclVat, decimal TotalExclVat, decimal TotalVat, decimal AccomVat, decimal OtherVat) BookingPrice(Booking booking)
+        {
+            if (booking == null)
+            {
+                throw new ArgumentNullException(nameof(booking));
+            }
+
+            // Accommodation (incl. moms)
+            decimal netAccom = booking.TotalAmount > 0 && booking.AccommodationListPrice > 0
+                ? Math.Max(0, booking.AccommodationListPrice - booking.DiscountAmount)
+                : booking.Accommodations?.Sum(a => CalculateAccommodationPrice(
+                    a.Accommodation?.AccommodationTypeID ?? 0,
+                    a.StartDate,
+                    a.EndDate)) ?? 0m;
+
+            var accomVatSplit = VatRates.SplitVat(netAccom, VatRates.Accommodation);
+
+            // Rentals (incl. moms)
+            decimal rentalTotal = booking.Rentals?.Sum(r => r.TotalPrice) ?? 0m;
+            var rentalVatSplit = VatRates.SplitVat(rentalTotal, VatRates.EquipmentRental);
+
+            // Skischool (incl. moms)
+            decimal skiLessonTotal = booking.SkiLessons?
+                .Sum(sl => sl.SkiLessonSession?.SkiLesson?.Price ?? 0m) ?? 0m;
+            var skiLessonVatSplit = VatRates.SplitVat(skiLessonTotal, VatRates.SkiLesson);
+
+            // Meetingrooms (incl. moms)
+            decimal meetingRoomTotal = 0m;
+            if (booking.MeetingRooms != null && booking.MeetingRooms.Any())
+            {
+                foreach (var mr in booking.MeetingRooms)
+                {
+                    int week = ISOWeek.GetWeekOfYear(mr.StartDate);
+                    int days = Math.Max(1, (mr.EndDate.Date - mr.StartDate.Date).Days);
+
+                    var priceObj = mr.meetingRoom?.SeasonPrices?
+                        .FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == week);
+
+                    meetingRoomTotal += (priceObj?.Price ?? 0m) * days;
+                }
+            }
+            var meetingRoomVatSplit = VatRates.SplitVat(meetingRoomTotal, VatRates.MeetingRoom);
+
+            // Cancellation protection
+            decimal insuranceTotal = booking.HasCancellationInsurance ? CancellationInsurancePrice : 0m;
+            var insuranceVatSplit = VatRates.SplitVat(insuranceTotal, VatRates.CancellationInsurance);
+
+            // Summering
+            decimal totalInclVat = netAccom + rentalTotal + skiLessonTotal + meetingRoomTotal + insuranceTotal;
+            decimal totalExclVat = accomVatSplit.amountExclVat
+                                 + rentalVatSplit.amountExclVat
+                                 + skiLessonVatSplit.amountExclVat
+                                 + meetingRoomVatSplit.amountExclVat
+                                 + insuranceVatSplit.amountExclVat;
+
+            decimal accomVat = accomVatSplit.vatAmount;
+            decimal otherVat = rentalVatSplit.vatAmount + skiLessonVatSplit.vatAmount + meetingRoomVatSplit.vatAmount + insuranceVatSplit.vatAmount;
+            decimal totalVat = accomVat + otherVat;
+
+            return (totalInclVat, totalExclVat, totalVat, accomVat, otherVat);
+        }
     }
 }
