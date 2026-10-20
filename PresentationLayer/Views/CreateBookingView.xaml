@@ -298,7 +298,6 @@
                             Content="Skapa bokning"
                             Width="150"
                             Height="38"
-                            IsEnabled="False"
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="CreateBooking_Click"/>
 

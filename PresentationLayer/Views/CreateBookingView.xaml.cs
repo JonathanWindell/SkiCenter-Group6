@@ -1,10 +1,12 @@
-﻿using BusinessLayer;
+﻿
+using BusinessLayer;
 using BusinessLayer.Controllers;
 using EntityLayer;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-
 
 namespace PresentationLayer.Views
 {
@@ -36,14 +38,17 @@ namespace PresentationLayer.Views
             StartDatePicker.DisplayDateStart = DateTime.Today;
             EndDatePicker.DisplayDateStart = DateTime.Today.AddDays(1);
 
-            // Invalidate the search when booking details change.
+            // Knappen ska vara klickbar så att felmeddelanden kan visas.
+            CreateBookingButton.IsEnabled = true;
+
+            // Nollställ boendesökningen om bokningsuppgifter ändras.
             StartDatePicker.SelectedDateChanged += BookingDetails_Changed;
             EndDatePicker.SelectedDateChanged += BookingDetails_Changed;
             NumberOfGuestsTextBox.TextChanged += BookingDetails_Changed;
         }
 
         /// <summary>
-        /// Searches for an existing customer.
+        /// Söker efter en befintlig kund.
         /// </summary>
         private void SearchCustomer_Click(object sender, RoutedEventArgs e)
         {
@@ -52,8 +57,6 @@ namespace PresentationLayer.Views
             _selectedCustomer = null;
             CustomerResultsListBox.ItemsSource = null;
             SelectedCustomerTextBlock.Text = "Ingen kund vald.";
-
-            CreateBookingButton.IsEnabled = false;
 
             try
             {
@@ -100,8 +103,6 @@ namespace PresentationLayer.Views
             }
             catch (Exception ex)
             {
-                CreateBookingButton.IsEnabled = false;
-
                 MessageBox.Show(
                     $"Kunde inte söka efter kunden eller beräkna rabatten.\n{ex.Message}",
                     "Fel vid kundsökning",
@@ -111,7 +112,7 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Opens the customer registration window.
+        /// Öppnar kundregistreringen.
         /// </summary>
         private void RegisterCustomer_Click(object sender, RoutedEventArgs e)
         {
@@ -133,8 +134,6 @@ namespace PresentationLayer.Views
             }
             catch (Exception ex)
             {
-                CreateBookingButton.IsEnabled = false;
-
                 MessageBox.Show(
                     ex.Message,
                     "Kundregistrering",
@@ -144,7 +143,7 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Clears the accommodation selection when booking details change.
+        /// Nollställer boendesökningen när datum eller gästantal ändras.
         /// </summary>
         private void BookingDetails_Changed(object sender, EventArgs e)
         {
@@ -152,7 +151,7 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Clears previously calculated accommodation data.
+        /// Rensar tidigare sökresultat och beräknat pris.
         /// </summary>
         private void InvalidateAccommodationSearch()
         {
@@ -164,14 +163,16 @@ namespace PresentationLayer.Views
             _hasCalculatedPrice = false;
 
             AvailableAccommodationsDataGrid.ItemsSource = null;
-            CreateBookingButton.IsEnabled = false;
 
             BookingPriceTextBlock.Text =
                 "Sök efter lediga boenden och välj ett boende.";
+
+            // Inaktivera inte knappen här.
+            // Fel kontrolleras när användaren klickar på Skapa bokning.
         }
 
         /// <summary>
-        /// Searches for available accommodations.
+        /// Söker efter lediga boenden.
         /// </summary>
         private void SearchAccommodations_Click(object sender, RoutedEventArgs e)
         {
@@ -259,14 +260,12 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Calculates the price when an accommodation is selected.
+        /// Beräknar priset när ett boende väljs.
         /// </summary>
         private void AvailableAccommodations_SelectionChanged(
             object sender,
             SelectionChangedEventArgs e)
         {
-            CreateBookingButton.IsEnabled = false;
-
             _accommodationPrice = 0m;
             _hasCalculatedPrice = false;
 
@@ -302,7 +301,6 @@ namespace PresentationLayer.Views
             {
                 _accommodationPrice = 0m;
                 _hasCalculatedPrice = false;
-                CreateBookingButton.IsEnabled = false;
 
                 BookingPriceTextBlock.Text =
                     "Kunde inte beräkna priset.";
@@ -316,7 +314,7 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Updates the price when cancellation insurance changes.
+        /// Uppdaterar priset när avbeställningsskydd ändras.
         /// </summary>
         private void CancellationInsurance_Changed(
             object sender,
@@ -328,8 +326,6 @@ namespace PresentationLayer.Views
             }
             catch (Exception ex)
             {
-                CreateBookingButton.IsEnabled = false;
-
                 MessageBox.Show(
                     ex.Message,
                     "Fel vid prisberäkning",
@@ -339,12 +335,10 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Calculates the total price including discounts and insurance.
+        /// Beräknar totalpris inklusive rabatt och avbeställningsskydd.
         /// </summary>
         private void UpdateBookingPrice()
         {
-            CreateBookingButton.IsEnabled = false;
-
             if (!_hasCalculatedPrice)
             {
                 BookingPriceTextBlock.Text =
@@ -354,7 +348,7 @@ namespace PresentationLayer.Views
 
             decimal discountAmount = 0m;
 
-            // Calculate the discount based on customer type.
+            // Beräkna rabatt beroende på kundtyp.
             if (_selectedCustomer is PrivateCustomer privateCustomer)
             {
                 discountAmount =
@@ -379,7 +373,6 @@ namespace PresentationLayer.Views
             decimal totalPrice =
                 _accommodationPrice - discountAmount + insurancePrice;
 
-            // Show a discount only when the amount is greater than zero.
             string discountText = discountAmount > 0
                 ? $"-{discountAmount:N2} kr"
                 : "0,00 kr";
@@ -389,23 +382,16 @@ namespace PresentationLayer.Views
                 $"Rabatt: {discountText}\n" +
                 $"Avbeställningsskydd: {insurancePrice:N2} kr\n" +
                 $"Totalt: {totalPrice:N2} kr";
-
-            // Enable booking creation only when all required data exists.
-            CreateBookingButton.IsEnabled =
-                _selectedCustomer != null &&
-                _selectedCustomer.CustomerID > 0 &&
-                AvailableAccommodationsDataGrid.SelectedItem is Accommodation &&
-                _searchedStartDate.HasValue &&
-                _searchedEndDate.HasValue &&
-                _searchedNumberOfGuests > 0;
         }
 
         /// <summary>
-        /// Creates and saves the selected accommodation booking.
+        /// Kontrollerar uppgifter och skapar bokningen.
         /// </summary>
         private void CreateBooking_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedCustomer == null)
+            // Kontrollera kund först.
+            if (_selectedCustomer == null ||
+                _selectedCustomer.CustomerID <= 0)
             {
                 MessageBox.Show(
                     "Välj en kund innan du skapar bokningen.",
@@ -415,6 +401,56 @@ namespace PresentationLayer.Views
                 return;
             }
 
+            // Kontrollera datum.
+            if (!StartDatePicker.SelectedDate.HasValue ||
+                !EndDatePicker.SelectedDate.HasValue)
+            {
+                MessageBox.Show(
+                    "Välj både incheckningsdatum och utcheckningsdatum.",
+                    "Saknade datum",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            DateTime startDate = StartDatePicker.SelectedDate.Value.Date;
+            DateTime endDate = EndDatePicker.SelectedDate.Value.Date;
+
+            if (startDate < DateTime.Today)
+            {
+                MessageBox.Show(
+                    "Incheckningsdatum kan inte vara tidigare än idag.",
+                    "Ogiltigt datum",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            if (endDate <= startDate)
+            {
+                MessageBox.Show(
+                    "Utcheckningsdatum måste vara efter incheckningsdatum.",
+                    "Ogiltigt datum",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            // Kontrollera antal gäster.
+            if (!int.TryParse(
+                    NumberOfGuestsTextBox.Text.Trim(),
+                    out int numberOfGuests) ||
+                numberOfGuests <= 0)
+            {
+                MessageBox.Show(
+                    "Ange ett giltigt antal gäster (minst 1).",
+                    "Ogiltigt antal gäster",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
+            // Kontrollera att boende har valts.
             if (AvailableAccommodationsDataGrid.SelectedItem
                 is not Accommodation selectedAccommodation)
             {
@@ -426,10 +462,13 @@ namespace PresentationLayer.Views
                 return;
             }
 
+            // Kontrollera att sökning och prisberäkning fortfarande gäller.
             if (!_hasCalculatedPrice ||
                 !_searchedStartDate.HasValue ||
                 !_searchedEndDate.HasValue ||
-                _searchedNumberOfGuests <= 0)
+                _searchedNumberOfGuests != numberOfGuests ||
+                _searchedStartDate.Value.Date != startDate ||
+                _searchedEndDate.Value.Date != endDate)
             {
                 MessageBox.Show(
                     "Sök efter lediga boenden och välj ett boende igen.",
@@ -455,10 +494,10 @@ namespace PresentationLayer.Views
 
             try
             {
+                // Inaktivera knappen tillfälligt under sparandet.
                 CreateBookingButton.IsEnabled = false;
 
-                // The controller validates availability and recalculates
-                // the price before saving the booking.
+                // Controller kontrollerar tillgänglighet och räknar om priset.
                 Booking booking = _bookingController.CreateBooking(
                     _selectedCustomer,
                     selectedAccommodation,
@@ -487,13 +526,18 @@ namespace PresentationLayer.Views
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
-                // Require a new availability search after a failed save.
+                // Kräver en ny sökning om sparandet misslyckades.
                 InvalidateAccommodationSearch();
+            }
+            finally
+            {
+                // Om fönstret fortfarande är öppet kan användaren försöka igen.
+                CreateBookingButton.IsEnabled = true;
             }
         }
 
         /// <summary>
-        /// Closes the booking window without saving.
+        /// Stänger fönstret utan att spara.
         /// </summary>
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
