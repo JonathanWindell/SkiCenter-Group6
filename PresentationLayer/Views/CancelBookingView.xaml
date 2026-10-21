@@ -60,8 +60,20 @@
                 <Button x:Name="ConfirmCancellationButton"
                         Grid.Column="2"
                         Content="Avboka bokning"
-                        Height="40"
-                        Style="{StaticResource DeepSeaButtonStyle}"/>
+                        Height="40">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
+                            <Setter Property="Background" Value="#DC2626"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderBrush" Value="#B91C1C"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#B91C1C"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
             </Grid>
         </StackPanel>
     </Border>

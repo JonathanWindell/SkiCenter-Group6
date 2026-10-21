@@ -26,6 +26,27 @@ namespace PresentationLayer.Views
                 booking.BookingStatus != BookingStatus.Cancelled &&
                 booking.BookingStatus != BookingStatus.Finished &&
                 booking.CheckInStatus == CheckInStatus.NotCheckedIn;
+
+            UpdateVatDisplay();
+        }
+
+        private void UpdateVatDisplay()
+        {
+            try
+            {
+                var app = (App)Application.Current;
+                var controller = app.Services.GetRequiredService<BookingController>();
+
+                var price = controller.BookingPrice(_booking);
+
+                AccomVatRun.Text = price.AccomVat.ToString("N2", CultureInfo.GetCultureInfo("sv-SE")) + " kr";
+                OtherVatRun.Text = price.OtherVat.ToString("N2", CultureInfo.GetCultureInfo("sv-SE")) + " kr";
+                TotalVatRun.Text = price.TotalVat.ToString("N2", CultureInfo.GetCultureInfo("sv-SE")) + " kr";
+            }
+            catch
+            {
+                AccomVatRun.Text = "-";
+            }
         }
 
         private void CancelBookingButton_Click(object sender, RoutedEventArgs e)

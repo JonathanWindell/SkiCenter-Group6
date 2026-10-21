@@ -103,6 +103,21 @@
                                         StringFormat={}{0:N0} kr}"/>
                                 </TextBlock>
 
+                                <TextBlock Margin="0,5,0,0">
+                                    <Run Text="Moms boende (12 %): "/>
+                                    <Run x:Name="AccomVatRun" Text="-"/>
+                                </TextBlock>
+
+                                <TextBlock Margin="0,5,0,0">
+                                    <Run Text="Moms övrigt: "/>
+                                    <Run x:Name="OtherVatRun" Text="-"/>
+                                </TextBlock>
+
+                                <TextBlock Margin="0,5,0,0" FontWeight="SemiBold">
+                                    <Run Text="Total moms: "/>
+                                    <Run x:Name="TotalVatRun" Text="-"/>
+                                </TextBlock>
+
                             </StackPanel>
                         </Border>
 
