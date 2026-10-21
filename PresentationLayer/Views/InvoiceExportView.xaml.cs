@@ -150,5 +150,11 @@ namespace PresentationLayer.Views
             TotalsTextBlock.Text = string.Empty;
             ExportJsonButton.IsEnabled = false;
         }
+
+        // Return to the existing dashboard.
+        private void BackButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            Close();
+        }
     }
 }

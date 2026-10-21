@@ -2,76 +2,105 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="SkiCenter - Registrera kund"
-        Height="750"
-        Width="800"
-        MinHeight="550"
-        MinWidth="600"
+        Height="650"
+        Width="1000"
+        MinHeight="620"
+        MinWidth="950"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource WindowBg}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <Border Background="{StaticResource CardBg}"
-                CornerRadius="15"
-                Padding="35"
-                Margin="40"
-                MaxWidth="700">
+        <!-- Header matches the ski school view. -->
+        <Grid Grid.Row="0" Margin="0,0,0,20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <StackPanel>
+            <Button Content="← Tillbaka"
+                    Width="110"
+                    Height="36"
+                    Margin="0,0,20,0"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Click="Cancel_Click"/>
 
-                <!-- Header -->
+            <StackPanel Grid.Column="1">
                 <TextBlock Text="Registrera kund"
                            FontSize="28"
                            FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryText}"
-                           Margin="0,0,0,10"/>
+                           Foreground="{StaticResource PrimaryText}"/>
 
                 <TextBlock Text="Fyll i kundens uppgifter nedan."
                            FontSize="14"
                            Foreground="{StaticResource SecondaryText}"
-                           Margin="0,0,0,30"/>
+                           Margin="0,4,0,0"/>
+            </StackPanel>
+        </Grid>
 
-                <!-- Customer type -->
-                <TextBlock Text="Kundtyp"
+        <Border Grid.Row="1"
+                Background="{StaticResource CardBg}"
+                CornerRadius="15"
+                Padding="20"
+                BorderBrush="{StaticResource InputBorder}"
+                BorderThickness="1">
+
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="15"
+                                  ShadowDepth="2"
+                                  Opacity="0.08"
+                                  Color="#1E1B4B"/>
+            </Border.Effect>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled">
+                <StackPanel>
+
+                    <!-- Customer type -->
+                    <TextBlock Text="Kundtyp"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,8"/>
 
-                <ComboBox x:Name="CustomerTypeComboBox"
+                    <ComboBox x:Name="CustomerTypeComboBox"
                           Height="38"
                           SelectedIndex="0"
                           SelectionChanged="CustomerTypeComboBox_SelectionChanged"
                           Margin="0,0,0,20"
                           VerticalContentAlignment="Center">
 
-                    <ComboBoxItem Content="Privatkund"/>
-                    <ComboBoxItem Content="Företagskund"/>
-  
-                    
+                        <ComboBoxItem Content="Privatkund"/>
+                        <ComboBoxItem Content="Företagskund"/>
 
-                </ComboBox>
 
-                <!-- First & last name -->
-                <Grid x:Name="PrivateFields" Margin="0,0,0,15">
 
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="20"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    </ComboBox>
 
-                    <StackPanel Grid.Column="0">
+                    <!-- First & last name -->
+                    <Grid x:Name="PrivateFields" Margin="0,0,0,15">
 
-                        <TextBlock Text="Förnamn *"
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+
+                            <TextBlock Text="Förnamn *"
                                    Foreground="{StaticResource PrimaryText}"
                                    Margin="0,0,0,5"/>
 
-                        <TextBox x:Name="FirstNameTextBox"
+                            <TextBox x:Name="FirstNameTextBox"
                                  Height="38"
                                  Padding="8"
                                  BorderBrush="{StaticResource InputBorder}"/>
-                        <TextBlock x:Name="FirstNameError"
+                            <TextBlock x:Name="FirstNameError"
                                    Foreground="#DC2626"
                                    FontSize="12"
                                    Visibility="Collapsed"
@@ -79,169 +108,169 @@
 
 
 
-                    </StackPanel>
+                        </StackPanel>
 
-                    <StackPanel Grid.Column="2">
+                        <StackPanel Grid.Column="2">
 
-                        <TextBlock Text="Efternamn *"
+                            <TextBlock Text="Efternamn *"
                                    Foreground="{StaticResource PrimaryText}"
                                    Margin="0,0,0,5"/>
 
-                        <TextBox x:Name="LastNameTextBox"
+                            <TextBox x:Name="LastNameTextBox"
                                  Height="38"
                                  Padding="8"
                                  BorderBrush="{StaticResource InputBorder}"/>
-                        <TextBlock x:Name="LastNameError"
+                            <TextBlock x:Name="LastNameError"
                                    Foreground="#DC2626"
                                    FontSize="12"
                                    Visibility="Collapsed"
                                    Margin="0,5,0,0"/>
 
-                    </StackPanel>
+                        </StackPanel>
 
-                </Grid>
+                    </Grid>
 
-                <!-- Address -->
-                <TextBlock Text="Adress *"
+                    <!-- Address -->
+                    <TextBlock Text="Adress *"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,5"/>
 
-                <TextBox x:Name="AddressTextBox"
+                    <TextBox x:Name="AddressTextBox"
                          Height="38"
                          Padding="8"
                          BorderBrush="{StaticResource InputBorder}"
                          Margin="0,0,0,15"/>
-                <TextBlock x:Name="AddressError"
+                    <TextBlock x:Name="AddressError"
                            Foreground="#DC2626"
                            FontSize="12"
                            Visibility="Collapsed"
                            Margin="0,5,0,0"/>
 
-                <!-- E-mail -->
-                <TextBlock Text="E-postadress *"
+                    <!-- E-mail -->
+                    <TextBlock Text="E-postadress *"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,5"/>
 
-                <TextBox x:Name="EmailTextBox"
+                    <TextBox x:Name="EmailTextBox"
                          Height="38"
                          Padding="8"
                          BorderBrush="{StaticResource InputBorder}"
                          Margin="0,0,0,15"/>
-                <TextBlock x:Name="EmailError"
+                    <TextBlock x:Name="EmailError"
                            Foreground="#DC2626"
                            FontSize="12"
                            Visibility="Collapsed"
                            Margin="0,5,0,0"/>
 
-                <!-- Phone number -->
-                <TextBlock Text="Telefonnummer *"
+                    <!-- Phone number -->
+                    <TextBlock Text="Telefonnummer *"
                            Foreground="{StaticResource PrimaryText}"
                            Margin="0,0,0,5"/>
 
-                <TextBox x:Name="PhoneTextBox"
+                    <TextBox x:Name="PhoneTextBox"
                          Height="38"
                          Padding="8"
                          BorderBrush="{StaticResource InputBorder}"
                          Margin="0,0,0,30"/>
-                <TextBlock x:Name="PhoneError"
+                    <TextBlock x:Name="PhoneError"
                            Foreground="#DC2626"
                            FontSize="12"
                            Visibility="Collapsed"
                            Margin="0,5,0,0"/>
 
 
-                <!-- Business -->
-                <StackPanel x:Name="CorporateFields"
+                    <!-- Business -->
+                    <StackPanel x:Name="CorporateFields"
                             Visibility="Collapsed"
                             Margin="0,0,0,20">
 
-                    <!-- Business name -->
-                    <TextBlock Text="Företagsnamn *"
+                        <!-- Business name -->
+                        <TextBlock Text="Företagsnamn *"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
 
-                    <TextBox x:Name="CompanyNameTextBox"
+                        <TextBox x:Name="CompanyNameTextBox"
                              Height="38"
                              Padding="8"
                              BorderBrush="{StaticResource InputBorder}"
                              Margin="0,0,0,15"/>
-                    <TextBlock x:Name="CompanyNameError"
+                        <TextBlock x:Name="CompanyNameError"
                                    Foreground="#DC2626"
                                    FontSize="12"
                                    Visibility="Collapsed"
                                    Margin="0,5,0,0"/>
 
-                    <!-- Organisation number -->
-                    <TextBlock Text="Organisationsnummer *"
+                        <!-- Organisation number -->
+                        <TextBlock Text="Organisationsnummer *"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
 
-                    <TextBox x:Name="OrgNumberTextBox"
+                        <TextBox x:Name="OrgNumberTextBox"
                              Height="38"
                              Padding="8"
                              BorderBrush="{StaticResource InputBorder}"
                              Margin="0,0,0,15"/>
-                    <TextBlock x:Name="OrgNumberError"
+                        <TextBlock x:Name="OrgNumberError"
                                    Foreground="#DC2626"
                                    FontSize="12"
                                    Visibility="Collapsed"
                                    Margin="0,5,0,0"/>
 
-                    <!-- Contact person -->
-                    <TextBlock Text="Kontaktperson *"
+                        <!-- Contact person -->
+                        <TextBlock Text="Kontaktperson *"
                                Foreground="{StaticResource PrimaryText}"
                                Margin="0,0,0,5"/>
 
-                    <TextBox x:Name="ContactPersonTextBox"
+                        <TextBox x:Name="ContactPersonTextBox"
                              Height="38"
                              Padding="8"
                               BorderBrush="{StaticResource InputBorder}"/>
-                    <TextBlock x:Name="ContactPersonError"
+                        <TextBlock x:Name="ContactPersonError"
                                    Foreground="#DC2626"
                                    FontSize="12"
                                    Visibility="Collapsed"
                                    Margin="0,5,0,0"/>
 
-                </StackPanel>
-                
+                    </StackPanel>
 
 
-                <!-- Knappar -->
-                <TextBlock x:Name="ValidationMessage"
+
+                    <!-- Knappar -->
+                    <TextBlock x:Name="ValidationMessage"
                            Foreground="#DC2626"
                            FontSize="12"
                            TextWrapping="Wrap"
                            Visibility="Collapsed"
                            Margin="0,0,0,15"/>
 
-                <StackPanel Orientation="Horizontal"
+                    <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right">
 
-                    <Button Content="Avbryt"
+                        <Button Content="Avbryt"
                             Width="130"
                             Height="40"
                             Margin="0,0,12,0"
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="Cancel_Click"/>
 
-                    <Button Content="Spara kund"
+                        <Button Content="Spara kund"
                             Width="130"
                             Height="40"
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="SaveCustomer_Click"/>
 
 
+                    </StackPanel>
+
+
+
+
+
                 </StackPanel>
-
-
-
-
-
-            </StackPanel>
+            </ScrollViewer>
 
         </Border>
-
-    </ScrollViewer>
+    </Grid>
 
 </Window>
 
