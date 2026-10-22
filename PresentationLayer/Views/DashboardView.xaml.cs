@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace PresentationLayer.Views
 {
@@ -18,25 +20,26 @@ namespace PresentationLayer.Views
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Display information for a menu button. WindowType is null for modules that have no view yet.
+        /// Display information for a menu card. WindowType is null for modules that have no view yet.
+        /// IconKey is the icon's resource key in Resources/Icons.xaml.
         /// </summary>
-        private record MenuItemInfo(string Title, string Description, Type? WindowType);
+        private record MenuItemInfo(string Title, string Description, string IconKey, Type? WindowType);
 
-        // Connects each module to its button text and the window it opens
+        // Connects each module to its card text, icon and the window it opens
         private static readonly Dictionary<SystemModule, MenuItemInfo> _menuItems = new()
         {
-            [SystemModule.CustomerRegistration] = new("Registrera kund", "Lägg till privat- eller företagskunder", typeof(CustomerRegistrationView)),
-            [SystemModule.EquipmentManagement] = new("Utrustning", "Hantera skidutrustning och lager", typeof(EquipmentMgmtView)),
-            [SystemModule.Rentals] = new("Uthyrning & återlämning", "Hantera uthyrning och returer", typeof(EquipmentRentalView)),
-            [SystemModule.Bookings] = new("Bokningar", "Skapa och hantera bokningar", typeof(BookingStatusView)),
-            [SystemModule.Accommodation] = new("Boende", "Lägenheter, stugor och konferensrum", typeof(PropertyMgmtView)),
-            [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", typeof(SkiSchoolView)),
-            [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", typeof(SeasonPriceView)),
-            [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", typeof(StatisticsView)),
-            [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", null),
-            [SystemModule.GuestCheckInOut] = new("In- och utcheckning", "Hantera gästers ankomst och avresa", typeof(GuestCheckInOutView)),
-            [SystemModule.InvoiceExport] = new("Faktureringsunderlag", "Exportera avslutade bokningar som JSON", typeof(InvoiceExportView)),
-            [SystemModule.MarketingManager] = new("Marknad", "Besluta om rabatter och godkänn företagskunder", typeof(MarketingMgmtView))
+            [SystemModule.CustomerRegistration] = new("Registrera kund", "Lägg till privat- eller företagskunder", "Icon.RegistreraKund", typeof(CustomerRegistrationView)),
+            [SystemModule.EquipmentManagement] = new("Utrustning", "Hantera skidutrustning och lager", "Icon.Utrustning", typeof(EquipmentMgmtView)),
+            [SystemModule.Rentals] = new("Uthyrning", "Lägg till utrustning på en bokning", "Icon.Uthyrning", typeof(EquipmentRentalView)),
+            [SystemModule.Bookings] = new("Bokningar", "Skapa och hantera bokningar", "Icon.Bokningar", typeof(BookingStatusView)),
+            [SystemModule.Accommodation] = new("Boende", "Lägenheter, stugor och konferensrum", "Icon.Boende", typeof(PropertyMgmtView)),
+            [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", "Icon.Skidskola", typeof(SkiSchoolView)),
+            [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", "Icon.Sasongspriser", typeof(SeasonPriceView)),
+            [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", "Icon.Rapporter", typeof(StatisticsView)),
+            [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", "Icon.Personal", null),
+            [SystemModule.GuestCheckInOut] = new("In- och utcheckning", "Hantera gästers ankomst och avresa", "Icon.InUtcheckning", typeof(GuestCheckInOutView)),
+            [SystemModule.InvoiceExport] = new("Faktureringsunderlag", "Exportera avslutade bokningar som JSON", "Icon.Fakturering", typeof(InvoiceExportView)),
+            [SystemModule.MarketingManager] = new("Marknad", "Besluta om rabatter och godkänn företagskunder", "Icon.Marknad", typeof(MarketingMgmtView))
         };
 
         // Swedish display names for staff roles
@@ -92,37 +95,67 @@ namespace PresentationLayer.Views
             txtNoModules.Visibility = modules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        /// <summary>
+        /// Creates a menu card: the module's icon in a circle, the title and a short description.
+        /// The round arrow on the right comes from DashboardCardStyle.
+        /// </summary>
         private Button CreateMenuButton(SystemModule module)
         {
             MenuItemInfo info = _menuItems[module];
 
-            var content = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center };
+            var content = new Grid();
+            content.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            content.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            content.Children.Add(new TextBlock
+            // Icon drawn on a 64 x 64 canvas, like the SVG originals
+            var icon = new Path
+            {
+                Data = (Geometry)FindResource(info.IconKey),
+                Stroke = (Brush)FindResource("PrimaryBtn"),
+                Style = (Style)FindResource("IconPathStyle")
+            };
+            var canvas = new Canvas { Width = 64, Height = 64 };
+            canvas.Children.Add(icon);
+
+            var iconCircle = new Border
+            {
+                Width = 46,
+                Height = 46,
+                CornerRadius = new CornerRadius(23),
+                Background = (Brush)FindResource("IconCircleBg"),
+                VerticalAlignment = VerticalAlignment.Center,
+                Child = new Viewbox { Width = 24, Height = 24, Child = canvas }
+            };
+            content.Children.Add(iconCircle);
+
+            var text = new StackPanel { Margin = new Thickness(12, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
+
+            text.Children.Add(new TextBlock
             {
                 Text = info.Title,
-                FontSize = 18,
+                FontSize = 13.5,
                 FontWeight = FontWeights.Bold,
-                Foreground = (System.Windows.Media.Brush)FindResource("PrimaryText"),
-                HorizontalAlignment = HorizontalAlignment.Center
+                Foreground = (Brush)FindResource("PrimaryText"),
+                TextTrimming = TextTrimming.CharacterEllipsis
             });
 
-            content.Children.Add(new TextBlock
+            text.Children.Add(new TextBlock
             {
                 Text = info.Description,
-                FontSize = 12,
-                Margin = new Thickness(0, 6, 0, 0),
+                FontSize = 11,
+                Margin = new Thickness(0, 3, 0, 0),
                 TextWrapping = TextWrapping.Wrap,
-                TextAlignment = TextAlignment.Center,
-                Foreground = (System.Windows.Media.Brush)FindResource("SecondaryText")
+                MaxHeight = 32,
+                Foreground = (Brush)FindResource("MutedText")
             });
+
+            Grid.SetColumn(text, 1);
+            content.Children.Add(text);
 
             var button = new Button
             {
                 Content = content,
-                Width = 240,
-                Height = 130,
-                Style = (Style)FindResource("MenuCardStyle"),
+                Style = (Style)FindResource("DashboardCardStyle"),
                 Tag = module
             };
 
