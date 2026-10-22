@@ -23,6 +23,18 @@ namespace PresentationLayer.Views
         private readonly List<EquipmentItem> _selectedItems = new();
         private List<Booking> _bookingResults = new();
         private Booking? _selectedBooking;
+        private Customer? _selectedDropInCustomer;
+        private Rental? _editingRental;
+
+        private readonly List<ReturnQueueRow> _returnQueue = new();
+        private EquipmentItem? _scannedReturnItem;
+
+        /// <summary>
+        /// A row in the selected equipment table.
+        /// </summary>
+        private record SelectedItemRow(int EquipmentItemID, string ArticleNumber, string Name, string PriceText);
+
+        private record ReturnQueueRow(int EquipmentItemID, string ArticleNumber, string Description, EquipmentCondition Condition, bool IsDamaged, string StatusText);
 
 
         // Close the rental window and return to the existing dashboard.
@@ -30,11 +42,6 @@ namespace PresentationLayer.Views
         {
             Close();
         }
-
-        /// <summary>
-        /// A row in the selected equipment table.
-        /// </summary>
-        private record SelectedItemRow(int EquipmentItemID, string ArticleNumber, string Name, string PriceText);
 
         public EquipmentRentalView(SkiShopController skiShopController)
         {
@@ -54,8 +61,48 @@ namespace PresentationLayer.Views
             LicenseVerifiedCheckBox.Checked += (_, _) => ResetLicenseHighlight();
             ConfirmRentalButton.Click += ConfirmRentalButton_Click;
 
+            SearchReturnItemButton.Click += SearchReturnItemButton_Click;
+            AddScannedItemToListButton.Click += AddScannedItemToListButton_Click;
+            RemoveFromReturnQueueButton.Click += RemoveFromReturnQueueButton_Click;
+            ConfirmAllReturnsButton.Click += ConfirmAllReturnsButton_Click;
+
+            ReturnConditionComboBox.ItemsSource = Enum.GetValues(typeof(EquipmentCondition));
+            ReturnConditionComboBox.SelectedItem = EquipmentCondition.BarelyUsed;
+
             Loaded += (_, _) => LoadAvailableItems();
         }
+
+        #region Mode-switch
+
+        private void RentalType_Changed(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded) return;
+
+            CancelEditRentalMode();
+            _selectedBooking = null;
+            _selectedDropInCustomer = null;
+            _selectedItems.Clear();
+            BookingSearchTextBox.Clear();
+            BookingSearchMessage.Visibility = Visibility.Collapsed;
+            BookingResultsComboBox.Visibility = Visibility.Collapsed;
+            BookingInfoBorder.Visibility = Visibility.Collapsed;
+            EquipmentPanel.IsEnabled = false;
+
+            if (RoomGuestRadioButton.IsChecked == true)
+            {
+                SearchHeaderTextBlock.Text = "Bokningsnummer eller lägenhetsnummer";
+                ConfirmRentalButton.Content = "Lägg till på bokningen";
+            }
+            else
+            {
+                SearchHeaderTextBlock.Text = "Kund (telefonnummer, e-post eller namn)";
+                ConfirmRentalButton.Content = "Slutför & Betala i kassa";
+            }
+
+            RefreshItemTables();
+        }
+
+        #endregion
 
         #region Booking search
 
@@ -68,10 +115,24 @@ namespace PresentationLayer.Views
 
             if (searchText.Length == 0)
             {
-                ShowSearchMessage("Ange ett bokningsnummer eller lägenhetsnummer.");
+                ShowSearchMessage(RoomGuestRadioButton.IsChecked == true
+                    ? "Ange ett bokningsnummer eller lägenhetsnummer."
+                    : "Ange telefonnummer, e-post eller namn.");
                 return;
             }
 
+            if (RoomGuestRadioButton.IsChecked == true)
+            {
+                SearchRoomBooking(searchText);
+            }
+            else
+            {
+                SearchDropInCustomer(searchText);
+            }
+        }
+
+        private void SearchRoomBooking(string searchText)
+        {
             try
             {
                 _bookingResults = _skiShopController.FindActiveBookings(searchText).ToList();
@@ -95,7 +156,6 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            // Several matches: let the user choose
             BookingResultsComboBox.Items.Clear();
             foreach (Booking booking in _bookingResults)
             {
@@ -104,6 +164,20 @@ namespace PresentationLayer.Views
 
             BookingResultsComboBox.Visibility = Visibility.Visible;
             BookingResultsComboBox.SelectedIndex = 0;
+        }
+
+        private void SearchDropInCustomer(string searchText)
+        {
+            Customer? customer = _skiShopController.SearchCustomer(searchText);
+
+            if (customer == null)
+            {
+                SelectCustomer(null);
+                ShowSearchMessage("Ingen kund matchade sökningen.");
+                return;
+            }
+
+            SelectCustomer(customer);
         }
 
         private void BookingResultsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -130,6 +204,7 @@ namespace PresentationLayer.Views
             _selectedBooking = booking;
             _selectedItems.Clear();
             RentalFeedbackTextBlock.Text = string.Empty;
+            CancelEditRentalMode();
 
             if (booking == null)
             {
@@ -152,9 +227,13 @@ namespace PresentationLayer.Views
             BookingTotalTextBlock.Text = $"Totalbelopp: {booking.TotalAmount:N2} kr";
 
             List<string> rentedItems = booking.Rentals
+                .Where(r => r.Status == "Active")
                 .SelectMany(r => r.RentalItems.Select(ri => ri.EquipmentItem))
                 .Select(item => $"{item.ArticleNumber} ({item.Equipment?.Category})")
                 .ToList();
+
+            bool hasActiveRental = booking.Rentals.Any(r => r.Status == "Active");
+            EditExistingRentalButton.Visibility = hasActiveRental ? Visibility.Visible : Visibility.Collapsed;
 
             BookingRentalsTextBlock.Text = rentedItems.Count == 0
                 ? "Ingen utrustning hyrd på bokningen."
@@ -175,6 +254,90 @@ namespace PresentationLayer.Views
             EndDatePicker.SelectedDate = defaultEnd;
 
             RefreshItemTables();
+        }
+
+        private void SelectCustomer(Customer? customer)
+        {
+            _selectedDropInCustomer = customer;
+            _selectedItems.Clear();
+            RentalFeedbackTextBlock.Text = string.Empty;
+
+            if (customer == null)
+            {
+                BookingInfoBorder.Visibility = Visibility.Collapsed;
+                EquipmentPanel.IsEnabled = false;
+                RefreshItemTables();
+                return;
+            }
+
+            BookingTitleTextBlock.Text = "Drop-in Uthyrning";
+            BookingCustomerTextBlock.Text = $"Kund: {customer.DisplayName}";
+            BookingStayTextBlock.Text = $"Telefon: {customer.PhoneNumber}";
+            BookingTotalTextBlock.Text = "Betalas i kassan";
+            BookingRentalsTextBlock.Text = "Utrustning betalas direkt via kort/Swish.";
+            EditExistingRentalButton.Visibility = Visibility.Collapsed;
+
+            BookingInfoBorder.Visibility = Visibility.Visible;
+            EquipmentPanel.IsEnabled = true;
+
+            // Dates for drop-in
+            StartDatePicker.DisplayDateStart = DateTime.Today;
+            StartDatePicker.DisplayDateEnd = null;
+            EndDatePicker.DisplayDateStart = DateTime.Today;
+            EndDatePicker.DisplayDateEnd = null;
+            StartDatePicker.SelectedDate = DateTime.Today;
+            EndDatePicker.SelectedDate = DateTime.Today;
+
+            RefreshItemTables();
+        }
+
+        #endregion
+
+        #region Edit rental mode
+
+        private void EditExistingRentalButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedBooking == null) return;
+
+            var activeRental = _selectedBooking.Rentals.FirstOrDefault(r => r.Status == "Active");
+            if (activeRental == null) return;
+
+            _editingRental = activeRental;
+
+            _selectedItems.Clear();
+
+            var items = activeRental.RentalItems
+                    .Select(ri => ri.EquipmentItem)
+                    .Where(ei => ei != null);
+
+            _selectedItems.AddRange(items!);
+
+            StartDatePicker.SelectedDate = activeRental.StartDate;
+            EndDatePicker.SelectedDate = activeRental.EndDate;
+            LicenseVerifiedCheckBox.IsChecked = activeRental.LicenseVerified;
+
+            ConfirmRentalButton.Content = "Spara ändringar";
+            CancelEditRentalButton.Visibility = Visibility.Visible;
+            EditExistingRentalButton.IsEnabled = false;
+
+            RefreshItemTables();
+        }
+
+        private void CancelEditRentalButton_Click(object sender, RoutedEventArgs e)
+        {
+            CancelEditRentalMode();
+            _selectedItems.Clear();
+            RefreshItemTables();
+        }
+
+        private void CancelEditRentalMode()
+        {
+            _editingRental = null;
+            ConfirmRentalButton.Content = RoomGuestRadioButton.IsChecked == true
+                ? "Lägg till på bokningen"
+                : "Slutför & Betala i kassa";
+            CancelEditRentalButton.Visibility = Visibility.Collapsed;
+            EditExistingRentalButton.IsEnabled = true;
         }
 
         #endregion
@@ -331,7 +494,8 @@ namespace PresentationLayer.Views
                 ResetLicenseHighlight();
             }
 
-            ConfirmRentalButton.IsEnabled = _selectedBooking != null && _selectedItems.Count > 0;
+            bool hasTarget = (_selectedBooking != null || _selectedDropInCustomer != null);
+            ConfirmRentalButton.IsEnabled = hasTarget && _selectedItems.Count > 0 && days.HasValue;
         }
 
         private int? GetRentalDays()
@@ -361,18 +525,6 @@ namespace PresentationLayer.Views
         {
             RentalFeedbackTextBlock.Text = string.Empty;
 
-            if (_selectedBooking == null)
-            {
-                RentalFeedbackTextBlock.Text = "Sök fram en aktiv bokning först.";
-                return;
-            }
-
-            if (_selectedItems.Count == 0)
-            {
-                RentalFeedbackTextBlock.Text = "Välj minst en utrustning att hyra ut.";
-                return;
-            }
-
             if (StartDatePicker.SelectedDate is not DateTime startDate || EndDatePicker.SelectedDate is not DateTime endDate)
             {
                 RentalFeedbackTextBlock.Text = "Välj både start- och slutdatum.";
@@ -382,6 +534,12 @@ namespace PresentationLayer.Views
             if (endDate < startDate)
             {
                 RentalFeedbackTextBlock.Text = "Slutdatum kan inte vara före startdatum.";
+                return;
+            }
+
+            if (_selectedItems.Count == 0)
+            {
+                RentalFeedbackTextBlock.Text = "Välj minst en utrustning att hyra ut.";
                 return;
             }
 
@@ -396,56 +554,273 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            int bookingId = _selectedBooking.BookingID;
-            List<EquipmentItem> rentedItems = _selectedItems.ToList();
+            List<int> itemIds = _selectedItems.Select(item => item.EquipmentItemID).ToList();
 
-            (bool success, string message, decimal addedAmount) result;
-
-            try
+            // Edit a existing rental
+            if (_editingRental != null && _selectedBooking != null)
             {
-                result = _skiShopController.AddEquipmentToBooking(
-                    bookingId,
-                    rentedItems.Select(item => item.EquipmentItemID),
+                var result = _skiShopController.UpdateBookingRental(
+                    _selectedBooking.BookingID,
+                    _editingRental.RentalID,
+                    itemIds,
                     startDate,
                     endDate,
                     licenseVerified);
-            }
-            catch (Exception ex)
-            {
-                RentalFeedbackTextBlock.Text = $"Ett fel uppstod när uthyrningen skulle sparas: {ex.Message}";
-                return;
-            }
 
-            if (!result.success)
-            {
-                RentalFeedbackTextBlock.Text = result.message;
-                // Another user may have rented an item in the meantime, so reload the list
+                if (!result.Success)
+                {
+                    RentalFeedbackTextBlock.Text = result.Message;
+                    return;
+                }
+
+                MessageBox.Show(
+                    $"{result.Message}\nPrisjustering på rummet: {result.PriceDifference:+0.00;-0.00;0.00} kr",
+                    "Uthyrning uppdaterad",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                int bId = _selectedBooking.BookingID;
+                CancelEditRentalMode();
+                _selectedItems.Clear();
                 LoadAvailableItems();
+
+                var updated = _skiShopController.FindActiveBookings(bId.ToString()).FirstOrDefault(b => b.BookingID == bId);
+                SelectBooking(updated);
                 return;
             }
 
-            string itemList = string.Join("\n", rentedItems.Select(item => $"  • {item.ArticleNumber} – {item.Equipment?.DisplayName}"));
+            // Drop-in customer, pays at the register
+            if (DropInRadioButton.IsChecked == true)
+            {
+                if (_selectedDropInCustomer == null)
+                {
+                    RentalFeedbackTextBlock.Text = "Sök fram en kund först.";
+                    return;
+                }
 
-            MessageBox.Show(
-                $"Utrustningen är kopplad till bokning {bookingId} och betalas på rummet.\n\n" +
-                $"{itemList}\n\n" +
-                $"Period: {startDate:yyyy-MM-dd} – {endDate:yyyy-MM-dd}\n" +
-                $"Tillagt belopp: {result.addedAmount:N2} kr\n\n" +
-                result.message,
-                "Uthyrning registrerad",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+                var dropInResult = _skiShopController.CreateDropInRental(
+                    _selectedDropInCustomer.CustomerID,
+                    itemIds,
+                    startDate,
+                    endDate,
+                    licenseVerified);
 
-            // Reload the booking and equipment so the new rental is visible
-            _selectedItems.Clear();
-            LoadAvailableItems();
+                if (!dropInResult.Success)
+                {
+                    RentalFeedbackTextBlock.Text = dropInResult.Message;
+                    return;
+                }
 
-            Booking? updated = _skiShopController.FindActiveBookings(bookingId.ToString())
-                .FirstOrDefault(b => b.BookingID == bookingId);
-            SelectBooking(updated);
+                MessageBox.Show(
+                    dropInResult.Message + "\n\nTa betalt i kassan via kort eller Swish.",
+                    "Drop-in registrerad",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                _selectedItems.Clear();
+                LoadAvailableItems();
+                SelectCustomer(null);
+                BookingSearchTextBox.Clear();
+                return;
+            }
+
+            // New rental to guest with accommodation
+            if (_selectedBooking != null)
+            {
+                int bookingId = _selectedBooking.BookingID;
+                (bool success, string message, decimal addedAmount) result;
+
+                try
+                {
+                    result = _skiShopController.AddEquipmentToBooking(
+                        bookingId,
+                        itemIds,
+                        startDate,
+                        endDate,
+                        licenseVerified);
+                }
+                catch (Exception ex)
+                {
+                    RentalFeedbackTextBlock.Text = $"Ett fel uppstod: {ex.Message}";
+                    return;
+                }
+
+                if (!result.success)
+                {
+                    RentalFeedbackTextBlock.Text = result.message;
+                    LoadAvailableItems();
+                    return;
+                }
+
+                string itemList = string.Join("\n", _selectedItems.Select(item => $"  • {item.ArticleNumber} – {item.Equipment?.DisplayName ?? item.Equipment?.Description}"));
+
+                MessageBox.Show(
+                    $"Utrustningen är kopplad till bokning {bookingId} och betalas på rummet.\n\n" +
+                    $"{itemList}\n\n" +
+                    $"Period: {startDate:yyyy-MM-dd} – {endDate:yyyy-MM-dd}\n" +
+                    $"Tillagt belopp: {result.addedAmount:N2} kr\n\n" +
+                    result.message,
+                    "Uthyrning registrerad",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                _selectedItems.Clear();
+                LoadAvailableItems();
+
+                var updated = _skiShopController.FindActiveBookings(bookingId.ToString()).FirstOrDefault(b => b.BookingID == bookingId);
+                SelectBooking(updated);
+            }
+        }
+        #endregion
+
+            #region Return flow
+        private void SearchReturnItemButton_Click(object sender, RoutedEventArgs e)
+        {
+            ReturnSearchFeedbackTextBlock.Text = string.Empty;
+            DelayWarningBorder.Visibility = Visibility.Collapsed;
+            _scannedReturnItem = null;
+
+            string barcode = ReturnArticleTextBox.Text.Trim();
+            if (string.IsNullOrEmpty(barcode))
+            {
+                ReturnSearchFeedbackTextBlock.Text = "Ange ett artikelnummer.";
+                ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+                AddScannedItemToListButton.IsEnabled = false;
+                return;
+            }
+
+            if (_returnQueue.Any(r => r.ArticleNumber.Equals(barcode, StringComparison.OrdinalIgnoreCase)))
+            {
+                ReturnSearchFeedbackTextBlock.Text = "Artikeln ligger redan i listan till höger.";
+                ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+                AddScannedItemToListButton.IsEnabled = false;
+                return;
+            }
+
+            var item = _skiShopController.GetRentedItemByBarcode(barcode);
+            if (item == null)
+            {
+                ReturnSearchFeedbackTextBlock.Text = "Ingen uthyrd artikel med det artikelnumret hittades.";
+                ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+                AddScannedItemToListButton.IsEnabled = false;
+                return;
+            }
+
+            _scannedReturnItem = item;
+
+            ScannedItemTitleTextBlock.Text = $"{item.ArticleNumber} – {item.Equipment?.DisplayName ?? item.Equipment?.Description}";
+            ScannedItemCategoryTextBlock.Text = $"Kategori: {item.Equipment?.Category} | Storlek: {item.Size}";
+
+            var rental = _skiShopController.GetActiveRentalForItem(item.EquipmentItemID);
+            if (rental != null)
+            {
+                ScannedItemRentalInfoTextBlock.Text = $"Bokning #{rental.BookingID} | Planerad retur: {rental.ReturnDate:yyyy-MM-dd}";
+
+                if (DateTime.Today > rental.ReturnDate.Date)
+                {
+                    int delayDays = (DateTime.Today - rental.ReturnDate.Date).Days;
+                    DelayWarningTextBlock.Text = $"OBS: Försenad med {delayDays} dag(ar)!";
+                    DelayWarningBorder.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                ScannedItemRentalInfoTextBlock.Text = "Ingen aktiv uthyrningspost hittades.";
+            }
+
+            ReturnConditionComboBox.SelectedItem = item.Condition;
+            ReturnIsDamagedCheckBox.IsChecked = false;
+
+            ScannedItemDetailBorder.Visibility = Visibility.Visible;
+            AddScannedItemToListButton.IsEnabled = true;
+        }
+
+        // Moves the article from the left window to the queue in the right window
+        private void AddScannedItemToListButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_scannedReturnItem == null) return;
+
+            var condition = (EquipmentCondition)(ReturnConditionComboBox.SelectedItem ?? EquipmentCondition.BarelyUsed);
+            bool isDamaged = ReturnIsDamagedCheckBox.IsChecked == true;
+
+            _returnQueue.Add(new ReturnQueueRow(
+                _scannedReturnItem.EquipmentItemID,
+                _scannedReturnItem.ArticleNumber,
+                _scannedReturnItem.Equipment?.DisplayName ?? _scannedReturnItem.Equipment?.Description ?? "Utrustning",
+                condition,
+                isDamaged,
+                isDamaged ? "Skadad" : "OK"));
+
+            ReturnArticleTextBox.Clear();
+            ScannedItemDetailBorder.Visibility = Visibility.Collapsed;
+            AddScannedItemToListButton.IsEnabled = false;
+            _scannedReturnItem = null;
+            ReturnArticleTextBox.Focus();
+
+            RefreshReturnQueue();
+        }
+
+        // Removes selected row from the return queue
+        private void RemoveFromReturnQueueButton_Click(object sender, RoutedEventArgs e)
+        {
+            HashSet<int> removeIds = ReturnQueueDataGrid.SelectedItems
+                .OfType<ReturnQueueRow>()
+                .Select(row => row.EquipmentItemID)
+                .ToHashSet();
+
+            _returnQueue.RemoveAll(item => removeIds.Contains(item.EquipmentItemID));
+            RefreshReturnQueue();
+        }
+
+        // Updates the return table and text of articles
+        private void RefreshReturnQueue()
+        {
+            ReturnQueueDataGrid.ItemsSource = null;
+            ReturnQueueDataGrid.ItemsSource = _returnQueue.ToList();
+
+            ReturnQueueSummaryTextBlock.Text = _returnQueue.Count == 0
+                ? "Ingen utrustning i listan."
+                : $"{_returnQueue.Count} artikel/artiklar redo för inlämning.";
+
+            ConfirmAllReturnsButton.IsEnabled = _returnQueue.Count > 0;
+        }
+
+        // Final approval of all articles in the list
+        private void ConfirmAllReturnsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_returnQueue.Count == 0) return;
+
+            var returns = _returnQueue.Select(r => (r.EquipmentItemID, r.Condition, r.IsDamaged)).ToList();
+
+            var result = _skiShopController.ReturnMultipleEquipmentItems(returns);
+
+            if (result.Success)
+            {
+                MessageBox.Show(
+                    $"{_returnQueue.Count} artikel/artiklar har återlämnats och sparats i systemet.",
+                    "Återlämning klar",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+
+                _returnQueue.Clear();
+                RefreshReturnQueue();
+
+                LoadAvailableItems();
+
+                if (_selectedBooking != null)
+                {
+                    int bId = _selectedBooking.BookingID;
+                    var updated = _skiShopController.FindActiveBookings(bId.ToString()).FirstOrDefault(b => b.BookingID == bId);
+                    SelectBooking(updated);
+                }
+            }
+            else
+            {
+                MessageBox.Show($"Kunde inte slutföra återlämningen:\n{result.Message}", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         #endregion
-
     }
 }
+

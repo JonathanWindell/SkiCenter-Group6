@@ -43,17 +43,18 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
-        /// Gets a specific category when staff scans/input the article number.
+        /// Gets a specific article when staff scans/input the article number, only fetches rented.
         /// </summary>
         /// /// <param name="articleNumber"/param>
-        public EquipmentItem FindItemByBarcode(string articleNumber)
+        public EquipmentItem? GetRentedItemByBarcode(string articleNumber)
         {
             if (string.IsNullOrWhiteSpace(articleNumber))
             {
                 return null;
             }
 
-            return _unitOfWork.EquipmentItem.GetByBarcode(articleNumber);
+            var item = _unitOfWork.EquipmentItem.GetByBarcode(articleNumber.Trim());
+            return item?.Status == EquipmentStatus.Rented ? item : null;
         }
 
         /// <summary>
@@ -211,11 +212,6 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            if (rental.RentalItems == null)
-            {
-                rental.RentalItems = new List<RentalItem>();
-            }
-
             var addedEquipmentItems = new List<EquipmentItem>();
 
             // Adds scanned items to the rental
@@ -224,17 +220,19 @@ namespace BusinessLayer.Controllers
                 var item = _unitOfWork.EquipmentItem.GetByBarcode(barcode);
                 if (item != null && IsItemAvailableForDates(item, rental.StartDate, rental.EndDate))
                 {
-                    var rentalItem = new RentalItem
+                    rental.RentalItems.Add(new RentalItem
                     {
+                        Rental = rental,
                         EquipmentItem = item,
-                        EquipmentItemID = item.EquipmentItemID,
-                        Rental = rental
-                    };
+                        EquipmentItemID = item.EquipmentItemID
+                    });
 
-                    rental.RentalItems.Add(rentalItem);
                     addedEquipmentItems.Add(item);
 
-                    _unitOfWork.EquipmentItem.UpdateStatusAndCondition(barcode, EquipmentStatus.Rented, item.Condition);
+                    if (rental.StartDate.Date <= DateTime.Today)
+                    {
+                        _unitOfWork.EquipmentItem.UpdateStatusAndCondition(barcode, EquipmentStatus.Rented, item.Condition);
+                    }
                 }
             }
 
@@ -251,8 +249,6 @@ namespace BusinessLayer.Controllers
 
             // Store the rental's price so it can be shown on the invoice later
             int days = CountRentalDays(rental.StartDate, rental.EndDate);
-
-            // Calculate prise based on temporary list
             rental.TotalPrice = addedEquipmentItems
                 .Sum(item => CalculateRentalPrice(item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days) ?? 0m);
 
@@ -263,7 +259,7 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
-        /// Returns a rental or scanned articles and make them available again.
+        /// Returns a rental or scanned articles and make them available again. OLD FUNCTION, keep?
         /// </summary>
         /// <param name="rentalID"></param>
         public bool ReturnRental(int rentalID)
@@ -274,22 +270,16 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            // Returns status to available
-            if (rental.RentalItems != null)
+            // Returns status to returned
+            foreach (var ri in rental.RentalItems)
             {
-                foreach (var rentalItem in rental.RentalItems)
+                if (ri.EquipmentItem != null)
                 {
-                    if (rentalItem.EquipmentItem != null)
-                    {
-                        _unitOfWork.EquipmentItem.UpdateStatusAndCondition(
-                            rentalItem.EquipmentItem.ArticleNumber,
-                            EquipmentStatus.Available,
-                            rentalItem.EquipmentItem.Condition);
-                    }
+                    _unitOfWork.EquipmentItem.UpdateStatusAndCondition(ri.EquipmentItem.ArticleNumber, EquipmentStatus.Available, ri.EquipmentItem.Condition);
                 }
             }
 
-            rental.Status = "Available";
+            rental.Status = "Returned";
             rental.ReturnDate = DateTime.Now;
 
             _unitOfWork.Rental.Update(rental);
@@ -499,6 +489,79 @@ namespace BusinessLayer.Controllers
         }
 
         /// <summary>
+        /// Gets the active rental for the selected item.
+        /// </summary>
+        public Rental? GetActiveRentalForItem(int equipmentItemID)
+        {
+            if (equipmentItemID <= 0)
+            {
+                return null;
+            }
+
+            return _unitOfWork.Rental.GetActiveRentals()
+                .FirstOrDefault(r => r.RentalItems.Any(ri => ri.EquipmentItemID == equipmentItemID));
+        }
+
+        /// <summary>
+        /// Makes a return of the articles inside a list, updates condition and sets a complete rental return to "Returned".
+        /// </summary>
+        public (bool Success, string Message) ReturnMultipleEquipmentItems(
+            IEnumerable<(int EquipmentItemID, EquipmentCondition Condition, bool IsDamaged)> returns)
+        {
+            var returnList = returns?.ToList() ?? new List<(int, EquipmentCondition, bool)>();
+            if (returnList.Count == 0)
+            {
+                return (false, "Inga artiklar att återlämna.");
+            }
+
+            var affectedRentalIds = new HashSet<int>();
+
+            foreach (var (itemId, condition, isDamaged) in returnList)
+            {
+                var item = _unitOfWork.EquipmentItem.GetByID(itemId);
+                if (item == null)
+                {
+                    continue;
+                }
+
+                item.Status = isDamaged ? EquipmentStatus.Damaged : EquipmentStatus.Available;
+                item.Condition = condition;
+                _unitOfWork.EquipmentItem.Update(item);
+
+                var activeRental = _unitOfWork.Rental.GetActiveRentals()
+                    .FirstOrDefault(r => r.RentalItems.Any(ri => ri.EquipmentItemID == itemId));
+
+                if (activeRental != null)
+                {
+                    affectedRentalIds.Add(activeRental.RentalID);
+                }
+            }
+
+            foreach (int rentalId in affectedRentalIds)
+            {
+                var trackedRental = _unitOfWork.Rental.GetRentalWithItems(rentalId);
+                if (trackedRental == null) continue;
+
+                bool allItemsIn = trackedRental.RentalItems
+                    .All(ri => ri.EquipmentItem == null || ri.EquipmentItem.Status != EquipmentStatus.Rented);
+
+                if (allItemsIn)
+                {
+                    trackedRental.Status = "Returned";
+                    trackedRental.ReturnDate = DateTime.Now;
+                    _unitOfWork.Rental.Update(trackedRental);
+                }
+            }
+
+            int changes = _unitOfWork.Complete();
+            if (changes <= 0)
+            {
+                return (false, "Inga ändringar behövde sparas eller så misslyckades databasuppdateringen.");
+            }
+
+            return (true, $"{returnList.Count} artikel/artiklar har återlämnats.");
+        }
+
         /// Validates a specific equipment between dates.
         /// </summary>
         public bool IsItemAvailableForDates(EquipmentItem item, DateTime startDate, DateTime endDate)
@@ -533,6 +596,239 @@ namespace BusinessLayer.Controllers
                 EquipmentStatus.Maintenance => "på service",
                 _ => status.ToString()
             };
+        }
+
+        /// <summary>
+        /// Updates articles and dates on a existing rental.
+        /// </summary>
+        public (bool Success, string Message, decimal PriceDifference) UpdateBookingRental(
+            int bookingID,
+            int rentalID,
+            IEnumerable<int> updatedItemIDs,
+            DateTime startDate,
+            DateTime endDate,
+            bool licenseVerified)
+        {
+            var itemIDs = updatedItemIDs?.Distinct().ToList() ?? new List<int>();
+
+            if (itemIDs.Count == 0)
+            {
+                return (false, "Uthyrningen måste innehålla minst en artikel.", 0m);
+            }
+
+            if (endDate.Date < startDate.Date)
+            {
+                return (false, "Slutdatum kan inte vara före startdatum.", 0m);
+            }
+
+            // Gets the rental tracked with articles and prices
+            var rental = _unitOfWork.Rental.GetRentalWithItems(rentalID);
+            if (rental == null || rental.BookingID != bookingID)
+            {
+                return (false, "Uthyrningsposten kunde inte hittas på bokningen.", 0m);
+            }
+
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingID);
+            if (booking == null)
+            {
+                return (false, "Bokningen hittades inte.", 0m);
+            }
+
+            // Validation to check if rental fits in with accommodation booking
+            if (booking.Accommodations.Any())
+            {
+                DateTime stayStart = booking.Accommodations.Min(ba => ba.StartDate).Date;
+                DateTime stayEnd = booking.Accommodations.Max(ba => ba.EndDate).Date;
+                if (startDate.Date < stayStart || endDate.Date > stayEnd)
+                {
+                    return (false, $"Hyresperioden måste ligga inom vistelsen {stayStart:yyyy-MM-dd} – {stayEnd:yyyy-MM-dd}.", 0m);
+                }
+            }
+
+            var newItems = _unitOfWork.EquipmentItem.GetItemsByIds(itemIDs).ToList();
+            if (newItems.Count != itemIDs.Count)
+            {
+                return (false, "En eller flera artiklar kunde inte hittas i databasen.", 0m);
+            }
+
+            var currentItemIDs = rental.RentalItems.Select(ri => ri.EquipmentItemID).ToHashSet();
+            var removedRentalItems = rental.RentalItems.Where(ri => !itemIDs.Contains(ri.EquipmentItemID)).ToList();
+            foreach (var removed in removedRentalItems)
+            {
+                if (removed.EquipmentItem != null)
+                {
+                    removed.EquipmentItem.Status = EquipmentStatus.Available;
+                }
+                rental.RentalItems.Remove(removed);
+            }
+
+            var newlyAddedItems = newItems.Where(i => !currentItemIDs.Contains(i.EquipmentItemID)).ToList();
+            foreach (var added in newlyAddedItems)
+            {
+                if (startDate.Date <= DateTime.Today)
+                {
+                    added.Status = EquipmentStatus.Rented;
+                }
+
+                rental.RentalItems.Add(new RentalItem
+                {
+                    Rental = rental,
+                    EquipmentItemID = added.EquipmentItemID,
+                    EquipmentItem = added
+                });
+            }
+
+            var allActiveItems = rental.RentalItems.Select(ri => ri.EquipmentItem).Where(i => i != null).ToList();
+
+            bool requiresLicense = RequiresDriverLicense(allActiveItems!);
+            if (requiresLicense && !licenseVerified)
+            {
+                return (false, "Körkort måste kontrolleras vid skoteruthyrning.", 0m);
+            }
+
+            // Calculate new price and price difference
+            int days = CountRentalDays(startDate, endDate);
+            decimal newTotalPrice = 0m;
+
+            foreach (var item in allActiveItems)
+            {
+                decimal? itemPrice = CalculateRentalPrice(item!.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days);
+                if (itemPrice == null)
+                {
+                    return (false, $"Artikel {item.ArticleNumber} saknar prislista.", 0m);
+                }
+                newTotalPrice += itemPrice.Value;
+            }
+
+            decimal priceDifference = newTotalPrice - rental.TotalPrice;
+
+            // Updates the rental
+            rental.StartDate = startDate.Date;
+            rental.EndDate = endDate.Date;
+            rental.ReturnDate = endDate.Date;
+            rental.TotalPrice = newTotalPrice;
+            rental.LicenseVerified = requiresLicense && licenseVerified;
+
+            // Adjustment to price difference
+            booking.TotalAmount += priceDifference;
+
+            _unitOfWork.Rental.Update(rental);
+            _unitOfWork.Booking.Update(booking);
+
+            if (_unitOfWork.Complete() <= 0)
+            {
+                return (false, "Kunde inte spara ändringarna i databasen.", 0m);
+            }
+
+            return (true, $"Uthyrningen uppdaterad. Nytt hyresbelopp: {newTotalPrice:N2} kr.", priceDifference);
+        }
+
+        /// <summary>
+        /// Registers a drop-in rental over the desk, paid at the register and does not connect to accommodation.
+        /// </summary>
+        public (bool Success, string Message, int? BookingID) CreateDropInRental(
+            int customerID,
+            IEnumerable<int> equipmentItemIDs,
+            DateTime startDate,
+            DateTime endDate,
+            bool licenseVerified)
+        {
+            var itemIDs = equipmentItemIDs?.Distinct().ToList() ?? new List<int>();
+
+            if (customerID <= 0)
+            {
+                return (false, "En giltig kund måste väljas.", null);
+            }
+
+            if (itemIDs.Count == 0)
+            {
+                return (false, "Välj minst en utrustning att hyra ut.", null);
+            }
+
+            if (endDate.Date < startDate.Date || startDate.Date < DateTime.Today)
+            {
+                return (false, "Ogiltigt datumintervall.", null);
+            }
+
+            var items = _unitOfWork.EquipmentItem.GetItemsByIds(itemIDs).ToList();
+            if (items.Count != itemIDs.Count)
+            {
+                return (false, "Kunde inte hitta all vald utrustning.", null);
+            }
+
+            var unavailable = items.Where(i => i.Status != EquipmentStatus.Available).ToList();
+            if (unavailable.Any())
+            {
+                return (false, "En eller flera valda artiklar är redan uthyrda.", null);
+            }
+
+            bool requiresLicense = RequiresDriverLicense(items);
+            if (requiresLicense && !licenseVerified)
+            {
+                return (false, "Körkort måste kontrolleras vid skoteruthyrning.", null);
+            }
+
+            int days = CountRentalDays(startDate, endDate);
+            decimal totalPrice = 0m;
+
+            foreach (var item in items)
+            {
+                decimal? itemPrice = CalculateRentalPrice(item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days);
+                if (itemPrice == null)
+                {
+                    return (false, $"Artikel {item.ArticleNumber} saknar prislista.", null);
+                }
+                totalPrice += itemPrice.Value;
+            }
+
+            var booking = new Booking
+            {
+                CustomerID = customerID,
+                BookingDate = DateTime.Now,
+                BookingStatus = BookingStatus.Confirmed,
+                CheckInStatus = CheckInStatus.NotCheckedIn,
+                HasCancellationInsurance = false,
+                TotalAmount = totalPrice,
+                AccommodationListPrice = 0m,
+                DiscountRate = 0m,
+                DiscountAmount = 0m
+            };
+
+            var rental = new Rental
+            {
+                StartDate = startDate.Date,
+                EndDate = endDate.Date,
+                ReturnDate = endDate.Date,
+                Status = "Active",
+                TotalPrice = totalPrice,
+                LicenseVerified = requiresLicense && licenseVerified
+            };
+
+            foreach (var item in items)
+            {
+                item.Status = EquipmentStatus.Rented;
+                rental.RentalItems.Add(new RentalItem
+                {
+                    Rental = rental,
+                    EquipmentItem = item,
+                    EquipmentItemID = item.EquipmentItemID
+                });
+            }
+
+            booking.Rentals.Add(rental);
+            _unitOfWork.Booking.Add(booking);
+
+            if (_unitOfWork.Complete() <= 0)
+            {
+                return (false, "Kunde inte spara drop-in-uthyrningen.", null);
+            }
+
+            return (true, $"Drop-in-uthyrning sparad! Bokningsnummer: #{booking.BookingID}. Att betala: {totalPrice:N2} kr.", booking.BookingID);
+        }
+
+        public Customer? SearchCustomer(string searchText)
+        {
+            return _unitOfWork.Customer.SearchCustomer(searchText);
         }
     }
 }
