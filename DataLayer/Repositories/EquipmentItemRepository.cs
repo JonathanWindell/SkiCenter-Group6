@@ -17,7 +17,7 @@ namespace DataLayer.Repositories
         /// Gets a specific ItemId 
         /// </summary>
         /// <param name="articleNumber"></param>
-        public EquipmentItem GetByBarcode(string articleNumber)
+        public EquipmentItem? GetByBarcode(string articleNumber)
         {
             if (string.IsNullOrWhiteSpace(articleNumber)) return null;
 
@@ -66,7 +66,8 @@ namespace DataLayer.Repositories
             IQueryable<EquipmentItem> items = _context.Set<EquipmentItem>()
                 .Include(ei => ei.Equipment)
                     .ThenInclude(e => e.Prices)
-                .Where(ei => ei.Status == EquipmentStatus.Available);
+                .Include(ei => ei.RentalItems)
+                    .ThenInclude(ri => ri.Rental);
 
             if (!string.IsNullOrWhiteSpace(category))
             {

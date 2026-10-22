@@ -212,31 +212,44 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
+            var addedEquipmentItems = new List<EquipmentItem>();
+
             // Adds scanned items to the rental
             foreach (var barcode in scannedArticleNumbers)
             {
                 var item = _unitOfWork.EquipmentItem.GetByBarcode(barcode);
-                if (item != null && item.Status == EquipmentStatus.Available)
+                if (item != null && IsItemAvailableForDates(item, rental.StartDate, rental.EndDate))
                 {
-                    rental.EquipmentItems.Add(item);
-                    _unitOfWork.EquipmentItem.UpdateStatusAndCondition(barcode, EquipmentStatus.Rented, item.Condition);
+                    rental.RentalItems.Add(new RentalItem
+                    {
+                        Rental = rental,
+                        EquipmentItem = item,
+                        EquipmentItemID = item.EquipmentItemID
+                    });
+
+                    addedEquipmentItems.Add(item);
+
+                    if (rental.StartDate.Date <= DateTime.Today)
+                    {
+                        _unitOfWork.EquipmentItem.UpdateStatusAndCondition(barcode, EquipmentStatus.Rented, item.Condition);
+                    }
                 }
             }
 
-            if (!rental.EquipmentItems.Any())
+            if (!rental.RentalItems.Any())
             {
                 return false;
             }
 
             // Snowmobiles require that the caller has set LicenseVerified
-            if (RequiresDriverLicense(rental.EquipmentItems) && !rental.LicenseVerified)
+            if (RequiresDriverLicense(addedEquipmentItems) && !rental.LicenseVerified)
             {
                 return false;
             }
 
             // Store the rental's price so it can be shown on the invoice later
             int days = CountRentalDays(rental.StartDate, rental.EndDate);
-            rental.TotalPrice = rental.EquipmentItems
+            rental.TotalPrice = addedEquipmentItems
                 .Sum(item => CalculateRentalPrice(item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days) ?? 0m);
 
             rental.Status = "Active";
@@ -257,13 +270,16 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
-            // Returns status to available
-            foreach (var item in rental.EquipmentItems)
+            // Returns status to returned
+            foreach (var ri in rental.RentalItems)
             {
-                _unitOfWork.EquipmentItem.UpdateStatusAndCondition(item.ArticleNumber, EquipmentStatus.Available, item.Condition);
+                if (ri.EquipmentItem != null)
+                {
+                    _unitOfWork.EquipmentItem.UpdateStatusAndCondition(ri.EquipmentItem.ArticleNumber, EquipmentStatus.Available, ri.EquipmentItem.Condition);
+                }
             }
 
-            rental.Status = "Available";
+            rental.Status = "Returned";
             rental.ReturnDate = DateTime.Now;
 
             _unitOfWork.Rental.Update(rental);
@@ -400,8 +416,10 @@ namespace BusinessLayer.Controllers
                 return (false, "En eller flera utrustningar kunde inte hittas.", 0m);
             }
 
-            // Only available equipment may be rented out
-            List<EquipmentItem> unavailable = items.Where(item => item.Status != EquipmentStatus.Available).ToList();
+            // Only available equipment may be rented out. This is validated through date check.
+            List<EquipmentItem> unavailable = items
+                .Where(item => !IsItemAvailableForDates(item, startDate, endDate))
+                .ToList();
             if (unavailable.Count > 0)
             {
                 string list = string.Join(", ", unavailable.Select(item => $"{item.ArticleNumber} ({StatusText(item.Status)})"));
@@ -433,7 +451,6 @@ namespace BusinessLayer.Controllers
                 BookingID = bookingID,
                 StartDate = startDate.Date,
                 EndDate = endDate.Date,
-                // Planned return date. Updated with the actual date when the rental is returned.
                 ReturnDate = endDate.Date,
                 Status = "Active",
                 TotalPrice = totalPrice,
@@ -442,8 +459,16 @@ namespace BusinessLayer.Controllers
 
             foreach (EquipmentItem item in items)
             {
-                item.Status = EquipmentStatus.Rented;
-                rental.EquipmentItems.Add(item);
+                if (startDate.Date <= DateTime.Today)
+                {
+                    item.Status = EquipmentStatus.Rented;
+                }
+
+                rental.RentalItems.Add(new RentalItem
+                {
+                    EquipmentItemID = item.EquipmentItemID,
+                    EquipmentItem = item
+                });
             }
 
             // Add the rental price to the booking's total amount
@@ -474,7 +499,7 @@ namespace BusinessLayer.Controllers
             }
 
             return _unitOfWork.Rental.GetActiveRentals()
-                .FirstOrDefault(r => r.EquipmentItems.Any(i => i.EquipmentItemID == equipmentItemID));
+                .FirstOrDefault(r => r.RentalItems.Any(ri => ri.EquipmentItemID == equipmentItemID));
         }
 
         /// <summary>
@@ -489,12 +514,12 @@ namespace BusinessLayer.Controllers
                 return (false, "Inga artiklar att återlämna.");
             }
 
-            var affectedRentals = new HashSet<Rental>();
+            var affectedRentalIds = new HashSet<int>();
 
             foreach (var (itemId, condition, isDamaged) in returnList)
             {
                 var item = _unitOfWork.EquipmentItem.GetByID(itemId);
-                if (item == null || item.Status != EquipmentStatus.Rented)
+                if (item == null)
                 {
                     continue;
                 }
@@ -503,30 +528,62 @@ namespace BusinessLayer.Controllers
                 item.Condition = condition;
                 _unitOfWork.EquipmentItem.Update(item);
 
-                var rental = GetActiveRentalForItem(item.EquipmentItemID);
-                if (rental != null)
+                var activeRental = _unitOfWork.Rental.GetActiveRentals()
+                    .FirstOrDefault(r => r.RentalItems.Any(ri => ri.EquipmentItemID == itemId));
+
+                if (activeRental != null)
                 {
-                    affectedRentals.Add(rental);
+                    affectedRentalIds.Add(activeRental.RentalID);
                 }
             }
 
-            foreach (var rental in affectedRentals)
+            foreach (int rentalId in affectedRentalIds)
             {
-                bool allReturned = rental.EquipmentItems.All(i => i.Status != EquipmentStatus.Rented);
-                if (allReturned)
+                var trackedRental = _unitOfWork.Rental.GetRentalWithItems(rentalId);
+                if (trackedRental == null) continue;
+
+                bool allItemsIn = trackedRental.RentalItems
+                    .All(ri => ri.EquipmentItem == null || ri.EquipmentItem.Status != EquipmentStatus.Rented);
+
+                if (allItemsIn)
                 {
-                    rental.Status = "Returned";
-                    rental.ReturnDate = DateTime.Now;
-                    _unitOfWork.Rental.Update(rental);
+                    trackedRental.Status = "Returned";
+                    trackedRental.ReturnDate = DateTime.Now;
+                    _unitOfWork.Rental.Update(trackedRental);
                 }
             }
 
-            if (_unitOfWork.Complete() <= 0)
+            int changes = _unitOfWork.Complete();
+            if (changes <= 0)
             {
-                return (false, "Kunde inte spara återlämningen till databasen.");
+                return (false, "Inga ändringar behövde sparas eller så misslyckades databasuppdateringen.");
             }
 
             return (true, $"{returnList.Count} artikel/artiklar har återlämnats.");
+        }
+
+        /// Validates a specific equipment between dates.
+        /// </summary>
+        public bool IsItemAvailableForDates(EquipmentItem item, DateTime startDate, DateTime endDate)
+        {
+            // Checks status for "Damaged" or "Maintenence".
+            if (item.Status == EquipmentStatus.Damaged || item.Status == EquipmentStatus.Maintenance)
+                return false;
+
+            // If RentalItems has had status = "Rented". 
+            if (item.RentalItems == null || !item.RentalItems.Any())
+                return true;
+
+            // Check for overlap. Overlas is defined when startdate for one booking begins when one ends. 
+            bool isDoubleBooked = item.RentalItems.Any(ri =>
+                ri.Rental != null &&
+                ri.Rental.Status != "Returned" &&
+                ri.Rental.Status != "Cancelled" &&
+                ri.Rental.StartDate.Date <= endDate.Date &&
+                ri.Rental.EndDate.Date >= startDate.Date
+            );
+
+            return !isDoubleBooked;
         }
 
         private static string StatusText(EquipmentStatus status)
@@ -594,29 +651,36 @@ namespace BusinessLayer.Controllers
                 return (false, "En eller flera artiklar kunde inte hittas i databasen.", 0m);
             }
 
-            var currentItemIDs = rental.EquipmentItems.Select(i => i.EquipmentItemID).ToHashSet();
-            var removedItems = rental.EquipmentItems.Where(i => !itemIDs.Contains(i.EquipmentItemID)).ToList();
-            foreach (var removed in removedItems)
+            var currentItemIDs = rental.RentalItems.Select(ri => ri.EquipmentItemID).ToHashSet();
+            var removedRentalItems = rental.RentalItems.Where(ri => !itemIDs.Contains(ri.EquipmentItemID)).ToList();
+            foreach (var removed in removedRentalItems)
             {
-                removed.Status = EquipmentStatus.Available;
-                rental.EquipmentItems.Remove(removed);
+                if (removed.EquipmentItem != null)
+                {
+                    removed.EquipmentItem.Status = EquipmentStatus.Available;
+                }
+                rental.RentalItems.Remove(removed);
             }
 
-            var newlyAdded = newItems.Where(i => !currentItemIDs.Contains(i.EquipmentItemID)).ToList();
-            var unavailable = newlyAdded.Where(i => i.Status != EquipmentStatus.Available).ToList();
-            if (unavailable.Any())
+            var newlyAddedItems = newItems.Where(i => !currentItemIDs.Contains(i.EquipmentItemID)).ToList();
+            foreach (var added in newlyAddedItems)
             {
-                string list = string.Join(", ", unavailable.Select(i => i.ArticleNumber));
-                return (false, $"Följande artiklar är inte tillgängliga: {list}.", 0m);
+                if (startDate.Date <= DateTime.Today)
+                {
+                    added.Status = EquipmentStatus.Rented;
+                }
+
+                rental.RentalItems.Add(new RentalItem
+                {
+                    Rental = rental,
+                    EquipmentItemID = added.EquipmentItemID,
+                    EquipmentItem = added
+                });
             }
 
-            foreach (var added in newlyAdded)
-            {
-                added.Status = EquipmentStatus.Rented;
-                rental.EquipmentItems.Add(added);
-            }
+            var allActiveItems = rental.RentalItems.Select(ri => ri.EquipmentItem).Where(i => i != null).ToList();
 
-            bool requiresLicense = RequiresDriverLicense(rental.EquipmentItems);
+            bool requiresLicense = RequiresDriverLicense(allActiveItems!);
             if (requiresLicense && !licenseVerified)
             {
                 return (false, "Körkort måste kontrolleras vid skoteruthyrning.", 0m);
@@ -626,9 +690,9 @@ namespace BusinessLayer.Controllers
             int days = CountRentalDays(startDate, endDate);
             decimal newTotalPrice = 0m;
 
-            foreach (var item in rental.EquipmentItems)
+            foreach (var item in allActiveItems)
             {
-                decimal? itemPrice = CalculateRentalPrice(item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days);
+                decimal? itemPrice = CalculateRentalPrice(item!.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days);
                 if (itemPrice == null)
                 {
                     return (false, $"Artikel {item.ArticleNumber} saknar prislista.", 0m);
@@ -743,7 +807,12 @@ namespace BusinessLayer.Controllers
             foreach (var item in items)
             {
                 item.Status = EquipmentStatus.Rented;
-                rental.EquipmentItems.Add(item);
+                rental.RentalItems.Add(new RentalItem
+                {
+                    Rental = rental,
+                    EquipmentItem = item,
+                    EquipmentItemID = item.EquipmentItemID
+                });
             }
 
             booking.Rentals.Add(rental);

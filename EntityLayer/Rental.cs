@@ -47,5 +47,10 @@ namespace EntityLayer
             Status = status;
             TotalPrice = sum;
         }
+
+        [NotMapped]
+        public IEnumerable<EquipmentItem> RentedEquipmentList =>
+            RentalItems?.Where(ri => ri.EquipmentItem != null)
+               .Select(ri => ri.EquipmentItem) ?? Enumerable.Empty<EquipmentItem>();
     }
 }

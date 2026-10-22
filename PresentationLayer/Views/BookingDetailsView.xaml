@@ -325,15 +325,15 @@
                                             </TextBlock>
 
                                             <!-- Equipment items -->
-                                            <ItemsControl ItemsSource="{Binding EquipmentItems}">
+                                            <ItemsControl ItemsSource="{Binding RentedEquipmentList}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
 
                                                         <StackPanel Margin="0,5,0,15">
 
                                                             <TextBlock Text="{Binding Equipment.Category}"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="{StaticResource PrimaryText}"/>
+                                                                FontWeight="SemiBold"
+                                                                Foreground="{StaticResource PrimaryText}"/>
 
                                                             <TextBlock Margin="0,5,0,0">
                                                                 <Run Text="Beskrivning: "/>
