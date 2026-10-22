@@ -27,6 +27,12 @@ namespace PresentationLayer.Views
         private readonly List<ReturnQueueRow> _returnQueue = new();
         private EquipmentItem? _scannedReturnItem;
 
+        // Close the rental window and return to the existing dashboard.
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
         /// <summary>
         /// A row in the selected equipment table.
         /// </summary>
