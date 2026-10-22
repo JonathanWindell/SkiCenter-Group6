@@ -3,10 +3,6 @@ using BusinessLayer.Controllers;
 using DataLayer.Interfaces;
 using EntityLayer;
 using Moq;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace TestLayer.UnitTests
 {

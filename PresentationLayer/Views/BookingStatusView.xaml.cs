@@ -219,11 +219,11 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            // Open the detail window
-            var detailsView = new BookingDetailsView(fullBooking)
-            {
-                Owner = this
-            };
+
+            // Use App.Current 
+            var detailsView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<BookingDetailsView>(
+                ((App)Application.Current).Services,
+                fullBooking);
 
             detailsView.ShowDialog();
 

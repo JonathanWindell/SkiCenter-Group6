@@ -1,11 +1,9 @@
-﻿using EntityLayer;
-
-namespace DataLayer
+﻿namespace DataLayer
 {
     public static class DbInitializer
     {
 
-        
+
 
     }
 }
