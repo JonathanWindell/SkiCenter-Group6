@@ -226,7 +226,7 @@ namespace PresentationLayer.Views
 
             List<string> rentedItems = booking.Rentals
                 .Where(r => r.Status == "Active")
-                .SelectMany(r => r.EquipmentItems)
+                .SelectMany(r => r.RentalItems.Select(ri => ri.EquipmentItem))
                 .Select(item => $"{item.ArticleNumber} ({item.Equipment?.Category})")
                 .ToList();
 
@@ -278,7 +278,7 @@ namespace PresentationLayer.Views
             BookingInfoBorder.Visibility = Visibility.Visible;
             EquipmentPanel.IsEnabled = true;
 
-            // Fria datum för drop-in
+            // Dates for drop-in
             StartDatePicker.DisplayDateStart = DateTime.Today;
             StartDatePicker.DisplayDateEnd = null;
             EndDatePicker.DisplayDateStart = DateTime.Today;

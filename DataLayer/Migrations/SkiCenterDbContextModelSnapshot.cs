@@ -258,9 +258,6 @@ namespace DataLayer.Migrations
                     b.Property<int>("EquipmentID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RentalID")
-                        .HasColumnType("int");
-
                     b.Property<string>("Size")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -271,8 +268,6 @@ namespace DataLayer.Migrations
                     b.HasKey("EquipmentItemID");
 
                     b.HasIndex("EquipmentID");
-
-                    b.HasIndex("RentalID");
 
                     b.ToTable("EquipmentItems");
                 });
@@ -429,6 +424,29 @@ namespace DataLayer.Migrations
                     b.HasIndex("BookingID");
 
                     b.ToTable("Rentals");
+                });
+
+            modelBuilder.Entity("EntityLayer.RentalItem", b =>
+                {
+                    b.Property<int>("RentalItemID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RentalItemID"));
+
+                    b.Property<int>("EquipmentItemID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RentalID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RentalItemID");
+
+                    b.HasIndex("EquipmentItemID");
+
+                    b.HasIndex("RentalID");
+
+                    b.ToTable("RentalItems");
                 });
 
             modelBuilder.Entity("EntityLayer.SeasonPrice", b =>
@@ -689,10 +707,6 @@ namespace DataLayer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EntityLayer.Rental", null)
-                        .WithMany("EquipmentItems")
-                        .HasForeignKey("RentalID");
-
                     b.Navigation("Equipment");
                 });
 
@@ -736,6 +750,25 @@ namespace DataLayer.Migrations
                         .HasForeignKey("BookingID");
 
                     b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("EntityLayer.RentalItem", b =>
+                {
+                    b.HasOne("EntityLayer.EquipmentItem", "EquipmentItem")
+                        .WithMany("RentalItems")
+                        .HasForeignKey("EquipmentItemID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EntityLayer.Rental", "Rental")
+                        .WithMany("RentalItems")
+                        .HasForeignKey("RentalID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EquipmentItem");
+
+                    b.Navigation("Rental");
                 });
 
             modelBuilder.Entity("EntityLayer.SeasonPrice", b =>
@@ -823,6 +856,11 @@ namespace DataLayer.Migrations
                     b.Navigation("Prices");
                 });
 
+            modelBuilder.Entity("EntityLayer.EquipmentItem", b =>
+                {
+                    b.Navigation("RentalItems");
+                });
+
             modelBuilder.Entity("EntityLayer.MeetingRoom", b =>
                 {
                     b.Navigation("BookingMeetingRooms");
@@ -832,7 +870,7 @@ namespace DataLayer.Migrations
 
             modelBuilder.Entity("EntityLayer.Rental", b =>
                 {
-                    b.Navigation("EquipmentItems");
+                    b.Navigation("RentalItems");
                 });
 
             modelBuilder.Entity("EntityLayer.SkiLesson", b =>

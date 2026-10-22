@@ -100,7 +100,7 @@ namespace TestLayer.IntegrationTests
             {
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddDays(1),
-                EquipmentItems = new List<EquipmentItem>()
+                RentalItems = new List<RentalItem>()
             };
 
             // Act: Attempt to create rental
@@ -153,7 +153,7 @@ namespace TestLayer.IntegrationTests
             {
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddDays(1),
-                EquipmentItems = new List<EquipmentItem>()
+                RentalItems = new List<RentalItem>()
             };
 
             // Act: Attempt to rent the damaged item
@@ -205,7 +205,7 @@ namespace TestLayer.IntegrationTests
             {
                 StartDate = DateTime.Today,
                 EndDate = DateTime.Today.AddDays(1),
-                EquipmentItems = new List<EquipmentItem>(),
+                RentalItems = new List<RentalItem>(),
                 LicenseVerified = false // Unverified license precondition
             };
 
@@ -257,7 +257,10 @@ namespace TestLayer.IntegrationTests
                 EndDate = DateTime.Today,
                 Status = "Active",
                 TotalPrice = 600m,
-                EquipmentItems = new List<EquipmentItem> { item }
+                RentalItems = new List<RentalItem>
+                {
+                    new RentalItem { EquipmentItem = item, EquipmentItemID = item.EquipmentItemID }
+                }
             };
             _context.Rentals.Add(rental);
             _context.SaveChanges();
