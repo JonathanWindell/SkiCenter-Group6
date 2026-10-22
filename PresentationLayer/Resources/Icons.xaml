@@ -1,0 +1,65 @@
+﻿<!--
+    Line icons converted from the SVG files in Resources/Images/Icons (viewBox 0 0 64 64).
+    WPF cannot show .svg files directly, so each icon is stored as a Geometry and drawn with a
+    3.5 px round stroke on a 64 x 64 canvas, exactly like the SVG originals.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Geometry x:Key="Icon.Boende">M7 30L32 9l25 21M14 27v29h36V27M26 56V39h12v17</Geometry>
+
+    <GeometryGroup x:Key="Icon.Bokningar">
+        <RectangleGeometry Rect="13,8,38,48" RadiusX="5" RadiusY="5"/>
+        <PathGeometry Figures="M23 20h18M23 30h18M23 40h18"/>
+    </GeometryGroup>
+
+    <Geometry x:Key="Icon.Fakturering">M17 7h22l9 9v41H17zM39 7v12h9M24 30h17M24 39h17M24 48h11</Geometry>
+
+    <Geometry x:Key="Icon.InUtcheckning">M12 9h29v46H12zM29 31h28M48 22l9 9-9 9M22 16v32</Geometry>
+
+    <GeometryGroup x:Key="Icon.Marknad">
+        <PathGeometry Figures="M9 29L31 7h23v23L32 52z"/>
+        <EllipseGeometry Center="44,18" RadiusX="4" RadiusY="4"/>
+    </GeometryGroup>
+
+    <GeometryGroup x:Key="Icon.Personal">
+        <EllipseGeometry Center="25,21" RadiusX="8" RadiusY="8"/>
+        <EllipseGeometry Center="45,23" RadiusX="7" RadiusY="7"/>
+        <PathGeometry Figures="M7 54v-6c0-9 8-15 18-15s18 6 18 15v6zM44 37c8 0 14 5 14 12v5H46"/>
+    </GeometryGroup>
+
+    <Geometry x:Key="Icon.Rapporter">M9 56h46M14 53V36h10v17M28 53V25h10v28M42 53V13h10v40</Geometry>
+
+    <GeometryGroup x:Key="Icon.RegistreraKund">
+        <EllipseGeometry Center="20,19" RadiusX="7" RadiusY="7"/>
+        <EllipseGeometry Center="44,19" RadiusX="7" RadiusY="7"/>
+        <PathGeometry Figures="M6 51v-7c0-9 7-14 14-14s14 5 14 14v7zM36 51v-7c0-8 5-13 11-13s11 5 11 13v7z"/>
+    </GeometryGroup>
+
+    <GeometryGroup x:Key="Icon.Sasongspriser">
+        <EllipseGeometry Center="32,32" RadiusX="11" RadiusY="11"/>
+        <PathGeometry Figures="M32 5v10M32 49v10M5 32h10M49 32h10M13 13l7 7M44 44l7 7M51 13l-7 7M20 44l-7 7"/>
+    </GeometryGroup>
+
+    <Geometry x:Key="Icon.Skidskola">M7 22L32 8l25 14-25 14zM17 29v15q15 13 30 0V29M57 22v23</Geometry>
+
+    <GeometryGroup x:Key="Icon.Uthyrning">
+        <RectangleGeometry Rect="10,15,44,39" RadiusX="5" RadiusY="5"/>
+        <PathGeometry Figures="M10 26h44M21 8v13M43 8v13"/>
+    </GeometryGroup>
+
+    <Geometry x:Key="Icon.Utrustning">M18 8L46 56M46 8L18 56M13 9l10 0M41 9h10M13 55h10M41 55h10</Geometry>
+
+    <!-- Interface icons in the same style -->
+    <Geometry x:Key="Icon.Logout">M26 10H12v44h14M30 32h25M45 22l10 10-10 10</Geometry>
+    <Geometry x:Key="Icon.Chevron">M26 16l16 16-16 16</Geometry>
+
+    <!-- Draws an icon geometry the same way as the SVG originals: 64 x 64 canvas, 3.5 px round stroke -->
+    <Style x:Key="IconPathStyle" TargetType="Path">
+        <Setter Property="StrokeThickness" Value="3.5"/>
+        <Setter Property="StrokeStartLineCap" Value="Round"/>
+        <Setter Property="StrokeEndLineCap" Value="Round"/>
+        <Setter Property="StrokeLineJoin" Value="Round"/>
+        <Setter Property="Fill" Value="{x:Null}"/>
+    </Style>
+</ResourceDictionary>
