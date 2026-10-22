@@ -7,39 +7,69 @@
         Background="Transparent"
         WindowStartupLocation="CenterScreen">
 
-    <Border x:Name="MainBorder" Background="{StaticResource WindowBg}" CornerRadius="20" Padding="40,30"
+    <Border x:Name="MainBorder" CornerRadius="20" Padding="34,24,34,30"
             MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        <!-- Mountain background -->
+        <Border.Background>
+            <ImageBrush ImageSource="pack://application:,,,/PresentationLayer;component/Resources/Images/Fjallbakgrund.png"
+                        Stretch="Fill"/>
+        </Border.Background>
+
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Header: welcome text, role and window controls -->
-            <Grid Grid.Row="0" Margin="0,0,0,25">
-                <StackPanel>
-                    <TextBlock x:Name="txtWelcome" FontSize="28" FontWeight="ExtraBold"
+            <!-- Header: logo, welcome text and role, log out and window controls -->
+            <Grid Grid.Row="0" Margin="0,0,0,18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Image Grid.Column="0"
+                       Source="pack://application:,,,/PresentationLayer;component/Resources/Images/SkiCenter_Logga.png"
+                       Height="72"
+                       Margin="-6,0,0,0"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       VerticalAlignment="Center"/>
+
+                <Rectangle Grid.Column="1" Width="1" Height="56" Margin="6,0,24,0"
+                           Fill="#B4BEF5" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                    <TextBlock x:Name="txtWelcome" FontSize="26" FontWeight="Bold"
                                Foreground="{StaticResource PrimaryText}"/>
-                    <TextBlock x:Name="txtRole" FontSize="14" FontWeight="SemiBold" Margin="0,4,0,0"
-                               Foreground="{StaticResource SecondaryText}"/>
+                    <TextBlock x:Name="txtRole" FontSize="13" Margin="0,4,0,0"
+                               Foreground="{StaticResource MutedText}"/>
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Button Content="Logga ut" Width="100" Height="34" Margin="0,0,15,0"
+                <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Top">
+                    <Button Height="34" Padding="14,0" Margin="0,0,12,0"
                             Style="{StaticResource DeepSeaButtonStyle}"
-                            Click="btnLogout_Click"/>
-                    <Button Content="−" Click="btnMinimize_Click" Width="30"
-                            Background="Transparent" BorderThickness="0"
+                            Click="btnLogout_Click">
+                        <StackPanel Orientation="Horizontal" Margin="14,0">
+                            <Viewbox Width="16" Height="16" Margin="0,0,8,0">
+                                <Canvas Width="64" Height="64">
+                                    <Path Data="{StaticResource Icon.Logout}" Stroke="White" Style="{StaticResource IconPathStyle}" StrokeThickness="5"/>
+                                </Canvas>
+                            </Viewbox>
+                            <TextBlock Text="Logga ut" Foreground="White" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Content="−" Click="btnMinimize_Click" Style="{StaticResource WindowChromeButtonStyle}"
                             Foreground="{StaticResource SecondaryText}" FontSize="18"/>
-                    <Button Content="✕" Click="btnClose_Click" Width="30"
-                            Background="Transparent" BorderThickness="0"
+                    <Button Content="✕" Click="btnClose_Click" Style="{StaticResource WindowChromeButtonStyle}"
                             Foreground="#FF5F57" FontSize="14" FontWeight="Bold"/>
                 </StackPanel>
             </Grid>
 
-            <!-- Menu buttons are generated in code based on the logged in staff member's role -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-                <WrapPanel x:Name="MenuPanel" HorizontalAlignment="Center"/>
+            <!-- Menu cards are generated in code based on the logged in staff member's role -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="-8,0,-8,0">
+                <UniformGrid x:Name="MenuPanel" Columns="3" VerticalAlignment="Top"/>
             </ScrollViewer>
 
             <TextBlock x:Name="txtNoModules" Grid.Row="1" Visibility="Collapsed"

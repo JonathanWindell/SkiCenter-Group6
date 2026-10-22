@@ -24,4 +24,10 @@
     </None>
   </ItemGroup>
 
+  <!-- Images are built into the program. The SVG icons are kept as originals; the app uses the XAML versions in Resources/Icons.xaml. -->
+  <ItemGroup>
+    <Resource Include="Resources\Images\*.png" />
+    <None Include="Resources\Images\Icons\*.svg" />
+  </ItemGroup>
+
 </Project>
