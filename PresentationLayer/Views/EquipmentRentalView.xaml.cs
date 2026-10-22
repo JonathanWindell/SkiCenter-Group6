@@ -47,6 +47,8 @@ namespace PresentationLayer.Views
             ItemSearchTextBox.TextChanged += (_, _) => ApplyItemFilter();
             AddToRentalButton.Click += AddToRentalButton_Click;
             RemoveFromRentalButton.Click += RemoveFromRentalButton_Click;
+            StartDatePicker.SelectedDateChanged += (_, _) => { UpdateRentalSummary(); ApplyItemFilter(); };
+            EndDatePicker.SelectedDateChanged += (_, _) => { UpdateRentalSummary(); ApplyItemFilter(); };
             StartDatePicker.SelectedDateChanged += (_, _) => UpdateRentalSummary();
             EndDatePicker.SelectedDateChanged += (_, _) => UpdateRentalSummary();
             LicenseVerifiedCheckBox.Checked += (_, _) => ResetLicenseHighlight();
@@ -221,12 +223,18 @@ namespace PresentationLayer.Views
             string search = ItemSearchTextBox.Text.Trim();
             HashSet<int> selectedIds = _selectedItems.Select(item => item.EquipmentItemID).ToHashSet();
 
+            // 1. Hämta datumen från UI
+            DateTime start = StartDatePicker.SelectedDate ?? DateTime.Today;
+            DateTime end = EndDatePicker.SelectedDate ?? DateTime.Today;
+
             List<EquipmentItem> filtered = _availableItems
                 .Where(item => !selectedIds.Contains(item.EquipmentItemID))
                 .Where(item => category == null || category == AllCategoriesOption || item.Equipment?.Category == category)
                 .Where(item => search.Length == 0
                     || item.ArticleNumber.Contains(search, StringComparison.OrdinalIgnoreCase)
                     || (item.Equipment?.Description?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false))
+                // 2. NY KOD: Filtrera bort pjäxor som är uthyrda de valda datumen
+                .Where(item => _skiShopController.IsItemAvailableForDates(item, start, end))
                 .ToList();
 
             AvailableItemsDataGrid.ItemsSource = filtered;

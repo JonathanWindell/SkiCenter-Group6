@@ -222,9 +222,8 @@ namespace BusinessLayer.Controllers
             foreach (var barcode in scannedArticleNumbers)
             {
                 var item = _unitOfWork.EquipmentItem.GetByBarcode(barcode);
-                if (item != null && item.Status == EquipmentStatus.Available)
+                if (item != null && IsItemAvailableForDates(item, rental.StartDate, rental.EndDate))
                 {
-                    // Create coupling object
                     var rentalItem = new RentalItem
                     {
                         EquipmentItem = item,
@@ -233,7 +232,7 @@ namespace BusinessLayer.Controllers
                     };
 
                     rental.RentalItems.Add(rentalItem);
-                    addedEquipmentItems.Add(item); // Spara för priskalkyl nedan
+                    addedEquipmentItems.Add(item);
 
                     _unitOfWork.EquipmentItem.UpdateStatusAndCondition(barcode, EquipmentStatus.Rented, item.Condition);
                 }
@@ -427,8 +426,10 @@ namespace BusinessLayer.Controllers
                 return (false, "En eller flera utrustningar kunde inte hittas.", 0m);
             }
 
-            // Only available equipment may be rented out
-            List<EquipmentItem> unavailable = items.Where(item => item.Status != EquipmentStatus.Available).ToList();
+            // Only available equipment may be rented out. This is validated through date check.
+            List<EquipmentItem> unavailable = items
+                .Where(item => !IsItemAvailableForDates(item, startDate, endDate))
+                .ToList();
             if (unavailable.Count > 0)
             {
                 string list = string.Join(", ", unavailable.Select(item => $"{item.ArticleNumber} ({StatusText(item.Status)})"));
@@ -460,7 +461,6 @@ namespace BusinessLayer.Controllers
                 BookingID = bookingID,
                 StartDate = startDate.Date,
                 EndDate = endDate.Date,
-                // Planned return date. Updated with the actual date when the rental is returned.
                 ReturnDate = endDate.Date,
                 Status = "Active",
                 TotalPrice = totalPrice,
@@ -469,9 +469,11 @@ namespace BusinessLayer.Controllers
 
             foreach (EquipmentItem item in items)
             {
-                item.Status = EquipmentStatus.Rented;
+                if (startDate.Date <= DateTime.Today)
+                {
+                    item.Status = EquipmentStatus.Rented;
+                }
 
-                // Create and add coupling object. 
                 rental.RentalItems.Add(new RentalItem
                 {
                     EquipmentItemID = item.EquipmentItemID,
@@ -494,6 +496,31 @@ namespace BusinessLayer.Controllers
                 $"{items.Count} utrustning(ar) har lagts till på bokning {bookingID} för {days} dag(ar). " +
                 $"{totalPrice:N2} kr har lagts till på bokningen. Nytt totalbelopp: {booking.TotalAmount:N2} kr.",
                 totalPrice);
+        }
+
+        /// <summary>
+        /// Validates a specific equipment between dates.
+        /// </summary>
+        public bool IsItemAvailableForDates(EquipmentItem item, DateTime startDate, DateTime endDate)
+        {
+            // Checks status for "Damaged" or "Maintenence".
+            if (item.Status == EquipmentStatus.Damaged || item.Status == EquipmentStatus.Maintenance)
+                return false;
+
+            // If RentalItems has had status = "Rented". 
+            if (item.RentalItems == null || !item.RentalItems.Any())
+                return true;
+
+            // Check for overlap. Overlas is defined when startdate for one booking begins when one ends. 
+            bool isDoubleBooked = item.RentalItems.Any(ri =>
+                ri.Rental != null &&
+                ri.Rental.Status != "Returned" &&
+                ri.Rental.Status != "Cancelled" &&
+                ri.Rental.StartDate.Date <= endDate.Date &&
+                ri.Rental.EndDate.Date >= startDate.Date
+            );
+
+            return !isDoubleBooked;
         }
 
         private static string StatusText(EquipmentStatus status)
