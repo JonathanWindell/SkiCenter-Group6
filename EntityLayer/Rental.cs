@@ -36,8 +36,8 @@ namespace EntityLayer
         // Parameterless constructor for EF
         public Rental() { }
 
-        // Relation to EquipmentItems. Many to Many relation
-        public virtual ICollection<EquipmentItem> EquipmentItems { get; set; } = new List<EquipmentItem>();
+        // Relation to RentalItems. Many to Many relation
+        public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
 
         public Rental(DateTime startDate, DateTime endDate, DateTime returnDate, string status, decimal sum)
         {

@@ -153,7 +153,7 @@ namespace TestLayer.UnitTests
             Assert.That(addedRental, Is.Not.Null);
             Assert.That(addedRental!.BookingID, Is.EqualTo(BookingId));
             Assert.That(addedRental.TotalPrice, Is.EqualTo(500m));
-            Assert.That(addedRental.EquipmentItems, Is.EquivalentTo(new[] { first, second }));
+            Assert.That(addedRental.RentalItems.Select(ri => ri.EquipmentItem), Is.EquivalentTo(new[] { first, second }));
             Assert.That(addedRental.Status, Is.EqualTo("Active"));
 
             // Verify

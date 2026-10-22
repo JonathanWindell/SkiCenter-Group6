@@ -51,10 +51,10 @@ namespace ServiceLayer
                     sb.AppendLine($"<li><strong>Hyresperiod ({rental.StartDate:yyyy-MM-dd} till {rental.EndDate:yyyy-MM-dd}) - Pris: {rental.TotalPrice:N2} kr</strong><ul>");
 
                     // List what equipment is rented (without price)
-                    foreach (var item in rental.EquipmentItems)
+                    foreach (var rentalItem in rental.RentalItems)
                     {
-                        string category = item.Equipment?.Category ?? "Utrustning";
-                        string size = string.IsNullOrWhiteSpace(item.Size) ? "Standard" : item.Size;
+                        string category = rentalItem.EquipmentItem?.Equipment?.Category ?? "Utrustning";
+                        string size = string.IsNullOrWhiteSpace(rentalItem.EquipmentItem?.Size) ? "Standard" : rentalItem.EquipmentItem.Size;
                         sb.AppendLine($"<li>{category} (Stl: {size})</li>");
                     }
                     sb.AppendLine("</ul></li>");

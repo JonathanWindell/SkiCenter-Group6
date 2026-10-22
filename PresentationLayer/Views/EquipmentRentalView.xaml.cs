@@ -150,7 +150,7 @@ namespace PresentationLayer.Views
             BookingTotalTextBlock.Text = $"Totalbelopp: {booking.TotalAmount:N2} kr";
 
             List<string> rentedItems = booking.Rentals
-                .SelectMany(r => r.EquipmentItems)
+                .SelectMany(r => r.RentalItems.Select(ri => ri.EquipmentItem))
                 .Select(item => $"{item.ArticleNumber} ({item.Equipment?.Category})")
                 .ToList();
 
