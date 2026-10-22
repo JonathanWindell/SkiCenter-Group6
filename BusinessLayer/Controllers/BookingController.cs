@@ -652,7 +652,7 @@ namespace BusinessLayer
             decimal insuranceTotal = booking.HasCancellationInsurance ? CancellationInsurancePrice : 0m;
             var insuranceVatSplit = VatRates.SplitVat(insuranceTotal, VatRates.CancellationInsurance);
 
-            // Summering
+            // Total calculation
             decimal totalInclVat = netAccom + rentalTotal + skiLessonTotal + meetingRoomTotal + insuranceTotal;
             decimal totalExclVat = accomVatSplit.amountExclVat
                                  + rentalVatSplit.amountExclVat
@@ -665,6 +665,86 @@ namespace BusinessLayer
             decimal totalVat = accomVat + otherVat;
 
             return (totalInclVat, totalExclVat, totalVat, accomVat, otherVat);
+        }
+
+        /// <summary>
+        /// Adds a meeting room to an existing booking.
+        /// </summary>
+        public void AddMeetingRoomToBooking(int bookingId, int meetingRoomId, DateTime startDate, DateTime endDate)
+        {
+            if (startDate.Date < DateTime.Today || endDate <= startDate)
+                throw new ArgumentException("Ogiltig datumperiod för mötesrummet.");
+
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId);
+            if (booking == null)
+                throw new InvalidOperationException("Hittade inte bokningen.");
+
+            int days = (endDate.Date - startDate.Date).Days;
+            int isoWeek = ISOWeek.GetWeekOfYear(startDate);
+
+            var room = _unitOfWork.MeetingRoom.GetByID(meetingRoomId);
+
+            // Set meeting room status = "Rented"
+            if (room != null)
+            {
+                room.Status = MeetingRoomStatus.Rented;
+            }
+
+            var seasonPrice = room?.SeasonPrices?.FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == isoWeek);
+            decimal calculatedPrice = (seasonPrice?.Price ?? 0m) * days;
+
+            var bookingMeetingRoom = new BookingMeetingRoom
+            {
+                BookingID = bookingId,
+                MeetingRoomID = meetingRoomId,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            if (booking.MeetingRooms == null)
+            {
+                booking.MeetingRooms = new List<BookingMeetingRoom>();
+            }
+
+            booking.MeetingRooms.Add(bookingMeetingRoom);
+
+            booking.TotalAmount += calculatedPrice;
+
+            if (booking.BookingStatus == BookingStatus.Cancelled)
+            {
+                booking.BookingStatus = BookingStatus.Preliminary;
+            }
+
+            _unitOfWork.Complete();
+        }
+
+        /// <summary>
+        /// Removes a meeting room from a booking and deducts the price.
+        /// </summary>
+        public void RemoveMeetingRoomFromBooking(int bookingId, int bookingMeetingRoomId)
+        {
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId);
+            if (booking == null) return;
+
+            var meetingRoomConnection = booking.MeetingRooms.FirstOrDefault(m => m.BookingMeetingRoomID == bookingMeetingRoomId);
+
+            if (meetingRoomConnection != null)
+            {
+                // Get meeting room and set status = "Available"
+                var room = _unitOfWork.MeetingRoom.GetByID(meetingRoomConnection.MeetingRoomID);
+                if (room != null)
+                {
+                    room.Status = MeetingRoomStatus.Available;
+                }
+
+                // Remove price from booking totalAmount.
+                booking.TotalAmount -= meetingRoomConnection.TotalPrice;
+
+                // Remove meeting room from booking.
+                booking.MeetingRooms.Remove(meetingRoomConnection);
+
+                _unitOfWork.Complete();
+            }
         }
     }
 }

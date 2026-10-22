@@ -45,6 +45,8 @@ namespace DataLayer.Repositories
                     .ThenInclude(ba => ba.Accommodation)
                     .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.MeetingRooms)
+                    .ThenInclude(mr => mr.meetingRoom)
+                        .ThenInclude(r => r.SeasonPrices)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
                     .ThenInclude(sls => sls.SkiLesson)

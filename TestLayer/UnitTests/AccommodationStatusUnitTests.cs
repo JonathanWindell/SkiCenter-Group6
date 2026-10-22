@@ -1,10 +1,7 @@
 ﻿using BusinessLayer.Controllers;
-using DataLayer;
 using DataLayer.Interfaces;
 using EntityLayer;
 using Moq;
-using NUnit.Framework;
-using System;
 
 namespace TestLayer.UnitTests
 {

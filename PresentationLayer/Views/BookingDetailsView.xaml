@@ -11,12 +11,9 @@
         Background="{StaticResource WindowBg}">
 
     <Window.Resources>
-        <local:BookingStatusSwedishConverter
-            x:Key="BookingStatusSwedishConverter"/>
-        <local:AccommodationStatusSwedishConverter
-            x:Key="AccommodationStatusSwedishConverter"/>
-        <local:BooleanSwedishConverter
-            x:Key="BooleanSwedishConverter"/>
+        <local:BookingStatusSwedishConverter x:Key="BookingStatusSwedishConverter"/>
+        <local:AccommodationStatusSwedishConverter x:Key="AccommodationStatusSwedishConverter"/>
+        <local:BooleanSwedishConverter x:Key="BooleanSwedishConverter"/>
     </Window.Resources>
 
     <Grid Margin="40">
@@ -33,20 +30,43 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <StackPanel Grid.Row="0"
-                            Margin="0,0,0,25">
+                <Grid Grid.Row="0" Margin="0,0,0,25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Bokningsdetaljer"
-                               FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource PrimaryText}"/>
+                    <StackPanel Grid.Column="0">
+                        <!-- Back button -->
+                        <Button Content="Tillbaka"
+                                Width="90"
+                                Height="32"
+                                Margin="0,0,0,15"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BackButton_Click"/>
 
-                    <TextBlock Text="Fullständig information om bokningen."
-                               Margin="0,6,0,0"
-                               FontSize="13"
-                               Foreground="{StaticResource SecondaryText}"/>
-                </StackPanel>
+                        <TextBlock Text="Bokningsdetaljer"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryText}"/>
+
+                        <TextBlock Text="Fullständig information om bokningen."
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource SecondaryText}"/>
+                    </StackPanel>
+
+                    <!-- Confirmation button (Sends mail using EmailNotificationService)-->
+                    <Button x:Name="BtnSendConfirmation"
+                            Grid.Column="1"
+                            VerticalAlignment="Top"
+                            Content="Skicka Bekräftelse"
+                            Width="150"
+                            Height="38"
+                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Click="BtnSendConfirmation_Click"/>
+                </Grid>
 
                 <!-- Scrollable booking information -->
                 <ScrollViewer Grid.Row="1"
@@ -207,62 +227,51 @@
                         <ItemsControl ItemsSource="{Binding MeetingRooms}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-
                                     <Border BorderBrush="{StaticResource InputBorder}"
-                                            BorderThickness="1"
-                                            CornerRadius="10"
-                                            Padding="20"
-                                            Margin="0,0,0,15">
-
+                                        BorderThickness="1"
+                                        CornerRadius="10"
+                                        Padding="20"
+                                        Margin="0,0,0,15">
+                                        
                                         <StackPanel>
-
-                                            <TextBlock Text="MÖTESRUM"
-                                                       FontSize="16"
-                                                       FontWeight="Bold"
-                                                       Foreground="{StaticResource PrimaryText}"
-                                                       Margin="0,0,0,12"/>
+                                            <TextBlock Text="MÖTESRUM" FontSize="16" FontWeight="Bold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,12"/>
 
                                             <TextBlock>
                                                 <Run Text="Rumsnummer: "/>
-                                                <Run Text="{Binding MeetingRoomNumber}"/>
+                                                <Run Text="{Binding meetingRoom.MeetingRoomNumber}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Kapacitet: "/>
-                                                <Run Text="{Binding Capacity}"/>
+                                                <Run Text="{Binding meetingRoom.Capacity}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Startdatum: "/>
-                                                <Run Text="{Binding StartDate,
-                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                                <Run Text="{Binding StartDate, StringFormat={}{0:yyyy-MM-dd}}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Slutdatum: "/>
-                                                <Run Text="{Binding EndDate,
-                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                                <Run Text="{Binding EndDate, StringFormat={}{0:yyyy-MM-dd}}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Beskrivning: "/>
-                                                <Run Text="{Binding Description}"/>
+                                                <Run Text="{Binding meetingRoom.Description}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Pris: "/>
-                                                <Run Text="{Binding Price,
-                                                    StringFormat={}{0:N0} kr}"/>
+                                                <Run Text="{Binding TotalPrice, Mode=OneWay, StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Status: "/>
-                                                <Run Text="{Binding Status}"/>
+                                                <Run Text="{Binding meetingRoom.Status}"/>
                                             </TextBlock>
-
                                         </StackPanel>
                                     </Border>
-
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -312,8 +321,7 @@
 
                                             <TextBlock Margin="0,5,0,15">
                                                 <Run Text="Pris för hyresperioden: "/>
-                                                <Run Text="{Binding TotalPrice,
-    StringFormat={}{0:N0} kr}"/>
+                                                <Run Text="{Binding TotalPrice, StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <!-- Equipment items -->
@@ -497,32 +505,23 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Booking actions -->
+                <!-- Buttons (Add & Cancel booking) -->
                 <Grid Grid.Row="2" Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button Grid.Column="0"
-                            Content="Tillbaka"
-                            Width="110"
-                            Height="38"
-                            HorizontalAlignment="Left"
-                            Style="{StaticResource DeepSeaButtonStyle}"
-                            Click="BackButton_Click"/>
-
+                    <!-- Cancel booking -->
                     <Button x:Name="CancelBookingButton"
-                            Grid.Column="1"
+                            Grid.Column="0"
                             Content="Avboka bokning"
-                            Width="160"
+                            Width="150"
                             Height="38">
-
                         <Button.Style>
-                            <Style TargetType="Button"
-                                    BasedOn="{StaticResource DeepSeaButtonStyle}">
+                            <Style TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
                                 <Style.Triggers>
-                                    <!-- Clearly show when cancellation is unavailable. -->
                                     <Trigger Property="IsEnabled" Value="False">
                                         <Setter Property="Background" Value="#E5E7EB"/>
                                         <Setter Property="Foreground" Value="#6B7280"/>
@@ -533,6 +532,34 @@
                             </Style>
                         </Button.Style>
                     </Button>
+
+                    <!-- Add buttons (Equipment, Ski school, meeting room -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                        <Button x:Name="BtnAddEquipment"
+                                Content="+ Lägg till Utrustning"
+                                Width="150"
+                                Height="38"
+                                Margin="0,0,10,0"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BtnAddEquipment_Click"/>
+
+                        <Button x:Name="BtnAddSkiSchool"
+                                Content="+ Lägg till Skidskola"
+                                Width="150"
+                                Height="38"
+                                Margin="0,0,10,0" 
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BtnAddSkiSchool_Click"/>
+
+                        <Button x:Name="BtnAddMeetingRoom"
+                                Content="+ Lägg till Mötesrum"
+                                Width="150"
+                                Height="38"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BtnAddMeetingRoom_Click"/>
+                        
+                    </StackPanel>
                 </Grid>
 
             </Grid>

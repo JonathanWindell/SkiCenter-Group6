@@ -170,10 +170,11 @@ namespace PresentationLayer.Views
 
                 if (specificBooking != null)
                 {
-                    BookingDetailsView bookingDetailsView =
-                        new BookingDetailsView(specificBooking);
+                    var detailsView = Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance<BookingDetailsView>(
+                        ((App)Application.Current).Services,
+                        booking);
 
-                    bookingDetailsView.ShowDialog();
+                    detailsView.ShowDialog();
                 }
             }
         }

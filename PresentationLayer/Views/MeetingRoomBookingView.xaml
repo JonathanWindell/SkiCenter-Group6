@@ -1,0 +1,78 @@
+﻿<Window x:Class="PresentationLayer.Views.MeetingRoomBookingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hantera Mötesrum" Height="650" Width="600"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource WindowBg}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+            <Button Content="Tillbaka" Width="90" Height="32" HorizontalAlignment="Left" Margin="0,0,0,10"
+                    Style="{StaticResource DeepSeaButtonStyle}" Click="BtnBack_Click"/>
+            <TextBlock Text="Hantera Mötesrum" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryText}"/>
+        </StackPanel>
+
+        <!-- Rented meeting rooms -->
+        <TextBlock Grid.Row="1" Text="Bokade mötesrum på denna bokning:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+
+        <DataGrid x:Name="BookedMeetingRoomsDataGrid" Grid.Row="2" AutoGenerateColumns="False" 
+                  IsReadOnly="True" SelectionMode="Single" Margin="0,0,0,5">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Rumsnummer" Binding="{Binding meetingRoom.MeetingRoomNumber}" Width="*"/>
+                <DataGridTextColumn Header="Startdatum" Binding="{Binding StartDate, StringFormat={}{0:yyyy-MM-dd}}" Width="*"/>
+                <DataGridTextColumn Header="Slutdatum" Binding="{Binding EndDate, StringFormat={}{0:yyyy-MM-dd}}" Width="*"/>
+                <DataGridTextColumn Header="Pris" Binding="{Binding TotalPrice, Mode=OneWay, StringFormat={}{0:N0} kr}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button x:Name="BtnRemove" Grid.Row="3" Content="Ta bort valt rum" Width="140" Height="30" 
+                HorizontalAlignment="Right" Margin="0,0,0,20" Click="BtnRemove_Click">
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
+                    <Setter Property="Background" Value="#EF4444"/>
+                </Style>
+            </Button.Style>
+        </Button>
+
+        <!-- Search for Available meeting rooms -->
+        <TextBlock Grid.Row="4" Text="Sök lediga mötesrum:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Margin="0,25,0,10">
+            <StackPanel Margin="0,0,15,0">
+                <TextBlock Text="Startdatum:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <DatePicker x:Name="StartDatePicker" Width="120"/>
+            </StackPanel>
+
+            <StackPanel Margin="0,0,15,0">
+                <TextBlock Text="Slutdatum:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                <DatePicker x:Name="EndDatePicker" Width="120"/>
+            </StackPanel>
+
+            <Button Content="Sök lediga rum" Width="120" Height="30" VerticalAlignment="Bottom"
+                    Style="{StaticResource DeepSeaButtonStyle}" Click="BtnSearch_Click"/>
+        </StackPanel>
+
+        <!-- Available Meeting Rooms -->
+        <DataGrid x:Name="MeetingRoomsDataGrid" Grid.Row="5" AutoGenerateColumns="False" 
+                  IsReadOnly="True" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Rumsnummer" Binding="{Binding MeetingRoomNumber}" Width="*"/>
+                <DataGridTextColumn Header="Kapacitet" Binding="{Binding Capacity}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Button x:Name="BtnAdd" Grid.Row="6" Content="Lägg till i bokning" Width="150" Height="35" 
+                HorizontalAlignment="Right" Margin="0,15,0,0"
+                Style="{StaticResource DeepSeaButtonStyle}" Click="BtnAdd_Click"/>
+    </Grid>
+</Window>

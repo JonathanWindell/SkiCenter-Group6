@@ -47,6 +47,19 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
-        // MISSING 2 FUNCTIONS, WIP
+        /// <summary>
+        /// Gets available meeting rooms for a specific date range.
+        /// </summary>
+        public IEnumerable<MeetingRoom> GetAvailableMeetingRooms(DateTime startDate, DateTime endDate)
+        {
+            // Fetch all available meeting rooms where there are no overlapping bookings.
+            return _context.Set<MeetingRoom>()
+                .Where(m => !_context.Set<BookingMeetingRoom>().Any(bmr =>
+                    bmr.MeetingRoomID == m.MeetingRoomID &&
+                    bmr.StartDate < endDate &&
+                    bmr.EndDate > startDate))
+                .AsNoTracking()
+                .ToList();
+        }
     }
 }
