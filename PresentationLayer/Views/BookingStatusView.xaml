@@ -31,7 +31,7 @@
                     Click="BackButton_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Bokningsöversikt"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Bokningsöversikt"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -55,7 +55,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <Border.Triggers>
@@ -127,7 +127,7 @@
                     <Button.Style>
                         <Style TargetType="Button"
                                BasedOn="{StaticResource DeepSeaButtonStyle}">
-                            <Setter Property="Background" Value="#E5E7EB"/>
+                            <Setter Property="Background" Value="#DCEAF7"/>
                             <Setter Property="Foreground"
                                     Value="{StaticResource PrimaryText}"/>
                         </Style>
@@ -212,11 +212,11 @@
                                         VerticalAlignment="Center">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#E5E7EB"/>
+                                                    <Setter Property="Background" Value="#DCEAF7"/>
 
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding BookingStatus}"  Value="Bekräftad">
-                                                            <Setter Property="Background" Value="#EDE9FE"/>
+                                                            <Setter Property="Background" Value="#DCEAF7"/>
                                                         </DataTrigger>
 
                                                         <DataTrigger Binding="{Binding BookingStatus}" Value="Preliminär">
@@ -229,11 +229,11 @@
                                             <TextBlock Text="{Binding BookingStatus}" FontWeight="SemiBold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="#374151"/>
+                                                        <Setter Property="Foreground" Value="#2A2F36"/>
 
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding BookingStatus}" Value="Bekräftad">
-                                                                <Setter Property="Foreground" Value="#5B21B6"/>
+                                                                <Setter Property="Foreground" Value="#1E4F8C"/>
                                                             </DataTrigger>
 
                                                             <DataTrigger Binding="{Binding BookingStatus}" Value="Preliminär">
@@ -259,7 +259,7 @@
                                         VerticalAlignment="Center">
                                             <Border.Style>
                                                 <Style TargetType="Border">
-                                                    <Setter Property="Background" Value="#E5E7EB"/>
+                                                    <Setter Property="Background" Value="#DCEAF7"/>
 
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding PaymentStatus}" Value="Fullbetald">
@@ -280,7 +280,7 @@
                                             <TextBlock Text="{Binding PaymentStatus}" FontWeight="SemiBold">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Foreground" Value="#374151"/>
+                                                        <Setter Property="Foreground" Value="#2A2F36"/>
 
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding PaymentStatus}" Value="Fullbetald">
@@ -314,7 +314,7 @@
                     Margin="0,20,0,0"
                     HorizontalAlignment="Left"
                     RenderTransformOrigin="0.5,0.5"
-                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Style="{StaticResource CtaButtonStyle}"
                     Click="ShowCustomerBookingsButton_Click"/>
 
                 <Button x:Name="ShowBookingDetailsButton"

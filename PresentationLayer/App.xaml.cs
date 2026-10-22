@@ -30,6 +30,9 @@ namespace PresentationLayer
         /// </summary>
         public App()
         {
+            // The graphic profile's body font for all windows. Must run before any window is created.
+            PresentationLayer.Resources.BrandFonts.Apply();
+
             var services = new ServiceCollection();
 
             // Build config and point to appsettings.json

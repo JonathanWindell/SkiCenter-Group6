@@ -17,7 +17,7 @@
                 <Rectangle Width="10" Height="10" Fill="{StaticResource PrimaryBtn}" RadiusX="2" RadiusY="2"/>
                 <TextBlock x:Name="CurrentLegendTextBlock" Text="Vald period" Margin="5,0,12,0" FontSize="12"
                            Foreground="{StaticResource PrimaryText}"/>
-                <Rectangle x:Name="PreviousLegendRectangle" Width="10" Height="10" Fill="#A5B4FC" RadiusX="2" RadiusY="2"/>
+                <Rectangle x:Name="PreviousLegendRectangle" Width="10" Height="10" Fill="#52B788" RadiusX="2" RadiusY="2"/>
                 <TextBlock x:Name="PreviousLegendTextBlock" Text="Föregående år" Margin="5,0,0,0" FontSize="12"
                            Foreground="{StaticResource PrimaryText}"/>
             </StackPanel>

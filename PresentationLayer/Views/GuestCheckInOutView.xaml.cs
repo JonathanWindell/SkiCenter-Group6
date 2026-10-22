@@ -108,7 +108,7 @@ namespace PresentationLayer.Views
 
             if (success)
             {
-                MessageBox.Show($"Bokning #{guest.BookingID} ({guest.CustomerName}) är nu incheckad!", "Incheckad", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Välkommen till fjället! Bokning #{guest.BookingID} ({guest.CustomerName}) är nu incheckad.", "Incheckning klar", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadGuests();
                 RefreshGuests();
             }
@@ -142,7 +142,7 @@ namespace PresentationLayer.Views
 
             if (success)
             {
-                MessageBox.Show($"Bokning #{guest.BookingID} ({guest.CustomerName}) är nu utcheckad!", "Utcheckad", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Tack för besöket! Bokning #{guest.BookingID} ({guest.CustomerName}) är nu utcheckad.", "Utcheckning klar", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadGuests();
                 RefreshGuests();
             }

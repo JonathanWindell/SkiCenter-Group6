@@ -46,7 +46,7 @@
                                 Style="{StaticResource DeepSeaButtonStyle}"
                                 Click="BackButton_Click"/>
 
-                        <TextBlock Text="Bokningsdetaljer"
+                        <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Bokningsdetaljer"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource PrimaryText}"/>
@@ -64,7 +64,7 @@
                             Content="Skicka Bekräftelse"
                             Width="150"
                             Height="38"
-                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Style="{StaticResource CtaButtonStyle}"
                             Click="BtnSendConfirmation_Click"/>
                 </Grid>
 
@@ -523,7 +523,7 @@
                             <Style TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
                                 <Style.Triggers>
                                     <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#E5E7EB"/>
+                                        <Setter Property="Background" Value="#DCEAF7"/>
                                         <Setter Property="Foreground" Value="#6B7280"/>
                                         <Setter Property="Opacity" Value="0.5"/>
                                         <Setter Property="Cursor" Value="Arrow"/>

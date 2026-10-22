@@ -19,7 +19,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.08" Color="#1E1B4B"/>
+                    <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.08" Color="#2A2F36"/>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -54,7 +54,7 @@
                         Click="BtnBack_Click"/>
 
                 <StackPanel Grid.Column="1" Margin="20,0,0,0" VerticalAlignment="Center">
-                    <TextBlock Text="Skidskola &amp; Lektioner" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryText}"/>
+                    <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Skidskola &amp; Lektioner" FontSize="26" FontWeight="Bold" Foreground="{StaticResource PrimaryText}"/>
                     <TextBlock Text="Boka grupp- och privatlektioner för gäster" FontSize="14" Foreground="{StaticResource SecondaryText}"/>
                 </StackPanel>
 
@@ -165,12 +165,12 @@
                             <TextBlock x:Name="TxtCustomerBookedSpots" Text="0 platser" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,15"/>
 
                             <TextBlock Text="PRIS PER DELTAGARE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SecondaryText}" Margin="0,0,0,3"/>
-                            <TextBlock x:Name="TxtSummaryPrice" Text="-" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBtn}" Margin="0,0,0,15"/>
+                            <TextBlock FontFamily="{StaticResource HeadingFont}" x:Name="TxtSummaryPrice" Text="-" FontSize="20" FontWeight="Bold" Foreground="{StaticResource PrimaryBtn}" Margin="0,0,0,15"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="2">
                             <Button x:Name="BtnBookSession" Content="Boka lektion" Height="42"
-                                    Style="{StaticResource DeepSeaButtonStyle}"
+                                    Style="{StaticResource CtaButtonStyle}"
                                     IsEnabled="False"
                                     Click="BtnBookSession_Click"/>
 

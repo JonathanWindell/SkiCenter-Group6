@@ -8,11 +8,11 @@
         WindowStartupLocation="CenterScreen">
 
     <Grid Background="Transparent" MouseLeftButtonDown="Window_MouseLeftButtonDown">
-        <Border x:Name="MainBorder" Width="380" Height="460" 
-                VerticalAlignment="Center" HorizontalAlignment="Center" 
-                Background="{StaticResource WindowBg}" CornerRadius="20" Padding="40">
+        <Border x:Name="MainBorder" Width="380" Height="530"
+                VerticalAlignment="Center" HorizontalAlignment="Center"
+                Background="{StaticResource MountainBackgroundBrush}" CornerRadius="20" Padding="40">
             <Border.Effect>
-                <DropShadowEffect BlurRadius="25" ShadowDepth="2" Opacity="0.15" Color="#1E1B4B"/>
+                <DropShadowEffect BlurRadius="25" ShadowDepth="2" Opacity="0.15" Color="#2A2F36"/>
             </Border.Effect>
 
             <Grid>
@@ -28,8 +28,11 @@
                         </StackPanel>
                     </Grid>
 
-                    <TextBlock FontSize="28" FontWeight="ExtraBold" 
-                               HorizontalAlignment="Center" Margin="0,0,0,20" 
+                    <ContentControl Style="{StaticResource BrandLogoStyle}" Height="62" HorizontalAlignment="Center" Margin="0,0,0,14"/>
+
+
+                    <TextBlock FontFamily="{StaticResource HeadingFont}" FontSize="24" FontWeight="Bold"
+                               HorizontalAlignment="Center" Margin="0,0,0,18" 
                                Foreground="{StaticResource PrimaryText}">
                         <Run Language="sv-se" Text="Logga in"/>
                     </TextBlock>
@@ -56,12 +59,12 @@
                     </StackPanel>
 
                     <Button Content="Logga in" Height="45"
-                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Style="{StaticResource CtaButtonStyle}"
                             Click="btnLogin_Click"/>
 
                     <!-- TEMP: Test button that logs in as system admin without animation. Remove before release. -->
                     <Button Content="Quick Login Sys Admin" Height="30" Margin="0,10,0,0"
-                            Background="#E5E7EB" Foreground="#374151"
+                            Background="#DCEAF7" Foreground="#2A2F36"
                             BorderThickness="0" FontSize="12"
                             Click="btnQuickLoginSysAdmin_Click"/>
 

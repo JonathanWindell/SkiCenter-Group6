@@ -31,7 +31,7 @@
                     Click="BackButton_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Kundens bokningar"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Kundens bokningar"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -55,7 +55,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -326,7 +326,7 @@
                                 Width="180"
                                 Height="38"
                                 HorizontalAlignment="Left"
-                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Style="{StaticResource CtaButtonStyle}"
                                 Click="CreateNewBooking_Click"/>
                     </Grid>
 

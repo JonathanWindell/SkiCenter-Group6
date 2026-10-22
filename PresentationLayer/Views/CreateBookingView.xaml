@@ -26,7 +26,7 @@
                 <!-- Header -->
                 <StackPanel Grid.Row="0">
 
-                    <TextBlock Text="Skapa ny bokning"
+                    <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Skapa ny bokning"
                                FontSize="26"
                                FontWeight="Bold"
                                Foreground="{StaticResource PrimaryText}"/>
@@ -298,7 +298,7 @@
                             Content="Skapa bokning"
                             Width="150"
                             Height="38"
-                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Style="{StaticResource CtaButtonStyle}"
                             Click="CreateBooking_Click"/>
 
                 </Grid>

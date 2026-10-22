@@ -1,0 +1,96 @@
+<!--
+    Brand graphics drawn as vectors in the graphic profile's colors, so they stay sharp at any size.
+    - MountainBackgroundBrush: the mountain landscape (same shapes as Images/Fjallbakgrund.png, recolored).
+    - BrandLogoStyle: the Ski-Center logo – a stylized mountain of two diagonal lines,
+      a sweeping curve for ski tracks/snow, and the name in Montserrat.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Mountain landscape in cold Nordic blue tones. Drawn on a 1440 x 900 canvas and stretched to fill. -->
+    <DrawingBrush x:Key="MountainBackgroundBrush" Stretch="Fill" Viewbox="0,0,1440,900" ViewboxUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <!-- Sky -->
+                <GeometryDrawing Geometry="M0,0 H1440 V900 H0 Z">
+                    <GeometryDrawing.Brush>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#F8FAFC" Offset="0"/>
+                            <GradientStop Color="#DCEAF7" Offset="0.75"/>
+                        </LinearGradientBrush>
+                    </GeometryDrawing.Brush>
+                </GeometryDrawing>
+
+                <!-- Distant mountains -->
+                <GeometryDrawing Brush="#CFE1F4"
+                                 Geometry="M0,340 L160,270 255,300 390,205 530,325 680,250 850,310 1000,180 1140,290 1300,225 1440,310 V900 H0 Z"/>
+
+                <!-- Near mountains -->
+                <GeometryDrawing Brush="#A8C6E6"
+                                 Geometry="M0,770 L210,670 350,720 590,610 770,730 1000,620 1180,730 1440,650 V900 H0 Z"/>
+
+                <!-- Snow hill -->
+                <GeometryDrawing Brush="#F1F6FC"
+                                 Geometry="M0,835 C150,790 300,775 470,830 C640,890 800,880 960,825 C1150,760 1300,775 1440,815 V900 H0 Z"/>
+
+                <!-- Trees in Fjällblå, slightly transparent -->
+                <GeometryDrawing Brush="#B31E4F8C"
+                                 Geometry="M90,745 L120,840 105,840 125,870 55,870 75,840 60,840 Z
+                                           M1330,725 L1360,835 1345,835 1370,875 1290,875 1315,835 1300,835 Z
+                                           M1390,755 L1410,840 1400,840 1413,870 1367,870 1380,840 1370,840 Z"/>
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!-- The logo's symbol: two diagonal lines forming a mountain and a sweeping ski track -->
+    <DrawingImage x:Key="LogoSymbol">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+                <!-- Transparent frame so the symbol keeps its proportions -->
+                <GeometryDrawing Brush="Transparent" Geometry="M0,0 H120 V60 H0 Z"/>
+
+                <!-- Outer mountain line -->
+                <GeometryDrawing Geometry="M6,52 L40,10 L60,32 L74,16 L114,52">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#1E4F8C" Thickness="7" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+
+                <!-- Inner mountain line -->
+                <GeometryDrawing Geometry="M24,50 L40,30 L52,44">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#1E4F8C" Thickness="6" StartLineCap="Round" EndLineCap="Round" LineJoin="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+
+                <!-- Ski track / snow -->
+                <GeometryDrawing Geometry="M4,46 C30,34 50,36 66,42 S96,48 116,40">
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#7DB2E3" Thickness="4.5" StartLineCap="Round" EndLineCap="Round"/>
+                    </GeometryDrawing.Pen>
+                </GeometryDrawing>
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!-- The full logo: symbol, name and tagline. Scales with the control's Height. -->
+    <Style x:Key="BrandLogoStyle" TargetType="ContentControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContentControl">
+                    <Viewbox Stretch="Uniform">
+                        <StackPanel Width="190">
+                            <Image Source="{StaticResource LogoSymbol}" Width="104" HorizontalAlignment="Left" Margin="2,0,0,-6"/>
+                            <TextBlock Text="Ski-Center"
+                                       FontFamily="pack://application:,,,/PresentationLayer;component/Resources/Fonts/#Montserrat"
+                                       FontWeight="Bold" FontSize="34" Foreground="#1E4F8C" Margin="0,0,0,-2"/>
+                            <TextBlock Text="F J Ä L L U P P L E V E L S E R   Å R E T   O M"
+                                       FontFamily="pack://application:,,,/PresentationLayer;component/Resources/Fonts/#Open Sans"
+                                       FontWeight="SemiBold" FontSize="8.2" Foreground="#2A2F36" Margin="2,0,0,0"/>
+                        </StackPanel>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

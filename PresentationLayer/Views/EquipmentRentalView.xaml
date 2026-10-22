@@ -66,8 +66,8 @@
         </Style>
 
         <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
-            <Setter Property="Background" Value="#E5E7EB"/>
-            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Background" Value="#DCEAF7"/>
+            <Setter Property="Foreground" Value="#2A2F36"/>
         </Style>
 
         <Style x:Key="LabelStyle" TargetType="TextBlock">
@@ -116,7 +116,7 @@
                                 Click="BackButton_Click"/>
 
                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Uthyrning"
+                        <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Uthyrning"
                                    FontSize="28"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource PrimaryText}"/>
@@ -404,7 +404,7 @@
                                             Content="Lägg till på bokningen"
                                             Height="38"
                                             IsEnabled="False"
-                                            Style="{StaticResource DeepSeaButtonStyle}"/>
+                                            Style="{StaticResource CtaButtonStyle}"/>
 
                                     <Button x:Name="CancelEditRentalButton"
                                             Grid.Column="1"
@@ -446,7 +446,7 @@
                             Click="BackButton_Click"/>
 
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Återlämning"
+                        <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Återlämning"
                                    FontSize="28"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource PrimaryText}"/>
@@ -628,7 +628,7 @@
                                         Height="38"
                                         Margin="0,12,0,0"
                                         IsEnabled="False"
-                                        Style="{StaticResource DeepSeaButtonStyle}"/>
+                                        Style="{StaticResource CtaButtonStyle}"/>
                             </Grid>
                         </Border>
                     </Grid>

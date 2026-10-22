@@ -54,10 +54,9 @@ namespace PresentationLayer.Views
             ItemSearchTextBox.TextChanged += (_, _) => ApplyItemFilter();
             AddToRentalButton.Click += AddToRentalButton_Click;
             RemoveFromRentalButton.Click += RemoveFromRentalButton_Click;
+            // A new period changes both the price and which items are free during it
             StartDatePicker.SelectedDateChanged += (_, _) => { UpdateRentalSummary(); ApplyItemFilter(); };
             EndDatePicker.SelectedDateChanged += (_, _) => { UpdateRentalSummary(); ApplyItemFilter(); };
-            StartDatePicker.SelectedDateChanged += (_, _) => UpdateRentalSummary();
-            EndDatePicker.SelectedDateChanged += (_, _) => UpdateRentalSummary();
             LicenseVerifiedCheckBox.Checked += (_, _) => ResetLicenseHighlight();
             ConfirmRentalButton.Click += ConfirmRentalButton_Click;
 
@@ -655,7 +654,7 @@ namespace PresentationLayer.Views
                 string itemList = string.Join("\n", _selectedItems.Select(item => $"  • {item.ArticleNumber} – {item.Equipment?.DisplayName ?? item.Equipment?.Description}"));
 
                 MessageBox.Show(
-                    $"Utrustningen är kopplad till bokning {bookingId} och betalas på rummet.\n\n" +
+                    $"Klart för fjället! Utrustningen är kopplad till bokning {bookingId} och betalas på rummet.\n\n" +
                     $"{itemList}\n\n" +
                     $"Period: {startDate:yyyy-MM-dd} – {endDate:yyyy-MM-dd}\n" +
                     $"Tillagt belopp: {result.addedAmount:N2} kr\n\n" +
@@ -797,7 +796,7 @@ namespace PresentationLayer.Views
             if (result.Success)
             {
                 MessageBox.Show(
-                    $"{_returnQueue.Count} artikel/artiklar har återlämnats och sparats i systemet.",
+                    $"Tack! {_returnQueue.Count} artikel/artiklar är återlämnade och redo för nästa fjälläventyr.",
                     "Återlämning klar",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

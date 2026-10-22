@@ -31,7 +31,7 @@
                     Click="BackButton_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Utrustning"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Utrustning"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -54,7 +54,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <Grid>
@@ -244,8 +244,8 @@
                                 <Button.Style>
                                     <Style TargetType="Button"
                                 BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                        <Setter Property="Background" Value="#E5E7EB"/>
-                                        <Setter Property="Foreground" Value="#374151"/>
+                                        <Setter Property="Background" Value="#DCEAF7"/>
+                                        <Setter Property="Foreground" Value="#2A2F36"/>
                                     </Style>
                                 </Button.Style>
                             </Button>
@@ -280,7 +280,7 @@
                         <ScrollViewer VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
                             <StackPanel>
-                                <TextBlock x:Name="EquipmentFormHeading"
+                                <TextBlock FontFamily="{StaticResource HeadingFont}" x:Name="EquipmentFormHeading"
                                        Text="Lägg till utrustning"
                                        FontSize="20"
                                        FontWeight="Bold"
@@ -390,8 +390,8 @@
                                         <Button.Style>
                                             <Style TargetType="Button"
                                                BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                                <Setter Property="Background" Value="#E5E7EB"/>
-                                                <Setter Property="Foreground" Value="#374151"/>
+                                                <Setter Property="Background" Value="#DCEAF7"/>
+                                                <Setter Property="Foreground" Value="#2A2F36"/>
                                             </Style>
                                         </Button.Style>
                                     </Button>
@@ -400,7 +400,7 @@
                                         Grid.Column="2"
                                         Content="Spara utrustning"
                                         Height="36"
-                                        Style="{StaticResource DeepSeaButtonStyle}"/>
+                                        Style="{StaticResource CtaButtonStyle}"/>
                                 </Grid>
                             </StackPanel>
                             

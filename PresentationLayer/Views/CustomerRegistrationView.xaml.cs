@@ -201,11 +201,11 @@ namespace PresentationLayer.Views
             // Handle result
             if (saveSuccess)
             {
-                ValidationMessage.Text = "Kunden har sparats i databasen!";
+                ValidationMessage.Text = "Kunden är registrerad och redo för sitt första fjälläventyr!";
                 ValidationMessage.Foreground = Brushes.Green;
                 ValidationMessage.Visibility = Visibility.Visible;
 
-                MessageBox.Show("Kunden registrerades framgångsrikt!", "Registrering klar", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Välkommen ombord! Kunden är nu registrerad och kan bokas direkt.", "Ny kund registrerad", MessageBoxButton.OK, MessageBoxImage.Information);
                 Close();
             }
             else
