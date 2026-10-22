@@ -31,7 +31,7 @@
                     Click="Cancel_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Registrera kund"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Registrera kund"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -54,7 +54,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
@@ -256,7 +256,7 @@
                         <Button Content="Spara kund"
                             Width="130"
                             Height="40"
-                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Style="{StaticResource CtaButtonStyle}"
                             Click="SaveCustomer_Click"/>
 
 

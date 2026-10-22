@@ -159,7 +159,7 @@ namespace PresentationLayer.Views
                     : "";
 
                 MessageBox.Show(
-                    $"{successCount} av {rowsToApprove.Count} företagskunder har godkänts och sparats i databasen!{bookingMsg}",
+                    $"Klart! {successCount} av {rowsToApprove.Count} företagskunder är godkända och redo att boka.{bookingMsg}",
                     "Klart",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

@@ -19,7 +19,7 @@
         <!-- Provide pressed and disabled button feedback. -->
         <Style x:Key="GuestActionButtonStyle"
                TargetType="Button"
-               BasedOn="{StaticResource DeepSeaButtonStyle}">
+               BasedOn="{StaticResource CtaButtonStyle}">
             <Style.Triggers>
                 <Trigger Property="IsPressed" Value="True">
                     <Setter Property="Opacity" Value="0.75"/>
@@ -32,10 +32,15 @@
 
         <Style x:Key="GuestSecondaryButtonStyle"
                TargetType="Button"
-               BasedOn="{StaticResource GuestActionButtonStyle}">
-            <Setter Property="Background" Value="#E5E7EB"/>
+               BasedOn="{StaticResource DeepSeaButtonStyle}">
+            <Setter Property="Background" Value="#DCEAF7"/>
             <Setter Property="Foreground"
                     Value="{StaticResource PrimaryText}"/>
+            <Style.Triggers>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Opacity" Value="0.75"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
@@ -62,7 +67,7 @@
                     Click="BtnBack_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="In- och utcheckning"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="In- och utcheckning"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -85,7 +90,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <Border.Triggers>
@@ -241,7 +246,7 @@
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background"
-                                                    Value="#E5E7EB"/>
+                                                    Value="#DCEAF7"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding PaymentStatus}"
                                                              Value="Fullbetald">
@@ -267,7 +272,7 @@
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground"
-                                                        Value="#374151"/>
+                                                        Value="#2A2F36"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding PaymentStatus}"
                                                                  Value="Fullbetald">
@@ -304,12 +309,12 @@
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Setter Property="Background"
-                                                    Value="#E5E7EB"/>
+                                                    Value="#DCEAF7"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding StayStatus}"
                                                              Value="Incheckad">
                                                         <Setter Property="Background"
-                                                            Value="#EDE9FE"/>
+                                                            Value="#DCEAF7"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -320,12 +325,12 @@
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Foreground"
-                                                        Value="#374151"/>
+                                                        Value="#2A2F36"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding StayStatus}"
                                                                  Value="Incheckad">
                                                             <Setter Property="Foreground"
-                                                                Value="#5B21B6"/>
+                                                                Value="#1E4F8C"/>
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>

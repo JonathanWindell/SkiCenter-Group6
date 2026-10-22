@@ -30,7 +30,7 @@
                     Click="BackButton_Click"/>
 
             <StackPanel>
-                <TextBlock Text="Kredit- och avtalshantering"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Kredit- och avtalshantering"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -53,7 +53,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <Border.Triggers>
@@ -106,7 +106,7 @@
                             <Button.Style>
                                 <Style TargetType="Button"
                                 BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                    <Setter Property="Background" Value="#E5E7EB"/>
+                                    <Setter Property="Background" Value="#DCEAF7"/>
                                     <Setter Property="Foreground"
                                     Value="{StaticResource PrimaryText}"/>
                                 </Style>
@@ -249,7 +249,7 @@
                     Margin="0,20,0,0"
                     HorizontalAlignment="Center"
                    
-                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Style="{StaticResource CtaButtonStyle}"
                     Click="SaveRowsButton_Click">
                    
 

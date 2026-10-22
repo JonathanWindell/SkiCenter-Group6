@@ -14,7 +14,7 @@ namespace PresentationLayer.Controls
     /// </summary>
     public partial class BarChart : UserControl
     {
-        private static readonly Brush PreviousBrush = new SolidColorBrush(Color.FromRgb(0xA5, 0xB4, 0xFC));
+        private static readonly Brush PreviousBrush = new SolidColorBrush(Color.FromRgb(0x52, 0xB7, 0x88));
 
         public BarChart()
         {

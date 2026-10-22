@@ -49,7 +49,29 @@ namespace TestLayer.UnitTests
             return booking;
         }
 
+        /// <summary>
+        /// Creates an item. A rented item also gets an active rental from today and six days ahead,
+        /// since availability is checked against rental dates and not only the status.
+        /// </summary>
         private static EquipmentItem CreateItem(int id, EquipmentStatus status, string category = "Alpint")
+        {
+            EquipmentItem item = CreateItemWithoutRentals(id, status, category);
+
+            if (status == EquipmentStatus.Rented)
+            {
+                AddRental(item, DateTime.Today, DateTime.Today.AddDays(6));
+            }
+
+            return item;
+        }
+
+        private static void AddRental(EquipmentItem item, DateTime start, DateTime end)
+        {
+            var rental = new Rental { StartDate = start, EndDate = end, Status = "Active" };
+            item.RentalItems.Add(new RentalItem { Rental = rental, EquipmentItem = item });
+        }
+
+        private static EquipmentItem CreateItemWithoutRentals(int id, EquipmentStatus status, string category)
         {
             return new EquipmentItem
             {
@@ -100,6 +122,24 @@ namespace TestLayer.UnitTests
             // Verify
             _mockRentalRepo.Verify(r => r.Add(It.IsAny<Rental>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
+        }
+
+        /// <summary>
+        /// Verifies that equipment rented out in another period can still be booked for free dates.
+        /// </summary>
+        [Test]
+        public void AddEquipmentToBooking_ItemRentedInOtherPeriod_CanBeRented()
+        {
+            // Arrange: the item is rented out next month, the booking's stay is now
+            EquipmentItem item = CreateItemWithoutRentals(1, EquipmentStatus.Available, "Alpint");
+            AddRental(item, DateTime.Today.AddMonths(1), DateTime.Today.AddMonths(1).AddDays(3));
+            SetupItems(item);
+
+            // Act
+            var (success, message, _) = _controller.AddEquipmentToBooking(BookingId, new[] { 1 }, DateTime.Today, DateTime.Today, false);
+
+            // Assert
+            Assert.That(success, Is.True, message);
         }
 
         /// <summary>

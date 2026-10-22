@@ -133,8 +133,9 @@ namespace PresentationLayer.Views
             text.Children.Add(new TextBlock
             {
                 Text = info.Title,
-                FontSize = 13.5,
-                FontWeight = FontWeights.Bold,
+                FontSize = 13,
+                FontFamily = (FontFamily)FindResource("HeadingFont"),
+                FontWeight = FontWeights.SemiBold,
                 Foreground = (Brush)FindResource("PrimaryText"),
                 TextTrimming = TextTrimming.CharacterEllipsis
             });

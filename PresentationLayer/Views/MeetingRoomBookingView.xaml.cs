@@ -89,7 +89,7 @@ namespace PresentationLayer.Views
                     EndDatePicker.SelectedDate.Value);
 
                 LoadBookedRooms(); // Update top list
-                MessageBox.Show("Mötesrummet har lagts till i bokningen!", "Klart", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Mötesrummet är bokat och tillagt i bokningen!", "Mötesrum bokat", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

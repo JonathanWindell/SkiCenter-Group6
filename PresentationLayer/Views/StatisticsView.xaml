@@ -115,7 +115,7 @@
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="BackButton_Click"/>
                     
-                    <TextBlock Text="Statistik"
+                    <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Statistik"
                                FontSize="26"
                                FontWeight="Bold"
                                Foreground="{StaticResource PrimaryText}"/>
@@ -190,7 +190,7 @@
                         Width="130"
                         Height="34"
                         VerticalAlignment="Bottom"
-                        Style="{StaticResource DeepSeaButtonStyle}"/>
+                        Style="{StaticResource CtaButtonStyle}"/>
 
                 <TextBlock x:Name="MessageTextBlock"
                            Grid.Column="9"

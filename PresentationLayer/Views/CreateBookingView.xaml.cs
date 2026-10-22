@@ -502,8 +502,8 @@ namespace PresentationLayer.Views
 
                 // Shows confirmation that booking with coupled accommodation is created. (Booking requires accommodation)
                 MessageBox.Show(
-                    $"Bokningen är skapad!\nBokningsnummer: {booking.BookingID}\n\nNu öppnas bokningsdetaljerna där du kan lägga till utrustning, skidskola och skicka bekräftelse.",
-                    "Bokning skapad",
+                    $"Nu är fjälläventyret bokat!\nBokningsnummer: {booking.BookingID}\n\nBokningsdetaljerna öppnas så att du kan lägga till utrustning, skidskola och skicka bekräftelse.",
+                    "Fjälläventyret är bokat!",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
 
