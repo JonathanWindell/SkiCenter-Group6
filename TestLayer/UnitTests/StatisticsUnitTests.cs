@@ -193,10 +193,10 @@ namespace TestLayer.UnitTests
             Booking booking = CreateBooking();
             booking.TotalAmount += 250m;
 
-            var rental = new Rental 
-            { 
-                StartDate = DateTime.Now, 
-                EndDate = DateTime.Now, 
+            var rental = new Rental
+            {
+                StartDate = DateTime.Now,
+                EndDate = DateTime.Now,
                 TotalPrice = 250m,
                 RentalItems = new List<RentalItem>()
             };
