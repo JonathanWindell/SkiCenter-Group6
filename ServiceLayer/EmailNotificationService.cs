@@ -1,57 +1,62 @@
-﻿using EntityLayer;
+﻿using BusinessLayer;
+using EntityLayer;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 
 namespace ServiceLayer
 {
-    public class EmailNotificationService : INotificationService
+    public class EmailNotificationService
     {
         private readonly CustomerEmailTemplate _template;
-        private readonly SmtpSettings _settings;
+        private readonly IConfiguration _config;
 
-        public EmailNotificationService()
+        public EmailNotificationService(IConfiguration config)
         {
+            // Template is found in CustomerEmailTemplate (HTML structure).
             _template = new CustomerEmailTemplate();
+            _config = config;
         }
 
-        public void SendEmail(Customer customer, Booking booking)
+        /// <summary>
+        /// Method for sending email to customer containing everything tied to specific booking. 
+        /// </summary>
+        public void SendEmail(Customer customer, Booking booking, List<PaymentInstallment> paymentPlan)
         {
-            if (customer == null || string.IsNullOrWhiteSpace(customer.Email))
-            {
-                throw new ArgumentException("Customer email address is required.");
-            }
+            if (string.IsNullOrWhiteSpace(customer.Email))
+                throw new ArgumentException("Kunden saknar e-postadress.");
 
             try
             {
                 using var mailMessage = new MailMessage();
-                // Sender is Ski-Center.
                 mailMessage.From = new MailAddress("noreply@skicenter.se", "SkiCenter Bokning");
-                // Receiver is customer. 
-                mailMessage.To.Add(new MailAddress(customer.Email, $"{customer.DisplayName}".Trim()));
+                mailMessage.To.Add(new MailAddress(customer.Email, customer.DisplayName.Trim()));
 
                 mailMessage.Subject = $"Bokningsbekräftelse - Bokning #{booking.BookingID}";
-                mailMessage.Body = _template.GenerateBookingConfirmation(customer, booking);
+
+                // Generate entire confirmation as HTML
+                string htmlContent = _template.GenerateBookingConfirmation(customer, booking, paymentPlan);
+
+                // Fill mail with created HTML
+                mailMessage.Body = htmlContent;
                 mailMessage.IsBodyHtml = true;
 
-                // Configure SMTP client.
-                using var smtpClient = new SmtpClient("smtp.skicenter.se", 587)
+                // Fetch SMTP settings from appsettings.json
+                // Variables accepted are defined in SmtpSettings.cs
+                using var smtpClient = new SmtpClient(_config["SmtpSettings:Host"], int.Parse(_config["SmtpSettings:Port"]))
                 {
-                    Credentials = new NetworkCredential(_settings.Username, _settings.Password),
-                    EnableSsl = true,
-                    UseDefaultCredentials = false
+                    Credentials = new NetworkCredential(_config["SmtpSettings:Username"], _config["SmtpSettings:Password"]),
+                    EnableSsl = true
                 };
 
-                // Send email.
                 smtpClient.Send(mailMessage);
-            }
-            catch (SmtpException smtpEx)
-            {
-                throw new InvalidOperationException($"Failed to send email via SMTP: {smtpEx.Message}", smtpEx);
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"An unexpected error occurred while sending email: {ex.Message}", ex);
+                throw new InvalidOperationException($"Ett fel uppstod när mailet skulle skickas: {ex.Message}", ex);
             }
         }
     }
 }
+
+
