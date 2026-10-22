@@ -189,19 +189,35 @@ namespace TestLayer.UnitTests
         [Test]
         public void CalculateMonthlyStatistics_Rental_CountedInRentalMonth()
         {
-            // Arrange: one day of rental in November, 250 kr incl. VAT = 200 kr excl. 25% VAT
+            // Arrange: one day of rental, 250 kr incl. VAT = 200 kr excl. 25% VAT
             Booking booking = CreateBooking();
             booking.TotalAmount += 250m;
 
-            var rental = new Rental { StartDate = November, EndDate = November, TotalPrice = 250m };
-            rental.EquipmentItems.Add(new EquipmentItem
+            var rental = new Rental 
+            { 
+                StartDate = DateTime.Now, 
+                EndDate = DateTime.Now, 
+                TotalPrice = 250m,
+                RentalItems = new List<RentalItem>()
+            };
+
+            var testEquipmentItem = new EquipmentItem
             {
                 ArticleNumber = "AS1",
                 Equipment = new Equipment("Skidor", "Alpint")
                 {
-                    Prices = new List<EquipmentPriceMatrix> { new EquipmentPriceMatrix { Days = 1, TotalAmount = 250 } }
+                    Prices = new List<EquipmentPriceMatrix>
+                    {
+                        new EquipmentPriceMatrix { Days = 1, TotalAmount = 250 }
+                    }
                 }
+            };
+
+            rental.RentalItems.Add(new RentalItem
+            {
+                EquipmentItem = testEquipmentItem
             });
+
             booking.Rentals.Add(rental);
 
             // Act

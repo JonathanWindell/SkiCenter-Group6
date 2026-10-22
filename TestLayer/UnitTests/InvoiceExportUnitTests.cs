@@ -107,7 +107,11 @@ namespace TestLayer.UnitTests
                 EndDate = new DateTime(2026, 10, 14),
                 TotalPrice = 250m
             };
-            rental.EquipmentItems.Add(item);
+            rental.RentalItems.Add(new RentalItem
+            {
+                EquipmentItem = item,
+                EquipmentItemID = item.EquipmentItemID
+            });
             booking.Rentals.Add(rental);
 
             booking.SkiLessons.Add(new SkiLessonBooking

@@ -211,31 +211,50 @@ namespace BusinessLayer.Controllers
                 return false;
             }
 
+            if (rental.RentalItems == null)
+            {
+                rental.RentalItems = new List<RentalItem>();
+            }
+
+            var addedEquipmentItems = new List<EquipmentItem>();
+
             // Adds scanned items to the rental
             foreach (var barcode in scannedArticleNumbers)
             {
                 var item = _unitOfWork.EquipmentItem.GetByBarcode(barcode);
                 if (item != null && item.Status == EquipmentStatus.Available)
                 {
-                    rental.EquipmentItems.Add(item);
+                    // Create coupling object
+                    var rentalItem = new RentalItem
+                    {
+                        EquipmentItem = item,
+                        EquipmentItemID = item.EquipmentItemID,
+                        Rental = rental
+                    };
+
+                    rental.RentalItems.Add(rentalItem);
+                    addedEquipmentItems.Add(item); // Spara för priskalkyl nedan
+
                     _unitOfWork.EquipmentItem.UpdateStatusAndCondition(barcode, EquipmentStatus.Rented, item.Condition);
                 }
             }
 
-            if (!rental.EquipmentItems.Any())
+            if (!rental.RentalItems.Any())
             {
                 return false;
             }
 
             // Snowmobiles require that the caller has set LicenseVerified
-            if (RequiresDriverLicense(rental.EquipmentItems) && !rental.LicenseVerified)
+            if (RequiresDriverLicense(addedEquipmentItems) && !rental.LicenseVerified)
             {
                 return false;
             }
 
             // Store the rental's price so it can be shown on the invoice later
             int days = CountRentalDays(rental.StartDate, rental.EndDate);
-            rental.TotalPrice = rental.EquipmentItems
+
+            // Calculate prise based on temporary list
+            rental.TotalPrice = addedEquipmentItems
                 .Sum(item => CalculateRentalPrice(item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days) ?? 0m);
 
             rental.Status = "Active";
@@ -257,9 +276,18 @@ namespace BusinessLayer.Controllers
             }
 
             // Returns status to available
-            foreach (var item in rental.EquipmentItems)
+            if (rental.RentalItems != null)
             {
-                _unitOfWork.EquipmentItem.UpdateStatusAndCondition(item.ArticleNumber, EquipmentStatus.Available, item.Condition);
+                foreach (var rentalItem in rental.RentalItems)
+                {
+                    if (rentalItem.EquipmentItem != null)
+                    {
+                        _unitOfWork.EquipmentItem.UpdateStatusAndCondition(
+                            rentalItem.EquipmentItem.ArticleNumber,
+                            EquipmentStatus.Available,
+                            rentalItem.EquipmentItem.Condition);
+                    }
+                }
             }
 
             rental.Status = "Available";
@@ -442,7 +470,13 @@ namespace BusinessLayer.Controllers
             foreach (EquipmentItem item in items)
             {
                 item.Status = EquipmentStatus.Rented;
-                rental.EquipmentItems.Add(item);
+
+                // Create and add coupling object. 
+                rental.RentalItems.Add(new RentalItem
+                {
+                    EquipmentItemID = item.EquipmentItemID,
+                    EquipmentItem = item
+                });
             }
 
             // Add the rental price to the booking's total amount
