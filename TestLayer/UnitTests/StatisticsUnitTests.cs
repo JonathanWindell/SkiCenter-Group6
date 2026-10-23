@@ -195,8 +195,9 @@ namespace TestLayer.UnitTests
 
             var rental = new Rental
             {
-                StartDate = DateTime.Now,
-                EndDate = DateTime.Now,
+                // A fixed date in November, so the test does not depend on today's date
+                StartDate = November,
+                EndDate = November,
                 TotalPrice = 250m,
                 RentalItems = new List<RentalItem>()
             };

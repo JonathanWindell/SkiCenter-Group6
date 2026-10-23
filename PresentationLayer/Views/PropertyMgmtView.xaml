@@ -31,7 +31,7 @@
                     Click="BackButton_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Boende- och mötesrumsöversikt"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Boende- och mötesrumsöversikt"
                            FontSize="28"
                            FontWeight="Bold"
                            TextWrapping="Wrap"
@@ -56,7 +56,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <Border.Triggers>
@@ -128,7 +128,7 @@
                         <Button.Style>
                             <Style TargetType="Button"
                                BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                <Setter Property="Background" Value="#E5E7EB"/>
+                                <Setter Property="Background" Value="#DCEAF7"/>
                                 <Setter Property="Foreground"
                                         Value="{StaticResource PrimaryText}"/>
                             </Style>
@@ -227,7 +227,7 @@
                     Height="38"
                     Margin="0,20,0,0"
                     HorizontalAlignment="Center"
-                    Style="{StaticResource DeepSeaButtonStyle}"
+                    Style="{StaticResource CtaButtonStyle}"
                     Click="ChangePropertyStatusButton_Click">
                 
                     <Button.Triggers>

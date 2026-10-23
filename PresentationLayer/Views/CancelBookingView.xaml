@@ -14,7 +14,7 @@
             Margin="16">
 
         <StackPanel>
-            <TextBlock Text="Avboka bokning?"
+            <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Avboka bokning?"
                        FontSize="24"
                        FontWeight="Bold"
                        Foreground="{StaticResource PrimaryText}"

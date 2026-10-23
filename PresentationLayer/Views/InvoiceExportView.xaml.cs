@@ -135,7 +135,7 @@ namespace PresentationLayer.Views
             }
 
             MessageBox.Show(
-                $"Faktureringsunderlaget för {_currentExport.BookingCount} bokning(ar) har sparats:\n{dialog.FileName}",
+                $"Underlaget för {_currentExport.BookingCount} bokning(ar) är sparat och redo för ekonomisystemet:\n{dialog.FileName}",
                 "Export klar",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);

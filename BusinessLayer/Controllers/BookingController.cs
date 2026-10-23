@@ -141,6 +141,12 @@ namespace BusinessLayer
             {
                 int week = ISOWeek.GetWeekOfYear(currentDate);
 
+                // Due to some years having 53 weeks. It's validated as week 52. 
+                if (week == 53)
+                {
+                    week = 52;
+                }
+
                 SeasonPrice weeklyPrice =
                     _unitOfWork.SeasonPrice.GetSeasonPrice(
                         accommodationTypeId,
@@ -161,6 +167,12 @@ namespace BusinessLayer
             while (currentDate < checkoutDate)
             {
                 int week = ISOWeek.GetWeekOfYear(currentDate);
+
+                // Due to some years having 53 weeks. It's validated as week 52. 
+                if (week == 53)
+                {
+                    week = 52;
+                }
 
                 bool isWeekend =
                     currentDate.DayOfWeek == DayOfWeek.Friday ||
@@ -195,7 +207,7 @@ namespace BusinessLayer
 
                 totalPrice += nightlyPrice.Price;
                 currentDate = currentDate.AddDays(1);
-            }
+            } 
 
             return totalPrice;
         }

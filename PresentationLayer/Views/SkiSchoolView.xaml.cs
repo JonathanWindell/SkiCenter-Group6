@@ -235,8 +235,8 @@ namespace PresentationLayer.Views
 
             if (success)
             {
-                MessageBox.Show($"1 plats har bokats till {selectedSession.Level} (V.{selectedSession.WeekNumber}) på bokning #{selectedBooking.BookingID}!",
-                                "Bokning genomförd", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Lektionen är bokad! En plats i {selectedSession.Level} (v. {selectedSession.WeekNumber}) är tillagd på bokning #{selectedBooking.BookingID}.",
+                                "Lektion bokad", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 await LoadSessionsAsync();
             }

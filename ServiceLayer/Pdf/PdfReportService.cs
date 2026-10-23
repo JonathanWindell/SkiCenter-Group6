@@ -1,6 +1,7 @@
 using BusinessLayer.Models;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
+using QuestPDF.Drawing;
 using QuestPDF.Infrastructure;
 using System.Globalization;
 
@@ -15,18 +16,34 @@ namespace ServiceLayer.Pdf
         private static readonly CultureInfo Swedish = CultureInfo.GetCultureInfo("sv-SE");
 
         // Colors from the application's theme
-        private const string PrimaryColor = "#3730A3";
-        private const string PreviousColor = "#A5B4FC";
-        private const string TextColor = "#1E1B4B";
-        private const string SecondaryTextColor = "#4338CA";
-        private const string SummaryBackground = "#E0E7FF";
-        private const string BorderColor = "#C7D2FE";
-        private const string AlternateRowColor = "#F5F7FF";
+        private const string PrimaryColor = "#1E4F8C";       // Fjällblå
+        private const string PreviousColor = "#52B788";      // Aurora grön (statistics in blue and green)
+        private const string TextColor = "#2A2F36";          // Midnattsgrå
+        private const string SecondaryTextColor = "#5C6670";
+        private const string SummaryBackground = "#DCEAF7";  // Isblå
+        private const string BorderColor = "#B7CFE8";
+        private const string AlternateRowColor = "#F8FAFC";  // Snövit
+        private const string AccentColor = "#52B788";        // Aurora grön accent line
+
+        // The graphic profile's fonts: Montserrat for headings, Open Sans for body text
+        private const string HeadingFont = "Montserrat";
+        private const string BodyFont = "Open Sans";
 
         static PdfReportService()
         {
             // QuestPDF is free under the Community license for education and small organisations
             QuestPDF.Settings.License = LicenseType.Community;
+
+            // Register the embedded brand fonts so the PDFs look the same on every computer
+            var assembly = typeof(PdfReportService).Assembly;
+            foreach (string resource in assembly.GetManifestResourceNames().Where(name => name.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase)))
+            {
+                using Stream? stream = assembly.GetManifestResourceStream(resource);
+                if (stream != null)
+                {
+                    FontManager.RegisterFont(stream);
+                }
+            }
         }
 
         /// <summary>
@@ -67,7 +84,7 @@ namespace ServiceLayer.Pdf
                 content.Item().PaddingTop(14).Element(c => BarChart(c, "Beläggning per månad", occupancy, v => v.ToString("P1", Swedish), compare));
                 content.Item().PaddingTop(14).Element(c => BarChart(c, "Försäljning per månad (kr exkl. moms)", sales, v => v.ToString("N0", Swedish), compare));
 
-                content.Item().PaddingTop(14).Text("Per månad").FontSize(12).SemiBold().FontColor(TextColor);
+                content.Item().PaddingTop(14).Text("Per månad").FontSize(12).SemiBold().FontFamily(HeadingFont).FontColor(TextColor);
                 content.Item().PaddingTop(4).Table(table =>
                 {
                     table.ColumnsDefinition(c =>
@@ -209,7 +226,7 @@ namespace ServiceLayer.Pdf
 
                 content.Item().PaddingTop(14).Element(c => BarChart(c, "Antal artiklar per kategori", perCategory, v => v.ToString("N0", Swedish), false));
 
-                content.Item().PaddingTop(14).Text("Status per kategori").FontSize(12).SemiBold().FontColor(TextColor);
+                content.Item().PaddingTop(14).Text("Status per kategori").FontSize(12).SemiBold().FontFamily(HeadingFont).FontColor(TextColor);
                 content.Item().PaddingTop(4).Table(table =>
                 {
                     table.ColumnsDefinition(c =>
@@ -243,7 +260,7 @@ namespace ServiceLayer.Pdf
                 });
 
                 content.Item().PageBreak();
-                content.Item().Text("Alla artiklar").FontSize(12).SemiBold().FontColor(TextColor);
+                content.Item().Text("Alla artiklar").FontSize(12).SemiBold().FontFamily(HeadingFont).FontColor(TextColor);
                 content.Item().PaddingTop(4).Table(table =>
                 {
                     table.ColumnsDefinition(c =>
@@ -291,7 +308,7 @@ namespace ServiceLayer.Pdf
             {
                 foreach (AccommodationPriceList list in report.AccommodationPrices)
                 {
-                    content.Item().PaddingTop(10).Text($"Boende: {list.AccommodationType}").FontSize(13).SemiBold().FontColor(TextColor);
+                    content.Item().PaddingTop(10).Text($"Boende: {list.AccommodationType}").FontSize(13).SemiBold().FontFamily(HeadingFont).FontColor(TextColor);
 
                     if (list.PriceTypes.Contains("vecka"))
                     {
@@ -338,7 +355,7 @@ namespace ServiceLayer.Pdf
                 {
                     List<int> dayColumns = report.EquipmentPrices.SelectMany(e => e.PricesByDays.Keys).Distinct().OrderBy(d => d).ToList();
 
-                    content.Item().Text("Uthyrning av utrustning").FontSize(13).SemiBold().FontColor(TextColor);
+                    content.Item().Text("Uthyrning av utrustning").FontSize(13).SemiBold().FontFamily(HeadingFont).FontColor(TextColor);
                     content.Item().PaddingTop(6).Table(table =>
                     {
                         table.ColumnsDefinition(c =>
@@ -372,7 +389,7 @@ namespace ServiceLayer.Pdf
 
                 if (report.SkiLessonPrices.Count > 0)
                 {
-                    content.Item().PaddingTop(16).Text("Skidskola").FontSize(13).SemiBold().FontColor(TextColor);
+                    content.Item().PaddingTop(16).Text("Skidskola").FontSize(13).SemiBold().FontFamily(HeadingFont).FontColor(TextColor);
                     content.Item().PaddingTop(6).Table(table =>
                     {
                         table.ColumnsDefinition(c =>
@@ -420,7 +437,7 @@ namespace ServiceLayer.Pdf
                 {
                     page.Size(landscape ? PageSizes.A4.Landscape() : PageSizes.A4);
                     page.Margin(30);
-                    page.DefaultTextStyle(style => style.FontSize(9).FontColor(TextColor));
+                    page.DefaultTextStyle(style => style.FontFamily(BodyFont).FontSize(9).FontColor(TextColor));
 
                     page.Header().Column(header =>
                     {
@@ -428,8 +445,8 @@ namespace ServiceLayer.Pdf
                         {
                             row.RelativeItem().Column(title =>
                             {
-                                title.Item().Text("SkiCenter").FontSize(10).SemiBold().FontColor(SecondaryTextColor);
-                                title.Item().Text(report.Title).FontSize(20).Bold().FontColor(PrimaryColor);
+                                title.Item().Text("Ski-Center").FontFamily(HeadingFont).FontSize(11).Bold().FontColor(PrimaryColor);
+                                title.Item().Text(report.Title).FontFamily(HeadingFont).FontSize(20).Bold().FontColor(TextColor);
                             });
 
                             row.ConstantItem(200).AlignRight().AlignBottom().Column(info =>
@@ -439,7 +456,7 @@ namespace ServiceLayer.Pdf
                             });
                         });
 
-                        header.Item().PaddingTop(6).PaddingBottom(10).LineHorizontal(1).LineColor(BorderColor);
+                        header.Item().PaddingTop(6).PaddingBottom(10).LineHorizontal(2).LineColor(AccentColor);
                     });
 
                     page.Content().Column(content =>
@@ -447,7 +464,7 @@ namespace ServiceLayer.Pdf
                         // The report's main message comes first
                         content.Item().Background(SummaryBackground).Padding(10).Column(summary =>
                         {
-                            summary.Item().Text("Sammanfattning").FontSize(11).Bold().FontColor(PrimaryColor);
+                            summary.Item().Text("Sammanfattning").FontFamily(HeadingFont).FontSize(11).Bold().FontColor(PrimaryColor);
 
                             foreach (string message in report.KeyMessages)
                             {
@@ -480,7 +497,7 @@ namespace ServiceLayer.Pdf
             {
                 chart.Item().Row(row =>
                 {
-                    row.RelativeItem().Text(title).FontSize(11).SemiBold();
+                    row.RelativeItem().Text(title).FontSize(11).SemiBold().FontFamily(HeadingFont);
 
                     if (showPrevious)
                     {

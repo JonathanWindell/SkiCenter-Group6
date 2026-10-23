@@ -171,7 +171,7 @@ namespace PresentationLayer.Views
                     emailService.SendEmail(fullBooking.Customer, fullBooking, paymentPlan);
                 });
 
-                MessageBox.Show("Bokningsbekräftelsen har skickats till kunden via e-post.", "Bekräftelse skickad", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Bekräftelsen är på väg till kundens inkorg – nu kan fjälläventyret börja!", "Bekräftelse skickad", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {

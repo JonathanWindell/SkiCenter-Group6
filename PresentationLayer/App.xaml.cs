@@ -30,6 +30,9 @@ namespace PresentationLayer
         /// </summary>
         public App()
         {
+            // The graphic profile's body font for all windows. Must run before any window is created.
+            PresentationLayer.Resources.BrandFonts.Apply();
+
             var services = new ServiceCollection();
 
             // Build config and point to appsettings.json
@@ -71,6 +74,7 @@ namespace PresentationLayer
             services.AddTransient<StatisticsView>();
             services.AddTransient<SkiSchoolView>();
             services.AddTransient<MarketingMgmtView>();
+            services.AddTransient<StaffAdminView>();
 
 
             // 2. Register Controllers
@@ -84,6 +88,7 @@ namespace PresentationLayer
             services.AddTransient<ReportController>();
             services.AddTransient<StatisticsController>();
             services.AddTransient<ListReportController>();
+            services.AddTransient<StaffController>();
 
             // Services
             services.AddTransient<PdfReportService>();
