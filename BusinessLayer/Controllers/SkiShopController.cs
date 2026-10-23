@@ -446,6 +446,19 @@ namespace BusinessLayer.Controllers
                 totalPrice += itemPrice.Value;
             }
 
+            decimal actualAddedAmount = totalPrice;
+            Booking booking = _unitOfWork.Booking.GetSpecificBooking(bookingID) ?? _unitOfWork.Booking.GetByID(bookingID);
+
+            if (booking.Customer is CorporateCustomer corp && corp.DiscountRate > 0)
+            {
+                decimal discount = Math.Round(totalPrice * corp.DiscountRate, 2, MidpointRounding.AwayFromZero);
+                actualAddedAmount = totalPrice - discount;
+                booking.DiscountAmount += discount;
+            }
+
+            booking.TotalAmount += actualAddedAmount;
+            _unitOfWork.Booking.Update(booking);
+
             var rental = new Rental
             {
                 BookingID = bookingID,
@@ -471,10 +484,6 @@ namespace BusinessLayer.Controllers
                 });
             }
 
-            // Add the rental price to the booking's total amount
-            Booking booking = _unitOfWork.Booking.GetByID(bookingID);
-            booking.TotalAmount += totalPrice;
-
             _unitOfWork.Rental.Add(rental);
 
             if (_unitOfWork.Complete() <= 0)
@@ -484,8 +493,8 @@ namespace BusinessLayer.Controllers
 
             return (true,
                 $"{items.Count} utrustning(ar) har lagts till på bokning {bookingID} för {days} dag(ar). " +
-                $"{totalPrice:N2} kr har lagts till på bokningen. Nytt totalbelopp: {booking.TotalAmount:N2} kr.",
-                totalPrice);
+                $"{actualAddedAmount:N2} kr har lagts till på bokningen. Nytt totalbelopp: {booking.TotalAmount:N2} kr.",
+                actualAddedAmount);
         }
 
         /// <summary>
@@ -524,13 +533,12 @@ namespace BusinessLayer.Controllers
                     continue;
                 }
 
+
                 item.Status = isDamaged ? EquipmentStatus.Damaged : EquipmentStatus.Available;
                 item.Condition = condition;
                 _unitOfWork.EquipmentItem.Update(item);
 
-                var activeRental = _unitOfWork.Rental.GetActiveRentals()
-                    .FirstOrDefault(r => r.RentalItems.Any(ri => ri.EquipmentItemID == itemId));
-
+                var activeRental = GetActiveRentalForItem(itemId);
                 if (activeRental != null)
                 {
                     affectedRentalIds.Add(activeRental.RentalID);
@@ -542,10 +550,10 @@ namespace BusinessLayer.Controllers
                 var trackedRental = _unitOfWork.Rental.GetRentalWithItems(rentalId);
                 if (trackedRental == null) continue;
 
-                bool allItemsIn = trackedRental.RentalItems
-                    .All(ri => ri.EquipmentItem == null || ri.EquipmentItem.Status != EquipmentStatus.Rented);
+                bool hasRentedItemsLeft = trackedRental.RentalItems
+                    .Any(ri => ri.EquipmentItem != null && ri.EquipmentItem.Status == EquipmentStatus.Rented);
 
-                if (allItemsIn)
+                if (!hasRentedItemsLeft)
                 {
                     trackedRental.Status = "Returned";
                     trackedRental.ReturnDate = DateTime.Now;
@@ -611,10 +619,7 @@ namespace BusinessLayer.Controllers
         {
             var itemIDs = updatedItemIDs?.Distinct().ToList() ?? new List<int>();
 
-            if (itemIDs.Count == 0)
-            {
-                return (false, "Uthyrningen måste innehålla minst en artikel.", 0m);
-            }
+
 
             if (endDate.Date < startDate.Date)
             {
@@ -632,6 +637,41 @@ namespace BusinessLayer.Controllers
             if (booking == null)
             {
                 return (false, "Bokningen hittades inte.", 0m);
+            }
+
+            // If user renoves all items from rental
+            if (itemIDs.Count == 0)
+            {
+                // Returns all items to Available
+                foreach (var ri in rental.RentalItems)
+                {
+                    if (ri.EquipmentItem != null)
+                    {
+                        ri.EquipmentItem.Status = EquipmentStatus.Available;
+                    }
+                }
+                rental.RentalItems.Clear();
+
+                decimal removedPrice = rental.TotalPrice;
+                rental.TotalPrice = 0m;
+                rental.Status = "Cancelled";
+
+                // Subtract from totalprice of booking
+                decimal actualDeduction = removedPrice;
+                if (booking.Customer is CorporateCustomer corp && corp.DiscountRate > 0)
+                {
+                    decimal discountPart = Math.Round(removedPrice * corp.DiscountRate, 2, MidpointRounding.AwayFromZero);
+                    actualDeduction = removedPrice - discountPart;
+                    booking.DiscountAmount = Math.Max(0, booking.DiscountAmount - discountPart);
+                }
+
+                booking.TotalAmount = Math.Max(0, booking.TotalAmount - actualDeduction);
+
+                _unitOfWork.Rental.Update(rental);
+                _unitOfWork.Booking.Update(booking);
+                _unitOfWork.Complete();
+
+                return (true, "Alla artiklar togs bort och uthyrningen har avbokats.", -actualDeduction);
             }
 
             // Validation to check if rental fits in with accommodation booking

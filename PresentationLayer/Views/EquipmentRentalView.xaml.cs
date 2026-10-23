@@ -227,8 +227,9 @@ namespace PresentationLayer.Views
 
             List<string> rentedItems = booking.Rentals
                 .Where(r => r.Status == "Active")
-                .SelectMany(r => r.RentalItems.Select(ri => ri.EquipmentItem))
-                .Select(item => $"{item.ArticleNumber} ({item.Equipment?.Category})")
+                .SelectMany(r => r.RentalItems)
+                .Where(ri => ri.EquipmentItem != null && ri.EquipmentItem.Status == EquipmentStatus.Rented)
+                .Select(ri => $"{ri.EquipmentItem.ArticleNumber} ({ri.EquipmentItem.Equipment?.Category})")
                 .ToList();
 
             bool hasActiveRental = booking.Rentals.Any(r => r.Status == "Active");
@@ -298,22 +299,23 @@ namespace PresentationLayer.Views
         {
             if (_selectedBooking == null) return;
 
-            var activeRental = _selectedBooking.Rentals.FirstOrDefault(r => r.Status == "Active");
-            if (activeRental == null) return;
+            var activeRentals = _selectedBooking.Rentals.Where(r => r.Status == "Active").ToList();
+            if (!activeRentals.Any()) return;
 
-            _editingRental = activeRental;
+            _editingRental = activeRentals.First();
 
             _selectedItems.Clear();
 
-            var items = activeRental.RentalItems
-                    .Select(ri => ri.EquipmentItem)
-                    .Where(ei => ei != null);
+            var allItems = activeRentals
+                .SelectMany(r => r.RentalItems)
+                .Select(ri => ri.EquipmentItem)
+                .Where(ei => ei != null);
 
-            _selectedItems.AddRange(items!);
+            _selectedItems.AddRange(allItems!);
 
-            StartDatePicker.SelectedDate = activeRental.StartDate;
-            EndDatePicker.SelectedDate = activeRental.EndDate;
-            LicenseVerifiedCheckBox.IsChecked = activeRental.LicenseVerified;
+            StartDatePicker.SelectedDate = _editingRental.StartDate;
+            EndDatePicker.SelectedDate = _editingRental.EndDate;
+            LicenseVerifiedCheckBox.IsChecked = activeRentals.Any(r => r.LicenseVerified);
 
             ConfirmRentalButton.Content = "Spara ändringar";
             CancelEditRentalButton.Visibility = Visibility.Visible;
@@ -494,7 +496,8 @@ namespace PresentationLayer.Views
             }
 
             bool hasTarget = (_selectedBooking != null || _selectedDropInCustomer != null);
-            ConfirmRentalButton.IsEnabled = hasTarget && _selectedItems.Count > 0 && days.HasValue;
+            bool allowEmptyListInEdit = _editingRental != null;
+            ConfirmRentalButton.IsEnabled = hasTarget && (allowEmptyListInEdit || _selectedItems.Count > 0) && days.HasValue;
         }
 
         private int? GetRentalDays()
@@ -536,7 +539,7 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            if (_selectedItems.Count == 0)
+            if (_selectedItems.Count == 0 && _editingRental == null)
             {
                 RentalFeedbackTextBlock.Text = "Välj minst en utrustning att hyra ut.";
                 return;
