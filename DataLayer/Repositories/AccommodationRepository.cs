@@ -47,6 +47,49 @@ namespace DataLayer.Repositories
                  .ToList();
         }
 
+
+        /// <summary>
+        /// Gets available accommodations when editing an existing booking.
+        /// Excludes the current booking from the overlap check.
+        /// </summary>
+        public IEnumerable<Accommodation> GetAvailableAccommodationsForEdit(
+            DateTime startDate,
+            DateTime endDate,
+            int numberOfBeds,
+            int bookingId)
+        {
+            if (startDate.Date <= DateTime.Today ||
+                startDate >= endDate ||
+                numberOfBeds <= 0 ||
+                bookingId <= 0)
+            {
+                return Enumerable.Empty<Accommodation>();
+            }
+
+            // Find accommodations booked by OTHER bookings
+            // during the selected period.
+            var bookedAccommodationIds = _context.Set<BookingAccommodation>()
+                .Where(ba =>
+                    ba.BookingID != bookingId &&
+                    ba.Booking != null &&
+                    ba.Booking.BookingStatus != BookingStatus.Cancelled &&
+                    ba.StartDate < endDate &&
+                    ba.EndDate > startDate)
+                .Select(ba => ba.AccommodationID)
+                .Distinct();
+
+            // Return available accommodations with enough beds.
+            return _context.Set<Accommodation>()
+                .Include(a => a.AccommodationType)
+                .Where(a =>
+                    !bookedAccommodationIds.Contains(a.AccommodationID) &&
+                    a.AccommodationType.NumberOfBeds >= numberOfBeds &&
+                    a.Status == AccommodationStatus.Available)
+                .AsNoTracking()
+                .ToList();
+        }
+
+
         /// <summary>
         /// Gets all accommodations that are registered in the system.
         /// </summary>

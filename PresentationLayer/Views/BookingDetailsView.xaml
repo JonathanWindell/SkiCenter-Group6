@@ -502,6 +502,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <Button Grid.Column="0"
@@ -512,8 +513,31 @@
                             Style="{StaticResource DeepSeaButtonStyle}"
                             Click="BackButton_Click"/>
 
+                    <Button x:Name="EditBookingButton"
+        Grid.Column="1"
+        Content="Ändra bokning"
+        Width="160"
+        Height="38"
+        Margin="0,0,10,0">
+
+                        <Button.Style>
+                            <Style TargetType="Button"
+               BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" Value="#E5E7EB"/>
+                                        <Setter Property="Foreground" Value="#6B7280"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                        <Setter Property="Cursor" Value="Arrow"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+
                     <Button x:Name="CancelBookingButton"
-                            Grid.Column="1"
+                            Grid.Column="2"
                             Content="Avboka bokning"
                             Width="160"
                             Height="38">

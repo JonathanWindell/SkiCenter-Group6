@@ -1,0 +1,149 @@
+﻿
+<Window x:Class="PresentationLayer.Views.EditBookingView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SkiCenter - Ändra bokning"
+        Width="850"
+        Height="700"
+        MinWidth="750"
+        MinHeight="650"
+        WindowStartupLocation="CenterOwner"
+        Background="{StaticResource WindowBg}">
+
+    <Grid Margin="40">
+
+        <Border Background="{StaticResource CardBg}"
+                CornerRadius="18"
+                Padding="35">
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <StackPanel Grid.Row="0"
+                            Margin="0,0,0,25">
+
+                    <TextBlock Text="Ändra bokning"
+                               FontSize="26"
+                               FontWeight="Bold"
+                               Foreground="{StaticResource PrimaryText}"/>
+
+                    <TextBlock x:Name="BookingNumberText"
+                               Margin="0,6,0,0"
+                               FontSize="13"
+                               Foreground="{StaticResource SecondaryText}"/>
+                </StackPanel>
+
+                <!-- Booking form -->
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto">
+
+                    <StackPanel>
+
+                        <Border BorderBrush="{StaticResource InputBorder}"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="20">
+
+                            <StackPanel>
+
+                                <TextBlock Text="BOENDEUPPGIFTER"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryText}"
+                                           Margin="0,0,0,20"/>
+
+                                <TextBlock Text="Incheckningsdatum"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <DatePicker x:Name="StartDatePicker"
+                                            Height="35"
+                                            Margin="0,8,0,20"/>
+
+                                <TextBlock Text="Utcheckningsdatum"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <DatePicker x:Name="EndDatePicker"
+                                            Height="35"
+                                            Margin="0,8,0,20"/>
+
+                                <TextBlock Text="Antal gäster"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <TextBox x:Name="NumberOfGuestsTextBox"
+                                         Height="35"
+                                         Margin="0,8,0,20"/>
+
+                                <Button x:Name="SearchAccommodationButton"
+                                        Content="Sök lediga boenden"
+                                        Width="180"
+                                        Height="38"
+                                        HorizontalAlignment="Left"
+                                        Margin="0,0,0,20"
+                                        Style="{StaticResource DeepSeaButtonStyle}"/>
+
+                                <TextBlock Text="Välj boende"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource PrimaryText}"/>
+
+                                <ComboBox x:Name="AccommodationComboBox"
+                                          Height="35"
+                                          Margin="0,8,0,0"
+                                          DisplayMemberPath="AccommodationNumber"/>
+
+                            </StackPanel>
+                        </Border>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Action buttons -->
+                <Grid Grid.Row="2" Margin="0,20,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="CancelButton"
+                            Grid.Column="0"
+                            Content="Avbryt"
+                            Width="110"
+                            Height="38"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource DeepSeaButtonStyle}"/>
+
+
+                    <Button x:Name="SaveChangesButton"
+                            Content="Spara ändringar"
+                            Width="170"
+                            Height="38"
+                            IsEnabled="False">
+                        <Button.Style>
+                            <Style TargetType="Button"
+                                   BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" Value="#E5E7EB"/>
+                                        <Setter Property="Foreground" Value="#6B7280"/>
+                                        <Setter Property="Opacity" Value="0.5"/>
+                                        <Setter Property="Cursor" Value="Arrow"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+
+                </Grid>
+
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
