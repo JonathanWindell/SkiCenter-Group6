@@ -279,7 +279,6 @@ namespace BusinessLayer
             return 0m;
         }
 
-
         /// <summary>
         /// Creates a new accommodation booking and saves it to the database.
         /// </summary>
@@ -590,7 +589,6 @@ namespace BusinessLayer
             foreach (var booking in preliminaryBookings)
             {
                 booking.BookingStatus = BookingStatus.Confirmed;
-                _unitOfWork.Booking.Update(booking);
                 confirmedCount++;
             }
 
