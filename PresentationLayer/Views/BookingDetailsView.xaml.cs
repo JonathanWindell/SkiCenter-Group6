@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -13,13 +14,17 @@ namespace PresentationLayer.Views
     public partial class BookingDetailsView : Window
     {
         private Booking _booking;
+        private readonly IServiceProvider _serviceProvider;
 
-        public BookingDetailsView(Booking booking)
+        public BookingDetailsView(IServiceProvider serviceProvider, Booking booking)
         {
             InitializeComponent();
 
-            _booking = booking ??
-                throw new ArgumentNullException(nameof(booking));
+            _serviceProvider = serviceProvider
+                ?? throw new ArgumentNullException(nameof(serviceProvider));
+
+            _booking = booking
+                ?? throw new ArgumentNullException(nameof(booking));
 
             DataContext = _booking;
 
@@ -31,37 +36,37 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Updates button availability based on booking status and dates.
+        /// Updates cancellation and editing button availability.
         /// </summary>
         private void UpdateButtonStates()
         {
-            // Only allow cancellation before check-in.
+            // Cancellation is allowed before check-in,
+            // unless the booking is cancelled or finished.
             CancelBookingButton.IsEnabled =
                 _booking.BookingStatus != BookingStatus.Cancelled &&
                 _booking.BookingStatus != BookingStatus.Finished &&
                 _booking.CheckInStatus == CheckInStatus.NotCheckedIn;
 
-            // Only allow editing before the accommodation stay begins.
+            // Editing is only allowed for future accommodation stays.
             EditBookingButton.IsEnabled =
                 (_booking.BookingStatus == BookingStatus.Preliminary ||
                  _booking.BookingStatus == BookingStatus.Confirmed) &&
                 _booking.CheckInStatus == CheckInStatus.NotCheckedIn &&
+                _booking.Accommodations != null &&
                 _booking.Accommodations.Any() &&
                 _booking.Accommodations.All(a =>
                     a.StartDate.Date > DateTime.Today);
         }
 
         /// <summary>
-        /// Calculates and displays VAT for the current booking.
+        /// Calculates and displays VAT for the booking.
         /// </summary>
         private void UpdateVatDisplay()
         {
             try
             {
-                var app = (App)Application.Current;
-
                 var controller =
-                    app.Services.GetRequiredService<BookingController>();
+                    _serviceProvider.GetRequiredService<BookingController>();
 
                 var price = controller.BookingPrice(_booking);
 
@@ -89,16 +94,13 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Reloads the booking and refreshes the displayed details.
+        /// Reloads the booking from the database and refreshes the view.
         /// </summary>
         private void RefreshBookingDetails()
         {
-            var app = (App)Application.Current;
-
             var controller =
-                app.Services.GetRequiredService<BookingController>();
+                _serviceProvider.GetRequiredService<BookingController>();
 
-            // Retrieve the updated booking.
             Booking updatedBooking =
                 controller.GetSpecificBooking(_booking.BookingID);
 
@@ -108,20 +110,163 @@ namespace PresentationLayer.Views
                     "Den uppdaterade bokningen kunde inte hittas.");
             }
 
-            // Replace the current booking with the updated booking.
             _booking = updatedBooking;
 
-            // Refresh all bindings in the details view.
             DataContext = null;
             DataContext = _booking;
 
-            // Recalculate VAT and update button availability.
             UpdateVatDisplay();
             UpdateButtonStates();
         }
 
         /// <summary>
-        /// Cancels a booking and updates the displayed booking status.
+        /// Opens the ski school window.
+        /// </summary>
+        private void BtnAddSkiSchool_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            try
+            {
+                var skiSchoolView =
+                    _serviceProvider.GetRequiredService<SkiSchoolView>();
+
+                skiSchoolView.Owner = this;
+                skiSchoolView.ShowDialog();
+
+                RefreshBookingDetails();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Kunde inte öppna Skidskolan.\n{ex.Message}",
+                    "Fel",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Opens the equipment rental window.
+        /// </summary>
+        private void BtnAddEquipment_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            try
+            {
+                var equipmentView =
+                    _serviceProvider.GetRequiredService<EquipmentRentalView>();
+
+                equipmentView.Owner = this;
+                equipmentView.ShowDialog();
+
+                RefreshBookingDetails();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Kunde inte öppna utrustningshanteringen.\n{ex.Message}",
+                    "Fel",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Opens the meeting room booking window.
+        /// </summary>
+        private void BtnAddMeetingRoom_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            try
+            {
+                var meetingRoomView =
+                    ActivatorUtilities.CreateInstance<MeetingRoomBookingView>(
+                        _serviceProvider,
+                        _booking);
+
+                meetingRoomView.Owner = this;
+                meetingRoomView.ShowDialog();
+
+                RefreshBookingDetails();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Kunde inte öppna mötesrumsvyn.\n{ex.Message}",
+                    "Fel",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Sends the booking confirmation by email.
+        /// </summary>
+        private async void BtnSendConfirmation_Click(
+            object sender,
+            RoutedEventArgs e)
+        {
+            var btn = (System.Windows.Controls.Button)sender;
+
+            try
+            {
+                btn.IsEnabled = false;
+
+                var controller =
+                    _serviceProvider.GetRequiredService<BookingController>();
+
+                Booking fullBooking =
+                    controller.GetSpecificBooking(_booking.BookingID);
+
+                if (fullBooking == null)
+                {
+                    throw new InvalidOperationException(
+                        "Bokningen kunde inte hittas.");
+                }
+
+                var paymentPlan =
+                    new PaymentPlanService().GeneratePaymentPlan(fullBooking);
+
+                await Task.Run(() =>
+                {
+                    var config =
+                        _serviceProvider.GetRequiredService<
+                            Microsoft.Extensions.Configuration.IConfiguration>();
+
+                    var emailService =
+                        new ServiceLayer.EmailNotificationService(config);
+
+                    emailService.SendEmail(
+                        fullBooking.Customer,
+                        fullBooking,
+                        paymentPlan);
+                });
+
+                MessageBox.Show(
+                    "Bekräftelsen är på väg till kundens inkorg – nu kan fjälläventyret börja!",
+                    "Bekräftelse skickad",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Kunde inte skicka e-post.\n{ex.Message}",
+                    "Fel vid utskick",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                btn.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Cancels a booking and updates its displayed status.
         /// </summary>
         private void CancelBookingButton_Click(
             object sender,
@@ -129,12 +274,10 @@ namespace PresentationLayer.Views
         {
             try
             {
-                var app = (App)Application.Current;
-
                 var controller =
-                    app.Services.GetRequiredService<BookingController>();
+                    _serviceProvider.GetRequiredService<BookingController>();
 
-                // Load the current booking before calculating the refund.
+                // Load the latest booking before calculating the refund.
                 Booking booking =
                     controller.GetSpecificBooking(_booking.BookingID);
 
@@ -190,16 +333,18 @@ namespace PresentationLayer.Views
                     Owner = this
                 };
 
-                // Closing the dialog without confirmation makes no changes.
+                // Closing without confirmation makes no changes.
                 if (dialog.ShowDialog() != true)
+                {
                     return;
+                }
 
                 CancelBookingButton.IsEnabled = false;
 
                 // Save the cancellation.
                 controller.CancelBooking(booking.BookingID);
 
-                // Refresh booking details after successful cancellation.
+                // Refresh the displayed details.
                 RefreshBookingDetails();
 
                 MessageBox.Show(
@@ -222,33 +367,44 @@ namespace PresentationLayer.Views
         }
 
         /// <summary>
-        /// Opens the edit booking window and refreshes details after saving.
+        /// Opens the edit booking window and refreshes after saving.
         /// </summary>
         private void EditBookingButton_Click(
             object sender,
             RoutedEventArgs e)
         {
-            var editWindow = new EditBookingView(_booking)
+            try
             {
-                Owner = this
-            };
+                var editWindow = new EditBookingView(_booking)
+                {
+                    Owner = this
+                };
 
-            // Only refresh when the user successfully saves changes.
-            if (editWindow.ShowDialog() == true)
+                // Only refresh after a successful save.
+                if (editWindow.ShowDialog() == true)
+                {
+                    try
+                    {
+                        RefreshBookingDetails();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            "Ändringen sparades, men bokningsdetaljerna " +
+                            "kunde inte uppdateras.\n\n" + ex.Message,
+                            "Kunde inte uppdatera vyn",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                }
+            }
+            catch (Exception ex)
             {
-                try
-                {
-                    RefreshBookingDetails();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(
-                        "Ändringen sparades, men bokningsdetaljerna " +
-                        "kunde inte uppdateras.\n\n" + ex.Message,
-                        "Kunde inte uppdatera vyn",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                }
+                MessageBox.Show(
+                    $"Kunde inte öppna Ändra bokning.\n{ex.Message}",
+                    "Fel",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
             }
         }
 

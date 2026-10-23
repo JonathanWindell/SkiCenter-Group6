@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 
 namespace EntityLayer
 {
@@ -22,5 +23,21 @@ namespace EntityLayer
         [ForeignKey("MeetingRoom")]
         public int MeetingRoomID { get; set; }
         public virtual MeetingRoom meetingRoom { get; set; }
+
+        // Needed to calculate price for WPF. 
+        [NotMapped]
+        public decimal TotalPrice
+        {
+            get
+            {
+                if (meetingRoom?.SeasonPrices == null) return 0m;
+
+                int week = ISOWeek.GetWeekOfYear(StartDate);
+                int days = Math.Max(1, (EndDate.Date - StartDate.Date).Days);
+
+                var priceObj = meetingRoom.SeasonPrices.FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == week);
+                return (priceObj?.Price ?? 0m) * days;
+            }
+        }
     }
 }

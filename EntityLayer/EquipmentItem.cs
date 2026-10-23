@@ -46,6 +46,9 @@ namespace EntityLayer
         public int EquipmentID { get; set; }
         public virtual Equipment Equipment { get; set; }
 
+        // Many to Many relation to RentalItems
+        public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
+
         public EquipmentItem() { }
     }
 }

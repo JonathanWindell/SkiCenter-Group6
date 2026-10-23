@@ -85,6 +85,7 @@ namespace DataLayer
         public DbSet<EquipmentItem> EquipmentItems { get; set; }
         public DbSet<EquipmentPriceMatrix> EquipmentPriceMatrix { get; set; }
         public DbSet<Rental> Rentals { get; set; }
+        public DbSet<RentalItem> RentalItems { get; set; }
         public DbSet<SkiLesson> SkiLessons { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
     }

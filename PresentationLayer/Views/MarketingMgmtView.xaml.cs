@@ -1,19 +1,10 @@
 ﻿using BusinessLayer;
 using BusinessLayer.Controllers;
 using PresentationLayer.Models;
-using EntityLayer;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PresentationLayer.Views
 {
@@ -168,7 +159,7 @@ namespace PresentationLayer.Views
                     : "";
 
                 MessageBox.Show(
-                    $"{successCount} av {rowsToApprove.Count} företagskunder har godkänts och sparats i databasen!{bookingMsg}",
+                    $"Klart! {successCount} av {rowsToApprove.Count} företagskunder är godkända och redo att boka.{bookingMsg}",
                     "Klart",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);

@@ -1,4 +1,5 @@
-﻿using DataLayer.Interfaces;
+﻿
+using DataLayer.Interfaces;
 using EntityLayer;
 using System.Globalization;
 
@@ -18,29 +19,33 @@ namespace BusinessLayer
 
         /// <summary>
         /// Retrieves all bookings with their navigation properties.
+        /// (Customer, Accommodations, MeetingRooms, SkiLessons, Rentals and Invoice).
         /// </summary>
+        /// <returns>A collection of all bookings.</returns>
         public IEnumerable<Booking> GetAllBookings()
         {
             return _unitOfWork.Booking.GetAllBookings();
         }
 
         /// <summary>
-        /// Retrieves a specific booking with all details.
+        /// Retrieves a specific booking with all details by its unique BookingID.
         /// </summary>
+        /// <param name="bookingID">The unique booking ID.</param>
+        /// <returns>The complete booking entity, or null if not found.</returns>
         public Booking GetSpecificBooking(int bookingID)
         {
-            if (bookingID <= 0)
-                return null;
+            if (bookingID <= 0) return null;
 
             return _unitOfWork.Booking.GetSpecificBooking(bookingID);
         }
 
         /// <summary>
-        /// Retrieves bookings within a date interval.
+        /// Retrieves all bookings that fall within a specified date interval.
         /// </summary>
-        public IEnumerable<Booking> GetBookingsInRange(
-            DateTime startDate,
-            DateTime endDate)
+        /// <param name="startDate">The start date.</param>
+        /// <param name="endDate">The end date.</param>
+        /// <returns>A collection of matching bookings.</returns>
+        public IEnumerable<Booking> GetBookingsInRange(DateTime startDate, DateTime endDate)
         {
             if (startDate == DateTime.MinValue ||
                 endDate == DateTime.MinValue ||
@@ -53,8 +58,11 @@ namespace BusinessLayer
         }
 
         /// <summary>
-        /// Retrieves bookings by status.
+        /// Retrieves all bookings filtered by status.
+        /// (e.g., Preliminary, Confirmed, Cancelled).
         /// </summary>
+        /// <param name="status">The booking status.</param>
+        /// <returns>A collection of bookings with the specified status.</returns>
         public IEnumerable<Booking> GetBookingsByStatus(BookingStatus status)
         {
             if (!Enum.IsDefined(typeof(BookingStatus), status))
@@ -66,8 +74,10 @@ namespace BusinessLayer
         }
 
         /// <summary>
-        /// Retrieves bookings for a specific customer.
+        /// Retrieves booking history for a specific customer.
         /// </summary>
+        /// <param name="customerId">The customer's ID.</param>
+        /// <returns>A collection of bookings belonging to the customer.</returns>
         public IEnumerable<Booking> GetBookingsByCustomer(int customerId)
         {
             if (customerId <= 0)
@@ -79,8 +89,13 @@ namespace BusinessLayer
         }
 
         /// <summary>
-        /// Retrieves available accommodations for selected dates and guests.
+        /// Retrieves available accommodations for the selected dates
+        /// and number of guests.
         /// </summary>
+        /// <param name="startDate">The check-in date.</param>
+        /// <param name="endDate">The check-out date.</param>
+        /// <param name="numberOfGuests">The number of guests.</param>
+        /// <returns>A collection of available accommodations.</returns>
         public IEnumerable<Accommodation> GetAvailableAccommodations(
             DateTime startDate,
             DateTime endDate,
@@ -138,10 +153,11 @@ namespace BusinessLayer
                 bookingId);
         }
 
+
         /// <summary>
-        /// Calculates the accommodation price using season prices.
-        /// Uses weekly prices for full seven-night periods
-        /// and nightly prices for remaining nights.
+        /// Calculates the accommodation price using existing season prices.
+        /// Uses weekly prices for full seven-night periods and
+        /// nightly prices for remaining nights.
         /// </summary>
         public decimal CalculateAccommodationPrice(
             int accommodationTypeId,
@@ -155,7 +171,7 @@ namespace BusinessLayer
                     "Ogiltig boendetyp eller bokningsperiod.");
             }
 
-            decimal totalPrice = 0m;
+            decimal totalPrice = 0;
             DateTime currentDate = startDate.Date;
             DateTime checkoutDate = endDate.Date;
 
@@ -163,6 +179,12 @@ namespace BusinessLayer
             while ((checkoutDate - currentDate).Days >= 7)
             {
                 int week = ISOWeek.GetWeekOfYear(currentDate);
+
+                // Due to some years having 53 weeks. It's validated as week 52. 
+                if (week == 53)
+                {
+                    week = 52;
+                }
 
                 SeasonPrice weeklyPrice =
                     _unitOfWork.SeasonPrice.GetSeasonPrice(
@@ -172,7 +194,7 @@ namespace BusinessLayer
 
                 if (weeklyPrice == null)
                 {
-                    // Use nightly prices when the weekly price is missing.
+                    // Calculate individual nights if weekly price is missing.
                     break;
                 }
 
@@ -184,6 +206,12 @@ namespace BusinessLayer
             while (currentDate < checkoutDate)
             {
                 int week = ISOWeek.GetWeekOfYear(currentDate);
+
+                // Due to some years having 53 weeks. It's validated as week 52. 
+                if (week == 53)
+                {
+                    week = 52;
+                }
 
                 bool isWeekend =
                     currentDate.DayOfWeek == DayOfWeek.Friday ||
@@ -199,7 +227,8 @@ namespace BusinessLayer
                         priceType,
                         week);
 
-                // Use standard daily prices when necessary.
+                // Camping uses standard daily prices.
+                // Also used when weekday/weekend prices are unavailable.
                 if (nightlyPrice == null)
                 {
                     nightlyPrice =
@@ -217,13 +246,14 @@ namespace BusinessLayer
 
                 totalPrice += nightlyPrice.Price;
                 currentDate = currentDate.AddDays(1);
-            }
+            } 
 
             return totalPrice;
         }
 
         /// <summary>
-        /// Calculates the corporate customer discount.
+        /// Calculates the accommodation discount for a corporate customer.
+        /// DiscountRate is stored as a decimal, for example 0.10 for 10%.
         /// </summary>
         public decimal CalculateCorporateDiscount(
             CorporateCustomer customer,
@@ -236,12 +266,10 @@ namespace BusinessLayer
 
             if (accommodationPrice < 0)
             {
-                throw new ArgumentException(
-                    "Boendepriset kan inte vara negativt.");
+                throw new ArgumentException("Boendepriset kan inte vara negativt.");
             }
 
-            if (customer.DiscountRate < 0 ||
-                customer.DiscountRate > 1)
+            if (customer.DiscountRate < 0 || customer.DiscountRate > 1)
             {
                 throw new InvalidOperationException(
                     "Företagskundens rabatt måste vara mellan 0 och 1.");
@@ -253,8 +281,10 @@ namespace BusinessLayer
                 MidpointRounding.AwayFromZero);
         }
 
+
         /// <summary>
-        /// Calculates an 8% discount for eligible returning private customers.
+        /// Calculates an 8% accommodation discount for private customers
+        /// when at least 365 days have passed since their latest booking.
         /// </summary>
         public decimal CalculatePrivateCustomerDiscount(
             PrivateCustomer customer,
@@ -300,8 +330,9 @@ namespace BusinessLayer
             return 0m;
         }
 
+
         /// <summary>
-        /// Creates a new accommodation booking.
+        /// Creates a new accommodation booking and saves it to the database.
         /// </summary>
         public Booking CreateBooking(
             Customer customer,
@@ -313,14 +344,12 @@ namespace BusinessLayer
         {
             if (customer == null || customer.CustomerID <= 0)
             {
-                throw new ArgumentException(
-                    "Välj en giltig kund.");
+                throw new ArgumentException("Välj en giltig kund.");
             }
 
             if (accommodation == null || accommodation.AccommodationID <= 0)
             {
-                throw new ArgumentException(
-                    "Välj ett giltigt boende.");
+                throw new ArgumentException("Välj ett giltigt boende.");
             }
 
             startDate = startDate.Date;
@@ -328,23 +357,20 @@ namespace BusinessLayer
 
             if (startDate < DateTime.Today || endDate <= startDate)
             {
-                throw new ArgumentException(
-                    "Ange en giltig bokningsperiod.");
+                throw new ArgumentException("Ange en giltig bokningsperiod.");
             }
 
             if (numberOfGuests <= 0)
             {
-                throw new ArgumentException(
-                    "Ange ett giltigt antal gäster.");
+                throw new ArgumentException("Ange ett giltigt antal gäster.");
             }
 
-            // Check availability before saving.
+            // Check that the accommodation is still available.
             bool isAvailable = GetAvailableAccommodations(
                 startDate,
                 endDate,
                 numberOfGuests)
-                .Any(a =>
-                    a.AccommodationID == accommodation.AccommodationID);
+                .Any(a => a.AccommodationID == accommodation.AccommodationID);
 
             if (!isAvailable)
             {
@@ -352,7 +378,7 @@ namespace BusinessLayer
                     "Boendet är inte längre tillgängligt för den valda perioden.");
             }
 
-            // Calculate accommodation price.
+            // Calculate the accommodation price.
             decimal accommodationPrice = CalculateAccommodationPrice(
                 accommodation.AccommodationTypeID,
                 startDate,
@@ -362,7 +388,7 @@ namespace BusinessLayer
             decimal discountAmount = 0m;
             decimal discountRate = 0m;
 
-            // Apply the existing customer discount rules.
+            // Calculate the discount based on customer type.
             if (customer is PrivateCustomer privateCustomer)
             {
                 discountAmount = CalculatePrivateCustomerDiscount(
@@ -388,9 +414,7 @@ namespace BusinessLayer
                 accommodationPrice - discountAmount;
 
             decimal insurancePrice =
-                hasCancellationInsurance
-                    ? CancellationInsurancePrice
-                    : 0m;
+                hasCancellationInsurance ? CancellationInsurancePrice : 0m;
 
             decimal totalAmount =
                 finalAccommodationPrice + insurancePrice;
@@ -401,9 +425,10 @@ namespace BusinessLayer
                 {
                     AccommodationID = accommodation.AccommodationID,
                     StartDate = startDate,
-                    EndDate = endDate
+                    EndDate = endDate,
                 };
 
+            // Create the booking.
             Booking booking = new Booking
             {
                 CustomerID = customer.CustomerID,
@@ -412,6 +437,7 @@ namespace BusinessLayer
                 CheckInStatus = CheckInStatus.NotCheckedIn,
                 HasCancellationInsurance = hasCancellationInsurance,
                 TotalAmount = totalAmount,
+                // Saved so invoicing can show the list price and the applied discount
                 AccommodationListPrice = accommodationPrice,
                 DiscountRate = discountRate,
                 DiscountAmount = discountAmount,
@@ -421,6 +447,7 @@ namespace BusinessLayer
                 }
             };
 
+            // Save the booking and its accommodation connection.
             _unitOfWork.Booking.Add(booking);
             _unitOfWork.Complete();
 
@@ -630,20 +657,20 @@ namespace BusinessLayer
         }
 
         /// <summary>
-        /// Updates the check-in status of a booking.
+        /// Updates the check-in status of a specific booking.
         /// </summary>
-        public bool UpdateCheckInStatus(
-            int bookingId,
-            CheckInStatus newStatus)
+        /// <param name="bookingId">The unique booking identifier.</param>
+        /// <param name="newStatus">The new check-in status to apply.</param>
+        /// <returns>True if the status was successfully updated; otherwise, false.</returns>
+        public bool UpdateCheckInStatus(int bookingId, CheckInStatus newStatus)
         {
             if (bookingId <= 0)
             {
                 return false;
             }
 
-            var booking =
-                _unitOfWork.Booking.GetSpecificBooking(bookingId)
-                ?? _unitOfWork.Booking.GetByID(bookingId);
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId)
+                          ?? _unitOfWork.Booking.GetByID(bookingId);
 
             if (booking == null)
             {
@@ -652,17 +679,18 @@ namespace BusinessLayer
 
             booking.CheckInStatus = newStatus;
 
+            // If Guest checks in
             if (newStatus == CheckInStatus.CheckedIn)
             {
                 booking.BookingStatus = BookingStatus.Confirmed;
             }
+            // When Guest checks out
             else if (newStatus == CheckInStatus.CheckedOut)
             {
                 booking.BookingStatus = BookingStatus.Finished;
             }
 
             _unitOfWork.Booking.Update(booking);
-
             return _unitOfWork.Complete() > 0;
         }
 
@@ -670,17 +698,19 @@ namespace BusinessLayer
         /// <summary>
         /// Checks whether a booking is fully paid based on its invoices.
         /// </summary>
+        /// <param name="bookingId">The unique booking identifier.</param>
+        /// <returns>True if all invoices are paid or no invoices exist; otherwise, false.</returns>
         public bool IsBookingFullyPaid(int bookingId)
         {
-            var booking =
-                _unitOfWork.Booking.GetSpecificBooking(bookingId)
-                ?? _unitOfWork.Booking.GetByID(bookingId);
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId)
+                          ?? _unitOfWork.Booking.GetByID(bookingId);
 
             if (booking == null)
             {
                 return false;
             }
 
+            // Företagskunder faktureras i efterhand och tillåts checka in
             if (booking.Customer is CorporateCustomer)
             {
                 return true;
@@ -695,15 +725,16 @@ namespace BusinessLayer
         }
         */
 
+
         /// <summary>
         /// Cancels a booking while keeping it in the customer's history.
+        /// Does not process refunds or send confirmation emails.
         /// </summary>
         public Booking CancelBooking(int bookingID)
         {
             if (bookingID <= 0)
             {
-                throw new ArgumentException(
-                    "Ogiltigt bokningsnummer.");
+                throw new ArgumentException("Ogiltigt bokningsnummer.");
             }
 
             Booking booking =
@@ -740,14 +771,15 @@ namespace BusinessLayer
             }
             catch
             {
-                // Restore the original status if saving fails.
+                // Restore the tracked status if saving fails.
                 booking.BookingStatus = previousStatus;
                 throw;
             }
         }
 
         /// <summary>
-        /// Calculates the protected cancellation refund.
+        /// Calculates the protected cancellation refund for accommodation bookings.
+        /// Returns null when the applicable refund rule cannot be determined.
         /// </summary>
         public decimal? GetCancellationRefund(
             Booking booking,
@@ -758,11 +790,13 @@ namespace BusinessLayer
                 throw new ArgumentNullException(nameof(booking));
             }
 
+            // No refund applies when cancellation protection was not purchased.
             if (!booking.HasCancellationInsurance)
             {
                 return 0m;
             }
 
+            // An arrival date is needed to check protection eligibility.
             if (!booking.Accommodations.Any())
             {
                 return null;
@@ -772,40 +806,40 @@ namespace BusinessLayer
                 .Min(stay => stay.StartDate)
                 .Date;
 
-            // Protection applies up to five days before arrival.
+            // Protection applies up to and including five days before arrival.
             if (cancellationDate.Date > arrivalDate.AddDays(-5))
             {
                 return null;
             }
 
-            if (booking.TotalAmount < CancellationInsurancePrice)
+            const decimal protectionFee = 300m;
+
+            if (booking.TotalAmount < protectionFee)
             {
                 throw new InvalidOperationException(
                     "Bokningsbeloppet är lägre än avgiften för avbeställningsskyddet.");
             }
 
+            // The protection fee is excluded from the refundable amount.
             return Math.Round(
-                (booking.TotalAmount - CancellationInsurancePrice) * 0.80m,
+                (booking.TotalAmount - protectionFee) * 0.80m,
                 2,
                 MidpointRounding.AwayFromZero);
         }
 
         /// <summary>
-        /// Confirms preliminary bookings for an approved corporate customer.
+        /// Confirms all preliminary bookings for an approved corporate customer.
         /// </summary>
         public int ConfirmPreliminaryBookingsForCustomer(int customerId)
         {
-            if (customerId <= 0)
-                return 0;
+            if (customerId <= 0) return 0;
 
-            var preliminaryBookings =
-                _unitOfWork.Booking.GetBookingsByCustomer(customerId)
-                    .Where(b =>
-                        b.BookingStatus == BookingStatus.Preliminary)
-                    .ToList();
+            // Gets the preliminary bookings of the customer
+            var preliminaryBookings = _unitOfWork.Booking.GetBookingsByCustomer(customerId)
+                .Where(b => b.BookingStatus == BookingStatus.Preliminary)
+                .ToList();
 
             int confirmedCount = 0;
-
             foreach (var booking in preliminaryBookings)
             {
                 booking.BookingStatus = BookingStatus.Confirmed;
@@ -822,133 +856,148 @@ namespace BusinessLayer
         }
 
         /// <summary>
-        /// Calculates the booking price and VAT for each service.
+        /// Calulates total price for each service with VatRates.
         /// </summary>
-        public (
-            decimal TotalInclVat,
-            decimal TotalExclVat,
-            decimal TotalVat,
-            decimal AccomVat,
-            decimal OtherVat) BookingPrice(Booking booking)
+        public (decimal TotalInclVat, decimal TotalExclVat, decimal TotalVat, decimal AccomVat, decimal OtherVat) BookingPrice(Booking booking)
         {
             if (booking == null)
             {
                 throw new ArgumentNullException(nameof(booking));
             }
 
-            // Accommodation price including VAT.
-            decimal netAccom =
-                booking.TotalAmount > 0 &&
-                booking.AccommodationListPrice > 0
-                    ? Math.Max(
-                        0,
-                        booking.AccommodationListPrice -
-                        booking.DiscountAmount)
-                    : booking.Accommodations?.Sum(a =>
-                        CalculateAccommodationPrice(
-                            a.Accommodation?.AccommodationTypeID ?? 0,
-                            a.StartDate,
-                            a.EndDate)) ?? 0m;
+            // Accommodation (incl. moms)
+            decimal netAccom = booking.TotalAmount > 0 && booking.AccommodationListPrice > 0
+                ? Math.Max(0, booking.AccommodationListPrice - booking.DiscountAmount)
+                : booking.Accommodations?.Sum(a => CalculateAccommodationPrice(
+                    a.Accommodation?.AccommodationTypeID ?? 0,
+                    a.StartDate,
+                    a.EndDate)) ?? 0m;
 
-            var accomVatSplit =
-                VatRates.SplitVat(netAccom, VatRates.Accommodation);
+            var accomVatSplit = VatRates.SplitVat(netAccom, VatRates.Accommodation);
 
-            // Equipment rental price including VAT.
-            decimal rentalTotal =
-                booking.Rentals?.Sum(r => r.TotalPrice) ?? 0m;
+            // Rentals (incl. moms)
+            decimal rentalTotal = booking.Rentals?.Sum(r => r.TotalPrice) ?? 0m;
+            var rentalVatSplit = VatRates.SplitVat(rentalTotal, VatRates.EquipmentRental);
 
-            var rentalVatSplit =
-                VatRates.SplitVat(
-                    rentalTotal,
-                    VatRates.EquipmentRental);
+            // Skischool (incl. moms)
+            decimal skiLessonTotal = booking.SkiLessons?
+                .Sum(sl => sl.SkiLessonSession?.SkiLesson?.Price ?? 0m) ?? 0m;
+            var skiLessonVatSplit = VatRates.SplitVat(skiLessonTotal, VatRates.SkiLesson);
 
-            // Ski school price including VAT.
-            decimal skiLessonTotal =
-                booking.SkiLessons?.Sum(sl =>
-                    sl.SkiLessonSession?.SkiLesson?.Price ?? 0m)
-                ?? 0m;
-
-            var skiLessonVatSplit =
-                VatRates.SplitVat(
-                    skiLessonTotal,
-                    VatRates.SkiLesson);
-
-            // Meeting room price including VAT.
+            // Meetingrooms (incl. moms)
             decimal meetingRoomTotal = 0m;
-
-            if (booking.MeetingRooms != null &&
-                booking.MeetingRooms.Any())
+            if (booking.MeetingRooms != null && booking.MeetingRooms.Any())
             {
                 foreach (var mr in booking.MeetingRooms)
                 {
-                    int week =
-                        ISOWeek.GetWeekOfYear(mr.StartDate);
+                    int week = ISOWeek.GetWeekOfYear(mr.StartDate);
+                    int days = Math.Max(1, (mr.EndDate.Date - mr.StartDate.Date).Days);
 
-                    int days = Math.Max(
-                        1,
-                        (mr.EndDate.Date - mr.StartDate.Date).Days);
+                    var priceObj = mr.meetingRoom?.SeasonPrices?
+                        .FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == week);
 
-                    var priceObj =
-                        mr.meetingRoom?.SeasonPrices?
-                            .FirstOrDefault(p =>
-                                p.PriceType == "dygn" &&
-                                p.WeekNumber == week);
-
-                    meetingRoomTotal +=
-                        (priceObj?.Price ?? 0m) * days;
+                    meetingRoomTotal += (priceObj?.Price ?? 0m) * days;
                 }
             }
+            var meetingRoomVatSplit = VatRates.SplitVat(meetingRoomTotal, VatRates.MeetingRoom);
 
-            var meetingRoomVatSplit =
-                VatRates.SplitVat(
-                    meetingRoomTotal,
-                    VatRates.MeetingRoom);
+            // Cancellation protection
+            decimal insuranceTotal = booking.HasCancellationInsurance ? CancellationInsurancePrice : 0m;
+            var insuranceVatSplit = VatRates.SplitVat(insuranceTotal, VatRates.CancellationInsurance);
 
-            // Cancellation insurance price including VAT.
-            decimal insuranceTotal =
-                booking.HasCancellationInsurance
-                    ? CancellationInsurancePrice
-                    : 0m;
+            // Total calculation
+            decimal totalInclVat = netAccom + rentalTotal + skiLessonTotal + meetingRoomTotal + insuranceTotal;
+            decimal totalExclVat = accomVatSplit.amountExclVat
+                                 + rentalVatSplit.amountExclVat
+                                 + skiLessonVatSplit.amountExclVat
+                                 + meetingRoomVatSplit.amountExclVat
+                                 + insuranceVatSplit.amountExclVat;
 
-            var insuranceVatSplit =
-                VatRates.SplitVat(
-                    insuranceTotal,
-                    VatRates.CancellationInsurance);
+            decimal accomVat = accomVatSplit.vatAmount;
+            decimal otherVat = rentalVatSplit.vatAmount + skiLessonVatSplit.vatAmount + meetingRoomVatSplit.vatAmount + insuranceVatSplit.vatAmount;
+            decimal totalVat = accomVat + otherVat;
 
-            // Calculate total including VAT.
-            decimal totalInclVat =
-                netAccom +
-                rentalTotal +
-                skiLessonTotal +
-                meetingRoomTotal +
-                insuranceTotal;
+            return (totalInclVat, totalExclVat, totalVat, accomVat, otherVat);
+        }
 
-            // Calculate total excluding VAT.
-            decimal totalExclVat =
-                accomVatSplit.amountExclVat +
-                rentalVatSplit.amountExclVat +
-                skiLessonVatSplit.amountExclVat +
-                meetingRoomVatSplit.amountExclVat +
-                insuranceVatSplit.amountExclVat;
+        /// <summary>
+        /// Adds a meeting room to an existing booking.
+        /// </summary>
+        public void AddMeetingRoomToBooking(int bookingId, int meetingRoomId, DateTime startDate, DateTime endDate)
+        {
+            if (startDate.Date < DateTime.Today || endDate <= startDate)
+                throw new ArgumentException("Ogiltig datumperiod för mötesrummet.");
 
-            decimal accomVat =
-                accomVatSplit.vatAmount;
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId);
+            if (booking == null)
+                throw new InvalidOperationException("Hittade inte bokningen.");
 
-            decimal otherVat =
-                rentalVatSplit.vatAmount +
-                skiLessonVatSplit.vatAmount +
-                meetingRoomVatSplit.vatAmount +
-                insuranceVatSplit.vatAmount;
+            int days = (endDate.Date - startDate.Date).Days;
+            int isoWeek = ISOWeek.GetWeekOfYear(startDate);
 
-            decimal totalVat =
-                accomVat + otherVat;
+            var room = _unitOfWork.MeetingRoom.GetByID(meetingRoomId);
 
-            return (
-                totalInclVat,
-                totalExclVat,
-                totalVat,
-                accomVat,
-                otherVat);
+            // Set meeting room status = "Rented"
+            if (room != null)
+            {
+                room.Status = MeetingRoomStatus.Rented;
+            }
+
+            var seasonPrice = room?.SeasonPrices?.FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == isoWeek);
+            decimal calculatedPrice = (seasonPrice?.Price ?? 0m) * days;
+
+            var bookingMeetingRoom = new BookingMeetingRoom
+            {
+                BookingID = bookingId,
+                MeetingRoomID = meetingRoomId,
+                StartDate = startDate,
+                EndDate = endDate
+            };
+
+            if (booking.MeetingRooms == null)
+            {
+                booking.MeetingRooms = new List<BookingMeetingRoom>();
+            }
+
+            booking.MeetingRooms.Add(bookingMeetingRoom);
+
+            booking.TotalAmount += calculatedPrice;
+
+            if (booking.BookingStatus == BookingStatus.Cancelled)
+            {
+                booking.BookingStatus = BookingStatus.Preliminary;
+            }
+
+            _unitOfWork.Complete();
+        }
+
+        /// <summary>
+        /// Removes a meeting room from a booking and deducts the price.
+        /// </summary>
+        public void RemoveMeetingRoomFromBooking(int bookingId, int bookingMeetingRoomId)
+        {
+            var booking = _unitOfWork.Booking.GetSpecificBooking(bookingId);
+            if (booking == null) return;
+
+            var meetingRoomConnection = booking.MeetingRooms.FirstOrDefault(m => m.BookingMeetingRoomID == bookingMeetingRoomId);
+
+            if (meetingRoomConnection != null)
+            {
+                // Get meeting room and set status = "Available"
+                var room = _unitOfWork.MeetingRoom.GetByID(meetingRoomConnection.MeetingRoomID);
+                if (room != null)
+                {
+                    room.Status = MeetingRoomStatus.Available;
+                }
+
+                // Remove price from booking totalAmount.
+                booking.TotalAmount -= meetingRoomConnection.TotalPrice;
+
+                // Remove meeting room from booking.
+                booking.MeetingRooms.Remove(meetingRoomConnection);
+
+                _unitOfWork.Complete();
+            }
         }
     }
 }

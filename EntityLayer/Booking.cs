@@ -52,6 +52,8 @@ namespace EntityLayer
         // Discount amount deducted from the accommodation price.
         [Required]
         public decimal DiscountAmount { get; set; }
+
+        // Used for calculations of final price of accommodation. 
         [NotMapped]
         public decimal FinalAccommodationPrice =>
         AccommodationListPrice > 0

@@ -13,11 +13,22 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
-        /// Fetches staff by email and password to validate login information. 
-        /// </summary>
-        public Staff GetStaffByEmailAndPassword(string email, string password)
+        /// Gets staff by Email and Password
+        /// <summary>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        public Staff? GetStaffByEmailAndPassword(string email, string password)
         {
             return _context.StaffMembers.FirstOrDefault(s => s.Email == email && s.Password == password);
+        }
+
+        /// <summary>
+        /// Checks if Email is already in use. 
+        /// <summary>
+        /// <param name="email"></param>
+        public bool EmailExists(string email)
+        {
+            return _context.StaffMembers.Any(s => s.Email.ToLower() == email.ToLower());
         }
     }
 }

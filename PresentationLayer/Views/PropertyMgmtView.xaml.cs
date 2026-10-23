@@ -189,7 +189,7 @@ namespace PresentationLayer.Views
                 }
             }
 
-            MessageBox.Show($"{successCount} av {changedRows.Count} rader sparades!", "Status uppdaterad", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Klart! {successCount} av {changedRows.Count} boenden har fått ny status.", "Status uppdaterad", MessageBoxButton.OK, MessageBoxImage.Information);
 
             // Reload list to reset IsChanged
             LoadData();

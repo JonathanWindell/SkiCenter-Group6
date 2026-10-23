@@ -202,9 +202,9 @@ namespace BusinessLayer.Controllers
             int days = SkiShopController.CountRentalDays(rental.StartDate, rental.EndDate);
             string period = $"{rental.StartDate:yyyy-MM-dd} – {rental.EndDate:yyyy-MM-dd}";
 
-            var itemPrices = rental.EquipmentItems
+            var itemPrices = rental.RentalItems
                 .Select(item => (item, price: SkiShopController.CalculateRentalPrice(
-                    item.Equipment?.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days)))
+                    item.EquipmentItem?.Equipment.Prices ?? Enumerable.Empty<EquipmentPriceMatrix>(), days)))
                 .ToList();
 
             bool pricesMatch = itemPrices.Count > 0
@@ -215,8 +215,8 @@ namespace BusinessLayer.Controllers
             {
                 return itemPrices.Select(p => CreateLine(
                     "Utrustning",
-                    p.item.ArticleNumber,
-                    $"{p.item.Equipment?.DisplayName} {p.item.Size} {period}".Trim(),
+                    p.item.EquipmentItem.ArticleNumber,
+                    $"{p.item.EquipmentItem.Equipment?.DisplayName} {p.item.EquipmentItem.Size} {period}".Trim(),
                     days,
                     "dagar",
                     p.price!.Value,
@@ -226,7 +226,7 @@ namespace BusinessLayer.Controllers
                     rental.EndDate.Date));
             }
 
-            string articles = string.Join(", ", rental.EquipmentItems.Select(i => i.ArticleNumber));
+            string articles = string.Join(", ", rental.RentalItems.Select(i => i.EquipmentItem.ArticleNumber));
 
             return new[]
             {

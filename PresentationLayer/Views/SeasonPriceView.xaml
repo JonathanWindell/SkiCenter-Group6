@@ -75,8 +75,8 @@
         </DataTemplate>
 
         <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
-            <Setter Property="Background" Value="#E5E7EB"/>
-            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Background" Value="#DCEAF7"/>
+            <Setter Property="Foreground" Value="#2A2F36"/>
         </Style>
     </Window.Resources>
 
@@ -102,7 +102,7 @@
                     Click="BackButton_Click"/>
 
             <StackPanel Grid.Column="1">
-                <TextBlock Text="Säsongspriser"
+                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Säsongspriser"
                            FontSize="28"
                            FontWeight="Bold"
                            Foreground="{StaticResource PrimaryText}"/>
@@ -126,7 +126,7 @@
                 <DropShadowEffect BlurRadius="15"
                                   ShadowDepth="2"
                                   Opacity="0.08"
-                                  Color="#1E1B4B"/>
+                                  Color="#2A2F36"/>
             </Border.Effect>
 
             <Grid>
@@ -257,7 +257,7 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0">
-                                <TextBlock Text="Ändra pris"
+                                <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Ändra pris"
                                        FontSize="20"
                                        FontWeight="Bold"
                                        Foreground="{StaticResource PrimaryText}"
@@ -288,7 +288,7 @@
                                     Content="Spara nytt pris"
                                     Height="36"
                                     IsEnabled="False"
-                                    Style="{StaticResource DeepSeaButtonStyle}"/>
+                                    Style="{StaticResource CtaButtonStyle}"/>
                             </StackPanel>
 
                             <TextBlock Grid.Row="1"

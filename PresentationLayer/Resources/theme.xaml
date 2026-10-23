@@ -1,17 +1,68 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<!--
+    Ski-Center theme, following the graphic profile (Grafisk profil – Ski-Center):
+    cold Nordic tones, high contrast, light frosted panels and orange call-to-action buttons.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <SolidColorBrush x:Key="WindowBg" Color="#E0E7FF"/>
-    <SolidColorBrush x:Key="CardBg" Color="#FFFFFF"/>
-    <SolidColorBrush x:Key="PrimaryBtn" Color="#3730A3"/>
-    <SolidColorBrush x:Key="PrimaryBtnHover" Color="#4338CA"/>
-    <SolidColorBrush x:Key="PrimaryText" Color="#1E1B4B"/>
-    <SolidColorBrush x:Key="SecondaryText" Color="#4338CA"/>
-    <SolidColorBrush x:Key="InputBorder" Color="#C7D2FE"/>
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Icons.xaml"/>
+        <ResourceDictionary Source="Graphics.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
 
+    <!-- ===== Brand palette ===== -->
+    <!-- Primary palette -->
+    <Color x:Key="BrandBlueColor">#1E4F8C</Color>      <!-- Fjällblå: primary brand color -->
+    <Color x:Key="IceBlueColor">#DCEAF7</Color>        <!-- Isblå: backgrounds -->
+    <Color x:Key="SnowWhiteColor">#F8FAFC</Color>      <!-- Snövit: neutral base -->
+    <Color x:Key="MidnightGrayColor">#2A2F36</Color>   <!-- Midnattsgrå: text and contrast -->
+    <!-- Accent colors -->
+    <Color x:Key="AuroraGreenColor">#52B788</Color>    <!-- Aurora grön: digital functions and statistics -->
+    <Color x:Key="SunsetOrangeColor">#F4A261</Color>   <!-- Solnedgång orange: call-to-action -->
+
+    <SolidColorBrush x:Key="BrandBlue" Color="{StaticResource BrandBlueColor}"/>
+    <SolidColorBrush x:Key="IceBlue" Color="{StaticResource IceBlueColor}"/>
+    <SolidColorBrush x:Key="SnowWhite" Color="{StaticResource SnowWhiteColor}"/>
+    <SolidColorBrush x:Key="MidnightGray" Color="{StaticResource MidnightGrayColor}"/>
+    <SolidColorBrush x:Key="AuroraGreen" Color="{StaticResource AuroraGreenColor}"/>
+    <SolidColorBrush x:Key="SunsetOrange" Color="{StaticResource SunsetOrangeColor}"/>
+
+    <!-- Tints derived from the palette -->
+    <SolidColorBrush x:Key="BrandBlueHover" Color="#2A64AB"/>
+    <SolidColorBrush x:Key="BrandBlueDark" Color="#163C6B"/>
+    <SolidColorBrush x:Key="SunsetOrangeHover" Color="#F6B47E"/>
+    <SolidColorBrush x:Key="SunsetOrangePressed" Color="#E8914C"/>
+
+    <!-- ===== Semantic keys used by the views (mapped to the brand palette) ===== -->
+    <SolidColorBrush x:Key="WindowBg" Color="{StaticResource IceBlueColor}"/>
+    <SolidColorBrush x:Key="CardBg" Color="{StaticResource SnowWhiteColor}"/>
+    <SolidColorBrush x:Key="PrimaryBtn" Color="{StaticResource BrandBlueColor}"/>
+    <SolidColorBrush x:Key="PrimaryBtnHover" Color="#2A64AB"/>
+    <SolidColorBrush x:Key="PrimaryText" Color="{StaticResource MidnightGrayColor}"/>
+    <SolidColorBrush x:Key="SecondaryText" Color="{StaticResource BrandBlueColor}"/>
+    <SolidColorBrush x:Key="InputBorder" Color="#B7CFE8"/>
+    <SolidColorBrush x:Key="MutedText" Color="#5C6670"/>
+    <SolidColorBrush x:Key="IconCircleBg" Color="{StaticResource IceBlueColor}"/>
+    <SolidColorBrush x:Key="SecondaryBtnBg" Color="{StaticResource IceBlueColor}"/>
+
+    <!-- ===== Typography: Montserrat for headings, Open Sans for body text ===== -->
+    <FontFamily x:Key="HeadingFont">pack://application:,,,/PresentationLayer;component/Resources/Fonts/#Montserrat</FontFamily>
+    <FontFamily x:Key="BodyFont">pack://application:,,,/PresentationLayer;component/Resources/Fonts/#Open Sans</FontFamily>
+
+    <!-- Page and window titles -->
+    <Style x:Key="HeadingTextStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HeadingFont}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="{StaticResource PrimaryText}"/>
+    </Style>
+
+    <!-- ===== Buttons ===== -->
+    <!-- Primary button in Fjällblå -->
     <Style x:Key="DeepSeaButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="{StaticResource PrimaryBtn}"/>
         <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -19,8 +70,12 @@
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <!-- Lightens whatever background the button has, so secondary buttons based on this style also work -->
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="{StaticResource PrimaryBtnHover}"/>
+                            <Setter TargetName="border" Property="Opacity" Value="0.86"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.45"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -28,23 +83,127 @@
         </Setter>
     </Style>
 
-    <Style x:Key="MenuCardStyle" TargetType="Button">
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="Margin" Value="10"/>
-        <Setter Property="Padding" Value="20"/>
+    <!-- Call-to-action button in Solnedgång orange, for the main action in a view.
+         Midnattsgrå text, since white text on orange does not have enough contrast. -->
+    <Style x:Key="CtaButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource SunsetOrange}"/>
+        <Setter Property="Foreground" Value="{StaticResource MidnightGray}"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="border" Background="{TemplateBinding Background}" 
-                        CornerRadius="15" BorderThickness="1" BorderBrush="{StaticResource InputBorder}">
+                    <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="10">
                         <Border.Effect>
-                            <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.1" Color="#1E1B4B"/>
+                            <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.18" Color="{StaticResource MidnightGrayColor}"/>
                         </Border.Effect>
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="border" Property="Background" Value="#F8FAFF"/>
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource SunsetOrangeHover}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="{StaticResource SunsetOrangePressed}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ===== Dashboard ===== -->
+    <!-- Menu card with a frosted glass look: icon and text as content, round arrow button on the right -->
+    <Style x:Key="DashboardCardStyle" TargetType="Button">
+        <Setter Property="Margin" Value="8"/>
+        <Setter Property="Height" Value="88"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="card" Background="#D9F8FAFC" CornerRadius="14"
+                            BorderThickness="1" BorderBrush="#99FFFFFF" Padding="14,10,12,10">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="18" ShadowDepth="3" Opacity="0.14" Color="{StaticResource BrandBlueColor}"/>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <ContentPresenter VerticalAlignment="Center"/>
+
+                            <Border x:Name="chevronCircle" Grid.Column="1" Width="26" Height="26" CornerRadius="13"
+                                    Margin="8,0,0,0" VerticalAlignment="Center" Background="{StaticResource IconCircleBg}">
+                                <Viewbox Width="12" Height="12">
+                                    <Canvas Width="64" Height="64">
+                                        <Path x:Name="chevron" Data="{StaticResource Icon.Chevron}" Stroke="{StaticResource PrimaryBtn}"
+                                              StrokeThickness="7" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="card" Property="Background" Value="{StaticResource SnowWhite}"/>
+                            <Setter TargetName="card" Property="BorderBrush" Value="{StaticResource PrimaryBtn}"/>
+                            <Setter TargetName="chevronCircle" Property="Background" Value="{StaticResource SunsetOrange}"/>
+                            <Setter TargetName="chevron" Property="Stroke" Value="{StaticResource MidnightGray}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="card" Property="Background" Value="White"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Small borderless window button, e.g. minimize and close -->
+    <Style x:Key="WindowChromeButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="30"/>
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="chrome" Background="Transparent" CornerRadius="8">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="chrome" Property="Background" Value="#33FFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Older menu card, kept for views that may still use it -->
+    <Style x:Key="MenuCardStyle" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource SnowWhite}"/>
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="Padding" Value="20"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" Background="{TemplateBinding Background}"
+                        CornerRadius="15" BorderThickness="1" BorderBrush="{StaticResource InputBorder}">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="15" ShadowDepth="2" Opacity="0.1" Color="{StaticResource MidnightGrayColor}"/>
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="White"/>
                             <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource PrimaryBtn}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>

@@ -7,12 +7,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="C:\Users\xioni\.nuget\packages\select.htmltopdf\26.5.0\contentFiles\any\any\Select.Html.dep" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EntityLayer\EntityLayer.csproj" />
     <ProjectReference Include="..\BusinessLayer\BusinessLayer.csproj" />
   </ItemGroup>
 
+  <!-- The graphic profile's fonts for the PDF reports, linked from PresentationLayer so they only exist once in the repo -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\PresentationLayer\Resources\Fonts\*.ttf" LinkBase="Pdf\Fonts" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="QuestPDF" Version="2026.9.1" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
 </Project>

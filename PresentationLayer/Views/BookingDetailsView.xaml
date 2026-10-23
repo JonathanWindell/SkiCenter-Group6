@@ -11,12 +11,9 @@
         Background="{StaticResource WindowBg}">
 
     <Window.Resources>
-        <local:BookingStatusSwedishConverter
-            x:Key="BookingStatusSwedishConverter"/>
-        <local:AccommodationStatusSwedishConverter
-            x:Key="AccommodationStatusSwedishConverter"/>
-        <local:BooleanSwedishConverter
-            x:Key="BooleanSwedishConverter"/>
+        <local:BookingStatusSwedishConverter x:Key="BookingStatusSwedishConverter"/>
+        <local:AccommodationStatusSwedishConverter x:Key="AccommodationStatusSwedishConverter"/>
+        <local:BooleanSwedishConverter x:Key="BooleanSwedishConverter"/>
     </Window.Resources>
 
     <Grid Margin="40">
@@ -33,20 +30,44 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Header -->
-                <StackPanel Grid.Row="0"
-                            Margin="0,0,0,25">
+                <Grid Grid.Row="0" Margin="0,0,0,25">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Bokningsdetaljer"
-                               FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource PrimaryText}"/>
+                    <StackPanel Grid.Column="0">
+                        <!-- Back button -->
+                        <Button Content="Tillbaka"
+                                Width="90"
+                                Height="32"
+                                Margin="0,0,0,15"
+                                HorizontalAlignment="Left"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BackButton_Click"/>
 
-                    <TextBlock Text="Fullständig information om bokningen."
-                               Margin="0,6,0,0"
-                               FontSize="13"
-                               Foreground="{StaticResource SecondaryText}"/>
-                </StackPanel>
+                        <TextBlock FontFamily="{StaticResource HeadingFont}"
+                                   Text="Bokningsdetaljer"
+                                   FontSize="26"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryText}"/>
+
+                        <TextBlock Text="Fullständig information om bokningen."
+                                   Margin="0,6,0,0"
+                                   FontSize="13"
+                                   Foreground="{StaticResource SecondaryText}"/>
+                    </StackPanel>
+
+                    <!-- Confirmation button -->
+                    <Button x:Name="BtnSendConfirmation"
+                            Grid.Column="1"
+                            VerticalAlignment="Top"
+                            Content="Skicka Bekräftelse"
+                            Width="150"
+                            Height="38"
+                            Style="{StaticResource CtaButtonStyle}"
+                            Click="BtnSendConfirmation_Click"/>
+                </Grid>
 
                 <!-- Scrollable booking information -->
                 <ScrollViewer Grid.Row="1"
@@ -113,7 +134,8 @@
                                     <Run x:Name="OtherVatRun" Text="-"/>
                                 </TextBlock>
 
-                                <TextBlock Margin="0,5,0,0" FontWeight="SemiBold">
+                                <TextBlock Margin="0,5,0,0"
+                                           FontWeight="SemiBold">
                                     <Run Text="Total moms: "/>
                                     <Run x:Name="TotalVatRun" Text="-"/>
                                 </TextBlock>
@@ -224,12 +246,12 @@
 
                                             <TextBlock>
                                                 <Run Text="Rumsnummer: "/>
-                                                <Run Text="{Binding MeetingRoomNumber}"/>
+                                                <Run Text="{Binding meetingRoom.MeetingRoomNumber}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Kapacitet: "/>
-                                                <Run Text="{Binding Capacity}"/>
+                                                <Run Text="{Binding meetingRoom.Capacity}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
@@ -246,18 +268,19 @@
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Beskrivning: "/>
-                                                <Run Text="{Binding Description}"/>
+                                                <Run Text="{Binding meetingRoom.Description}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Pris: "/>
-                                                <Run Text="{Binding Price,
+                                                <Run Text="{Binding TotalPrice,
+                                                    Mode=OneWay,
                                                     StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Status: "/>
-                                                <Run Text="{Binding Status}"/>
+                                                <Run Text="{Binding meetingRoom.Status}"/>
                                             </TextBlock>
 
                                         </StackPanel>
@@ -280,7 +303,6 @@
 
                                         <StackPanel>
 
-                                            <!-- Rental information -->
                                             <TextBlock Text="UTRUSTNING"
                                                        FontSize="16"
                                                        FontWeight="Bold"
@@ -313,11 +335,11 @@
                                             <TextBlock Margin="0,5,0,15">
                                                 <Run Text="Pris för hyresperioden: "/>
                                                 <Run Text="{Binding TotalPrice,
-    StringFormat={}{0:N0} kr}"/>
+                                                    StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <!-- Equipment items -->
-                                            <ItemsControl ItemsSource="{Binding EquipmentItems}">
+                                            <ItemsControl ItemsSource="{Binding RentedEquipmentList}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
 
@@ -497,66 +519,89 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Booking actions -->
+                <!-- Booking action buttons -->
                 <Grid Grid.Row="2" Margin="0,20,0,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <Button Grid.Column="0"
-                            Content="Tillbaka"
-                            Width="110"
-                            Height="38"
-                            HorizontalAlignment="Left"
-                            Style="{StaticResource DeepSeaButtonStyle}"
-                            Click="BackButton_Click"/>
+                    <!-- First row: Edit and cancel booking -->
+                    <StackPanel Grid.Row="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                Margin="0,0,0,10">
 
-                    <Button x:Name="EditBookingButton"
-        Grid.Column="1"
-        Content="Ändra bokning"
-        Width="160"
-        Height="38"
-        Margin="0,0,10,0">
+                        <Button x:Name="EditBookingButton"
+                                Content="Ändra bokning"
+                                Width="160"
+                                Height="38"
+                                Margin="0,0,10,0">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#E5E7EB"/>
+                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                            <Setter Property="Opacity" Value="0.5"/>
+                                            <Setter Property="Cursor" Value="Arrow"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
-                        <Button.Style>
-                            <Style TargetType="Button"
-               BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#E5E7EB"/>
-                                        <Setter Property="Foreground" Value="#6B7280"/>
-                                        <Setter Property="Opacity" Value="0.5"/>
-                                        <Setter Property="Cursor" Value="Arrow"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                        <Button x:Name="CancelBookingButton"
+                                Content="Avboka bokning"
+                                Width="150"
+                                Height="38">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#DCEAF7"/>
+                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                            <Setter Property="Opacity" Value="0.5"/>
+                                            <Setter Property="Cursor" Value="Arrow"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
+                    </StackPanel>
 
-                    <Button x:Name="CancelBookingButton"
-                            Grid.Column="2"
-                            Content="Avboka bokning"
-                            Width="160"
-                            Height="38">
+                    <!-- Second row: Add services -->
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
 
-                        <Button.Style>
-                            <Style TargetType="Button"
-                                    BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                <Style.Triggers>
-                                    <!-- Clearly show when cancellation is unavailable. -->
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#E5E7EB"/>
-                                        <Setter Property="Foreground" Value="#6B7280"/>
-                                        <Setter Property="Opacity" Value="0.5"/>
-                                        <Setter Property="Cursor" Value="Arrow"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                        <Button x:Name="BtnAddEquipment"
+                                Content="+ Lägg till Utrustning"
+                                Width="150"
+                                Height="38"
+                                Margin="0,0,10,0"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BtnAddEquipment_Click"/>
+
+                        <Button x:Name="BtnAddSkiSchool"
+                                Content="+ Lägg till Skidskola"
+                                Width="150"
+                                Height="38"
+                                Margin="0,0,10,0"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BtnAddSkiSchool_Click"/>
+
+                        <Button x:Name="BtnAddMeetingRoom"
+                                Content="+ Lägg till Mötesrum"
+                                Width="150"
+                                Height="38"
+                                Style="{StaticResource DeepSeaButtonStyle}"
+                                Click="BtnAddMeetingRoom_Click"/>
+
+                    </StackPanel>
                 </Grid>
 
             </Grid>

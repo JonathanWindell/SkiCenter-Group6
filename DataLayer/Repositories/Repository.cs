@@ -52,7 +52,7 @@ namespace DataLayer.Repositories
         /// </summary>
         /// <param name="id">The unique identifier of the entity.</param>
         /// <returns>The found entity or null if no match exists.</returns>
-        public T GetByID(int id)
+        public T? GetByID(int id)
         {
             return _context.Set<T>().Find(id);
         }

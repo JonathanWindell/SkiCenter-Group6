@@ -3,7 +3,7 @@ using BusinessLayer.Controllers;
 using DataLayer;
 using DataLayer.Interfaces;
 using DataLayer.Repositories;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PresentationLayer.Views;
 using ServiceLayer.Pdf;
@@ -30,8 +30,19 @@ namespace PresentationLayer
         /// </summary>
         public App()
         {
-            // Create a new service collection.
+            // The graphic profile's body font for all windows. Must run before any window is created.
+            PresentationLayer.Resources.BrandFonts.Apply();
+
             var services = new ServiceCollection();
+
+            // Build config and point to appsettings.json
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            // Register IConfiguration in to the container so that view is found 
+            services.AddSingleton<IConfiguration>(configuration);
 
             // Register application dependencies.
             ConfigureServices(services);
@@ -63,6 +74,7 @@ namespace PresentationLayer
             services.AddTransient<StatisticsView>();
             services.AddTransient<SkiSchoolView>();
             services.AddTransient<MarketingMgmtView>();
+            services.AddTransient<StaffAdminView>();
 
 
             // 2. Register Controllers
@@ -76,6 +88,7 @@ namespace PresentationLayer
             services.AddTransient<ReportController>();
             services.AddTransient<StatisticsController>();
             services.AddTransient<ListReportController>();
+            services.AddTransient<StaffController>();
 
             // Services
             services.AddTransient<PdfReportService>();
@@ -101,18 +114,6 @@ namespace PresentationLayer
             // Resolve the main window (LoginView) from the service provider and show it
             var loginWindow = Services.GetRequiredService<LoginView>();
             loginWindow.Show();
-
-            // To test the guest view directly without logging in, comment out the two lines above and use:
-            // var guestWindow = Services.GetRequiredService<GuestCheckInOutView>();
-            // guestWindow.Show();
-
-            // Only use when data should be written from seeding files.
-            // Jonathan will handle database initialization.
-
-
-
-
-
         }
     }
 }

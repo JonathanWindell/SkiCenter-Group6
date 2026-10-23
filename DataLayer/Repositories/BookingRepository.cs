@@ -26,8 +26,9 @@ namespace DataLayer.Repositories
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
                 .Include(b => b.Rentals)
-                    .ThenInclude(r => r.EquipmentItems)
-                        .ThenInclude(ei => ei.Equipment)
+                    .ThenInclude(r => r.RentalItems)
+                        .ThenInclude(r => r.EquipmentItem)
+                            .ThenInclude(ei => ei.Equipment)
                 .Include(b => b.Invoices)
                 .AsSplitQuery()
                 .ToList();
@@ -45,12 +46,15 @@ namespace DataLayer.Repositories
                     .ThenInclude(ba => ba.Accommodation)
                     .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.MeetingRooms)
+                    .ThenInclude(mr => mr.meetingRoom)
+                        .ThenInclude(r => r.SeasonPrices)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
                     .ThenInclude(sls => sls.SkiLesson)
                 .Include(b => b.Rentals)
-                    .ThenInclude(r => r.EquipmentItems)
-                        .ThenInclude(ri => ri.Equipment)
+                    .ThenInclude(r => r.RentalItems)
+                        .ThenInclude(r => r.EquipmentItem)
+                            .ThenInclude(ri => ri.Equipment)
                             .ThenInclude(e => e.Prices)
                 .Include(b => b.Invoices)
                 .AsSplitQuery()
@@ -117,9 +121,10 @@ namespace DataLayer.Repositories
                     .ThenInclude(ba => ba.Accommodation)
                         .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.Rentals)
-                    .ThenInclude(r => r.EquipmentItems)
-                        .ThenInclude(ei => ei.Equipment)
-                            .ThenInclude(e => e.Prices)
+                    .ThenInclude(r => r.RentalItems)
+                        .ThenInclude(r => r.EquipmentItem)
+                            .ThenInclude(ei => ei.Equipment)
+                                .ThenInclude(e => e.Prices)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
                         .ThenInclude(sls => sls.SkiLesson)
@@ -150,9 +155,10 @@ namespace DataLayer.Repositories
                     .ThenInclude(ba => ba.Accommodation)
                         .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.Rentals)
-                    .ThenInclude(r => r.EquipmentItems)
-                        .ThenInclude(ei => ei.Equipment)
-                            .ThenInclude(e => e.Prices)
+                    .ThenInclude(r => r.RentalItems)
+                        .ThenInclude(r => r.EquipmentItem)
+                            .ThenInclude(ei => ei.Equipment)
+                                .ThenInclude(e => e.Prices)
                 .Include(b => b.SkiLessons)
                     .ThenInclude(sl => sl.SkiLessonSession)
                         .ThenInclude(sls => sls.SkiLesson)
@@ -187,19 +193,31 @@ namespace DataLayer.Repositories
 
             DateTime today = DateTime.Today;
 
-            return _context.Set<Booking>()
+            var query = _context.Set<Booking>()
                 .Include(b => b.Customer)
                 .Include(b => b.Accommodations)
                     .ThenInclude(ba => ba.Accommodation)
                         .ThenInclude(a => a.AccommodationType)
                 .Include(b => b.Rentals)
-                    .ThenInclude(r => r.EquipmentItems)
-                        .ThenInclude(ei => ei.Equipment)
-                .Where(b => (b.BookingStatus == BookingStatus.Preliminary || b.BookingStatus == BookingStatus.Confirmed)
-                    && b.CheckInStatus != CheckInStatus.CheckedOut
-                    && b.Accommodations.Any(ba => ba.EndDate >= today))
-                .Where(b => (bookingID.HasValue && b.BookingID == bookingID.Value)
-                    || (roomNumber != null && b.Accommodations.Any(ba => ba.Accommodation.AccommodationNumber == roomNumber)))
+                    .ThenInclude(r => r.RentalItems)
+                        .ThenInclude(r => r.EquipmentItem)
+                            .ThenInclude(ei => ei.Equipment)
+                                .ThenInclude(e => e.Prices)
+                .Where(b => b.BookingStatus != BookingStatus.Cancelled
+                         && b.BookingStatus != BookingStatus.Finished
+                         && b.CheckInStatus != CheckInStatus.CheckedOut);
+
+            if (bookingID.HasValue)
+            {
+                query = query.Where(b => b.BookingID == bookingID.Value);
+            }
+            else if (roomNumber != null)
+            {
+                query = query.Where(b => b.Accommodations.Any(ba =>
+                    ba.Accommodation.AccommodationNumber == roomNumber && ba.EndDate >= today));
+            }
+
+            return query
                 .AsSplitQuery()
                 .AsNoTracking()
                 .ToList();

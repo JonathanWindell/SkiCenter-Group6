@@ -17,13 +17,13 @@ namespace DataLayer.Repositories
         /// Gets the specific rental with its equipmentItems connected to it.
         /// </summary>
         /// <param name="rentalID"></param>
-        public Rental GetRentalWithItems(int rentalID)
+        public Rental? GetRentalWithItems(int rentalID)
         {
             if (rentalID <= 0) return null;
 
             return _context.Set<Rental>()
-                .Include(r => r.EquipmentItems)
-                    .ThenInclude(ei => ei.Equipment)
+                .Include(r => r.RentalItems)
+                    .ThenInclude(ei => ei.EquipmentItem)
                 .FirstOrDefault(r => r.RentalID == rentalID);
         }
 
@@ -33,8 +33,8 @@ namespace DataLayer.Repositories
         public IEnumerable<Rental> GetActiveRentals()
         {
             return _context.Set<Rental>()
-                .Include(r => r.EquipmentItems)
-                    .ThenInclude(ei => ei.Equipment)
+                .Include(r => r.RentalItems)
+                    .ThenInclude(ei => ei.EquipmentItem)
                 .Where(r => r.Status == "Active")
                 .AsNoTracking()
                 .ToList();
@@ -52,8 +52,8 @@ namespace DataLayer.Repositories
             }
 
             return _context.Set<Rental>()
-                .Include(r => r.EquipmentItems)
-                    .ThenInclude(ei => ei.Equipment)
+                .Include(r => r.RentalItems)
+                    .ThenInclude(ei => ei.EquipmentItem)
                 .Where(r => r.Booking != null && r.Booking.CustomerID == customerID)
                 .AsNoTracking()
                 .ToList();
@@ -72,8 +72,9 @@ namespace DataLayer.Repositories
             }
 
             return _context.Set<Rental>()
-                .Include(r => r.EquipmentItems)
-                .ThenInclude(ei => ei.Equipment)
+                .Include(ri => ri.RentalItems)
+                    .ThenInclude(r => r.EquipmentItem)
+                        .ThenInclude(ei => ei.Equipment)
                 .Where(r => r.BookingID == bookingID)
                 .AsNoTracking()
                 .ToList();

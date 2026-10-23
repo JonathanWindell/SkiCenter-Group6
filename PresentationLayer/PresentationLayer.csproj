@@ -24,4 +24,13 @@
     </None>
   </ItemGroup>
 
+  <!-- Images and fonts are built into the program. The SVG icons are kept as originals; the app uses the XAML versions in Resources/Icons.xaml.
+       Fonts: Montserrat and Open Sans, SIL Open Font License (see Resources/Fonts/OFL-*.txt). -->
+  <ItemGroup>
+    <Resource Include="Resources\Images\*.png" />
+    <Resource Include="Resources\Fonts\*.ttf" />
+    <None Include="Resources\Fonts\*.txt" />
+    <None Include="Resources\Images\Icons\*.svg" />
+  </ItemGroup>
+
 </Project>

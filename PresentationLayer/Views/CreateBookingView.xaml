@@ -26,7 +26,15 @@
                 <!-- Header -->
                 <StackPanel Grid.Row="0">
 
-                    <TextBlock Text="Skapa ny bokning"
+                    <Button x:Name="BackButton"
+                            Content="← Tillbaka"
+                            Width="110" Height="36"
+                            HorizontalAlignment="Left"
+                            Margin="0,0,0,20"
+                            Style="{StaticResource DeepSeaButtonStyle}"
+                            Click="BackButton_Click"/>
+
+                    <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Skapa ny bokning"
                                FontSize="26"
                                FontWeight="Bold"
                                Foreground="{StaticResource PrimaryText}"/>
@@ -276,31 +284,14 @@
                 </ScrollViewer>
 
                 <!-- Footer buttons -->
-                <Grid Grid.Row="2"
-                      Margin="0,20,0,0">
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <Button x:Name="BackButton"
-                            Grid.Column="0"
-                            Content="Tillbaka"
-                            Width="110"
-                            Height="38"
-                            HorizontalAlignment="Left"
-                            Style="{StaticResource DeepSeaButtonStyle}"
-                            Click="BackButton_Click"/>
-
+                <Grid Grid.Row="2" Margin="0,20,0,0">
                     <Button x:Name="CreateBookingButton"
-                            Grid.Column="1"
                             Content="Skapa bokning"
                             Width="150"
                             Height="38"
-                            Style="{StaticResource DeepSeaButtonStyle}"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource CtaButtonStyle}"
                             Click="CreateBooking_Click"/>
-
                 </Grid>
 
             </Grid>
