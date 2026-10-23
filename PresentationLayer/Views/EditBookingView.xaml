@@ -89,14 +89,46 @@
                                         Margin="0,0,0,20"
                                         Style="{StaticResource DeepSeaButtonStyle}"/>
 
-                                <TextBlock Text="Välj boende"
-                                           FontWeight="SemiBold"
-                                           Foreground="{StaticResource PrimaryText}"/>
 
-                                <ComboBox x:Name="AccommodationComboBox"
-                                          Height="35"
-                                          Margin="0,8,0,0"
-                                          DisplayMemberPath="AccommodationNumber"/>
+                                <TextBlock Text="Välj boende"
+           FontWeight="SemiBold"
+           Foreground="{StaticResource PrimaryText}"/>
+
+                                <DataGrid x:Name="AccommodationDataGrid"
+          Height="160"
+          Margin="0,8,0,0"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          SelectionMode="Single"
+          SelectionUnit="FullRow"
+          CanUserAddRows="False"
+          CanUserDeleteRows="False"
+          CanUserResizeRows="False"
+          HeadersVisibility="Column"
+          GridLinesVisibility="Horizontal"
+          RowHeight="28"
+          ColumnHeaderHeight="30"
+          BorderBrush="{StaticResource InputBorder}"
+          BorderThickness="1"
+          Background="{StaticResource CardBg}"
+          HorizontalGridLinesBrush="#E5E7EB">
+
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Boendenummer"
+                            Binding="{Binding AccommodationNumber}"
+                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Boendetyp"
+                            Binding="{Binding AccommodationType.CategoryCode}"
+                            Width="*"/>
+
+                                        <DataGridTextColumn Header="Antal sängar"
+                            Binding="{Binding AccommodationType.NumberOfBeds}"
+                            Width="*"/>
+                                    </DataGrid.Columns>
+
+                                </DataGrid>
+
 
                             </StackPanel>
                         </Border>

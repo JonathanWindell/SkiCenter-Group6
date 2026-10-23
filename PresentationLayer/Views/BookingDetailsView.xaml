@@ -14,6 +14,92 @@
         <local:BookingStatusSwedishConverter x:Key="BookingStatusSwedishConverter"/>
         <local:AccommodationStatusSwedishConverter x:Key="AccommodationStatusSwedishConverter"/>
         <local:BooleanSwedishConverter x:Key="BooleanSwedishConverter"/>
+
+        <!-- Blue style for service dropdown items -->
+        <Style x:Key="BlueServiceMenuItemStyle"
+               TargetType="{x:Type MenuItem}">
+
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#20518E"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="15,12"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+
+                        <Border x:Name="MenuItemBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="5"
+                                Margin="3,2"
+                                MinHeight="32">
+
+                            <ContentPresenter
+                                ContentSource="Header"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                Margin="12,0"/>
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="MenuItemBorder"
+                                        Property="Background"
+                                        Value="#3674B5"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Blue background for the entire dropdown popup -->
+        <Style x:Key="BlueServiceMenuStyle"
+               TargetType="{x:Type MenuItem}">
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+
+                        <Grid>
+                            <ContentPresenter
+                                ContentSource="Header"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"/>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade"
+                                   IsOpen="{Binding IsSubmenuOpen,
+                                            RelativeSource={RelativeSource TemplatedParent}}">
+
+                                <Border Background="#20518E"
+                                        BorderBrush="#20518E"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="5"
+                                        MinWidth="190">
+
+                                    <StackPanel IsItemsHost="True"/>
+
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Grid Margin="40">
@@ -519,18 +605,19 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Booking action buttons -->
+                <!-- Booking action buttons: all on the same bottom row -->
                 <Grid Grid.Row="2" Margin="0,20,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <!-- First row: Edit and cancel booking -->
-                    <StackPanel Grid.Row="0"
+                    <!-- Left side: Edit and cancel booking -->
+                    <StackPanel Grid.Column="0"
                                 Orientation="Horizontal"
                                 HorizontalAlignment="Left"
-                                Margin="0,0,0,10">
+                                VerticalAlignment="Center">
 
                         <Button x:Name="EditBookingButton"
                                 Content="Ändra bokning"
@@ -573,35 +660,58 @@
 
                     </StackPanel>
 
-                    <!-- Second row: Add services -->
-                    <StackPanel Grid.Row="1"
-                                Orientation="Horizontal"
-                                HorizontalAlignment="Right">
+                    <!-- Right side: Add service dropdown -->
+                    <Menu Grid.Column="2"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          Padding="0">
 
-                        <Button x:Name="BtnAddEquipment"
-                                Content="+ Lägg till Utrustning"
-                                Width="150"
-                                Height="38"
-                                Margin="0,0,10,0"
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BtnAddEquipment_Click"/>
+                        <MenuItem x:Name="AddServiceMenu"
+                                  Width="170"
+                                  Height="38"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  Padding="0"
+                                  Style="{StaticResource BlueServiceMenuStyle}"
+                                  StaysOpenOnClick="False">
 
-                        <Button x:Name="BtnAddSkiSchool"
-                                Content="+ Lägg till Skidskola"
-                                Width="150"
-                                Height="38"
-                                Margin="0,0,10,0"
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BtnAddSkiSchool_Click"/>
+                            <MenuItem.Header>
+                                <Border Background="#20518E"
+                                        CornerRadius="8"
+                                        Width="170"
+                                        Height="38">
 
-                        <Button x:Name="BtnAddMeetingRoom"
-                                Content="+ Lägg till Mötesrum"
-                                Width="150"
-                                Height="38"
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BtnAddMeetingRoom_Click"/>
+                                    <Grid>
+                                        <TextBlock Text="+ Lägg till tjänst  ▼"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"/>
+                                    </Grid>
+                                </Border>
+                            </MenuItem.Header>
 
-                    </StackPanel>
+                            <MenuItem x:Name="BtnAddEquipment"
+                                      Header="+ Lägg till Utrustning"
+                                      Style="{StaticResource BlueServiceMenuItemStyle}"
+                                      Click="BtnAddEquipment_Click"/>
+
+                            <MenuItem x:Name="BtnAddSkiSchool"
+                                      Header="+ Lägg till Skidskola"
+                                      Style="{StaticResource BlueServiceMenuItemStyle}"
+                                      Click="BtnAddSkiSchool_Click"/>
+
+                            <MenuItem x:Name="BtnAddMeetingRoom"
+                                      Header="+ Lägg till Mötesrum"
+                                      Style="{StaticResource BlueServiceMenuItemStyle}"
+                                      Click="BtnAddMeetingRoom_Click"/>
+
+                        </MenuItem>
+                    </Menu>
+
                 </Grid>
 
             </Grid>

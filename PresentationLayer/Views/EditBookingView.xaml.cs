@@ -55,10 +55,10 @@ namespace PresentationLayer.Views
                 CancelButton_Click;
 
             // Enable saving only after selecting an accommodation.
-            AccommodationComboBox.SelectionChanged += (_, _) =>
+            AccommodationDataGrid.SelectionChanged += (_, _) =>
             {
                 SaveChangesButton.IsEnabled =
-                    AccommodationComboBox.SelectedItem is Accommodation;
+                    AccommodationDataGrid.SelectedItem is Accommodation;
             };
 
             // Require a new search when search criteria change.
@@ -76,14 +76,14 @@ namespace PresentationLayer.Views
 
         private void ClearSearch()
         {
-            if (AccommodationComboBox == null ||
+            if (AccommodationDataGrid == null ||
                 SaveChangesButton == null)
             {
                 return;
             }
 
-            AccommodationComboBox.ItemsSource = null;
-            AccommodationComboBox.SelectedItem = null;
+            AccommodationDataGrid.ItemsSource = null;
+            AccommodationDataGrid.SelectedItem = null;
             SaveChangesButton.IsEnabled = false;
         }
 
@@ -225,7 +225,7 @@ namespace PresentationLayer.Views
                         _booking.BookingID)
                     .ToList();
 
-                AccommodationComboBox.ItemsSource =
+                AccommodationDataGrid.ItemsSource =
                     accommodations;
 
                 if (accommodations.Count == 0)
@@ -264,7 +264,7 @@ namespace PresentationLayer.Views
                 return;
             }
 
-            if (AccommodationComboBox.SelectedItem
+            if (AccommodationDataGrid.SelectedItem
                 is not Accommodation selectedAccommodation)
             {
                 ShowWarning(
@@ -327,15 +327,6 @@ namespace PresentationLayer.Views
                     oldStay.StartDate.Date == newStartDate &&
                     oldStay.EndDate.Date == newEndDate;
 
-                MessageBox.Show(
-    $"Oförändrad: {isUnchanged}\n" +
-    $"Gammalt boende-ID: {oldStay.AccommodationID}\n" +
-    $"Valt boende-ID: {selectedAccommodation.AccommodationID}\n" +
-    $"Gammalt startdatum: {oldStay.StartDate:yyyy-MM-dd}\n" +
-    $"Nytt startdatum: {newStartDate:yyyy-MM-dd}\n" +
-    $"Gammalt slutdatum: {oldStay.EndDate:yyyy-MM-dd}\n" +
-    $"Nytt slutdatum: {newEndDate:yyyy-MM-dd}",
-    "Kontroll av bokningsändring");
 
                 // Preserve the saved accommodation price if nothing changed.
                 decimal newListPrice = isUnchanged
