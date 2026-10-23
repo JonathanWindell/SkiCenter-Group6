@@ -220,6 +220,16 @@ namespace PresentationLayer.Views
                 return;
             }
 
+            if (numberOfGuests > 4)
+            {
+                MessageBox.Show(
+                    "Största möjliga antalet gäster för ett boende är 4.",
+                    "För många gäster",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
                 var availableAccommodations =
