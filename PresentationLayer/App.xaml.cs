@@ -74,6 +74,7 @@ namespace PresentationLayer
             services.AddTransient<StatisticsView>();
             services.AddTransient<SkiSchoolView>();
             services.AddTransient<MarketingMgmtView>();
+            services.AddTransient<StaffAdminView>();
 
 
             // 2. Register Controllers
@@ -87,6 +88,7 @@ namespace PresentationLayer
             services.AddTransient<ReportController>();
             services.AddTransient<StatisticsController>();
             services.AddTransient<ListReportController>();
+            services.AddTransient<StaffController>();
 
             // Services
             services.AddTransient<PdfReportService>();

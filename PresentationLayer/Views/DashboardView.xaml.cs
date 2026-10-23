@@ -36,7 +36,7 @@ namespace PresentationLayer.Views
             [SystemModule.SkiSchool] = new("Skidskola", "Lektioner och gruppbokningar", "Icon.Skidskola", typeof(SkiSchoolView)),
             [SystemModule.SeasonPrices] = new("Säsongspriser", "Ändra priser per säsong", "Icon.Sasongspriser", typeof(SeasonPriceView)),
             [SystemModule.Reports] = new("Rapporter", "Statistik och beläggning", "Icon.Rapporter", typeof(StatisticsView)),
-            [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", "Icon.Personal", null),
+            [SystemModule.StaffAdmin] = new("Personal", "Hantera personal och roller", "Icon.Personal", typeof(StaffAdminView)),
             [SystemModule.GuestCheckInOut] = new("In- och utcheckning", "Hantera gästers ankomst och avresa", "Icon.InUtcheckning", typeof(GuestCheckInOutView)),
             [SystemModule.InvoiceExport] = new("Faktureringsunderlag", "Exportera avslutade bokningar som JSON", "Icon.Fakturering", typeof(InvoiceExportView)),
             [SystemModule.MarketingManager] = new("Marknad", "Besluta om rabatter och godkänn företagskunder", "Icon.Marknad", typeof(MarketingMgmtView))
