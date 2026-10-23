@@ -1,9 +1,17 @@
-﻿using EntityLayer;
+﻿using DataLayer.Interfaces;
+using EntityLayer;
 
 namespace BusinessLayer.Controllers
 {
     public class StaffController
     {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public StaffController(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
         /// <summary>
         /// Verifies that current user has SystemAdmin role. 
         /// This function is used to validate if user can access view and change season prices. 
@@ -90,5 +98,59 @@ namespace BusinessLayer.Controllers
             return currentRole == staffRole.MarketingManager || currentRole == staffRole.SystemAdmin;
         }
 
+        /// <summary>
+        /// Verifies that user is SystemAdmin and can thererfore manage personel.
+        /// </summary>
+        public static bool CanManageStaff(staffRole currentRole)
+        {
+            return currentRole == staffRole.SystemAdmin;
+        }
+
+        /// <summary>
+        /// Creates a new user and hashes password.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="firstName"></param>
+        /// <param name="lastName"></param>
+        /// <param name="password"></param>
+        /// <param name="role"></param>
+        public (bool success, string message) CreateStaff(string firstName, string lastName, string email, string password, staffRole role)
+        {
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) ||
+                string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            {
+                return (false, "Alla fält måste fyllas i.");
+            }
+
+            if (password.Length < 10)
+            {
+                return (false, "Lösenordet måste vara minst 10 tecken långt.");
+            }
+
+            if (_unitOfWork.Staff.EmailExists(email.Trim()))
+            {
+                return (false, "En användare med denna e-postadress finns redan.");
+            }
+
+            // Hash password before object is built. 
+            string hashedPassword = HashingService.HashPassword(password);
+
+            var newStaff = new Staff(
+                firstName.Trim(),
+                lastName.Trim(),
+                email.Trim().ToLower(),
+                hashedPassword,
+                role
+            );
+
+            _unitOfWork.Staff.Add(newStaff);
+
+            if (_unitOfWork.Complete() > 0)
+            {
+                return (true, $"{firstName} {lastName} har registrerats som {role}.");
+            }
+
+            return (false, "Ett fel uppstod när användaren skulle sparas i databasen.");
+        }
     }
 }
