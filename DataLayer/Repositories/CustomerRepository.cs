@@ -82,12 +82,9 @@ namespace DataLayer.Repositories
         /// <summary>
         /// Gets all corporate customers that has not yet been approved by marketing manager. 
         /// </summary>
-        public IEnumerable<CorporateCustomer> GetPendingCorporateCustomer()
+        public IEnumerable<CorporateCustomer> GetAllCorporateCustomers()
         {
-            return _context.Set<CorporateCustomer>()
-                .Where(cc => !cc.IsApproved)
-                .AsNoTracking()
-                .ToList();
+            return _context.Set<CorporateCustomer>().ToList();
         }
     }
 }

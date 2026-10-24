@@ -226,7 +226,7 @@
                             </DataGridTemplateColumn>
 
                             <!-- Approve CheckBox -->
-                            <DataGridTemplateColumn Header="Godkänn" 
+                            <DataGridTemplateColumn Header="Godkänd" 
                                                 Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>

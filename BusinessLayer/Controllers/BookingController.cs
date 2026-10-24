@@ -252,45 +252,36 @@ namespace BusinessLayer
             decimal accommodationPrice,
             DateTime bookingDate)
         {
-            if (customer == null)
-            {
-                throw new ArgumentNullException(nameof(customer));
-            }
+            if (customer == null) throw new ArgumentNullException(nameof(customer));
+            if (accommodationPrice <= 0) return 0m;
 
-            if (accommodationPrice < 0)
-            {
-                throw new ArgumentException(
-                    "Boendepriset kan inte vara negativt.");
-            }
-
-            // Get previous bookings, excluding cancelled bookings.
             var previousBookings = GetBookingsByCustomer(customer.CustomerID)
-                .Where(b =>
-                    b.BookingDate < bookingDate &&
-                    b.BookingStatus != BookingStatus.Cancelled)
+                .Where(b => b.BookingStatus != BookingStatus.Cancelled &&
+                            b.Accommodations != null &&
+                            b.Accommodations.Any())
                 .ToList();
 
-            if (!previousBookings.Any())
-            {
-                return 0m;
-            }
+            if (!previousBookings.Any()) return 0m;
 
-            // Find the date of the most recent booking.
-            DateTime latestBookingDate = previousBookings
-                .Max(b => b.BookingDate);
+            var pastStays = previousBookings
+                .SelectMany(b => b.Accommodations)
+                .Where(ba => ba.EndDate.Date < bookingDate.Date)
+                .Select(ba => ba.EndDate.Date)
+                .ToList();
 
-            // Check whether at least 365 days have passed.
-            if ((bookingDate.Date - latestBookingDate.Date).TotalDays >= 365)
+            if (!pastStays.Any()) return 0m;
+
+            DateTime latestCheckout = pastStays.Max();
+
+            int daysSinceStay = (bookingDate.Date - latestCheckout).Days;
+
+            if (daysSinceStay >= 0 && daysSinceStay <= 365)
             {
-                return Math.Round(
-                    accommodationPrice * 0.08m,
-                    2,
-                    MidpointRounding.AwayFromZero);
+                return Math.Round(accommodationPrice * 0.08m, 2, MidpointRounding.AwayFromZero);
             }
 
             return 0m;
         }
-
 
         /// <summary>
         /// Creates a new accommodation booking and saves it to the database.
@@ -362,13 +353,10 @@ namespace BusinessLayer
                     discountRate = 0.08m;
                 }
             }
-            else if (customer is CorporateCustomer corporateCustomer)
+            else if (customer is CorporateCustomer corporateCustomer && corporateCustomer.DiscountRate > 0)
             {
-                discountAmount = CalculateCorporateDiscount(
-                    corporateCustomer,
-                    accommodationPrice);
-
                 discountRate = corporateCustomer.DiscountRate;
+                discountAmount = Math.Round(accommodationPrice * discountRate, 2, MidpointRounding.AwayFromZero);
             }
 
             decimal finalAccommodationPrice =
@@ -382,12 +370,12 @@ namespace BusinessLayer
 
             // Create the accommodation connection.
             BookingAccommodation bookingAccommodation =
-                new BookingAccommodation
-                {
-                    AccommodationID = accommodation.AccommodationID,
-                    StartDate = startDate,
-                    EndDate = endDate,
-                };
+            new BookingAccommodation
+            {
+                AccommodationID = accommodation.AccommodationID,
+                StartDate = startDate,
+                EndDate = endDate,
+            };
 
             // Create the booking.
             Booking booking = new Booking
@@ -602,7 +590,6 @@ namespace BusinessLayer
             foreach (var booking in preliminaryBookings)
             {
                 booking.BookingStatus = BookingStatus.Confirmed;
-                _unitOfWork.Booking.Update(booking);
                 confirmedCount++;
             }
 
@@ -624,27 +611,42 @@ namespace BusinessLayer
                 throw new ArgumentNullException(nameof(booking));
             }
 
+            // Gets CorpCustomer discount
+            decimal corporateDiscount = (booking.Customer is CorporateCustomer corp) ? corp.DiscountRate : 0m;
+
             // Accommodation (incl. moms)
-            decimal netAccom = booking.TotalAmount > 0 && booking.AccommodationListPrice > 0
-                ? Math.Max(0, booking.AccommodationListPrice - booking.DiscountAmount)
-                : booking.Accommodations?.Sum(a => CalculateAccommodationPrice(
+            decimal netAccom;
+            if (booking.AccommodationListPrice > 0)
+            {
+                netAccom = corporateDiscount > 0
+                    ? booking.AccommodationListPrice * (1m - corporateDiscount)
+                    : Math.Max(0, booking.AccommodationListPrice - booking.DiscountAmount);
+            }
+            else
+            {
+                decimal rawAccom = booking.Accommodations?.Sum(a => CalculateAccommodationPrice(
                     a.Accommodation?.AccommodationTypeID ?? 0,
                     a.StartDate,
                     a.EndDate)) ?? 0m;
 
+                netAccom = corporateDiscount > 0 ? rawAccom * (1m - corporateDiscount) : rawAccom;
+            }
+
             var accomVatSplit = VatRates.SplitVat(netAccom, VatRates.Accommodation);
 
             // Rentals (incl. moms)
-            decimal rentalTotal = booking.Rentals?.Sum(r => r.TotalPrice) ?? 0m;
+            decimal rawRental = booking.Rentals?.Sum(r => r.TotalPrice) ?? 0m;
+            decimal rentalTotal = corporateDiscount > 0 ? rawRental * (1m - corporateDiscount) : rawRental;
             var rentalVatSplit = VatRates.SplitVat(rentalTotal, VatRates.EquipmentRental);
 
             // Skischool (incl. moms)
-            decimal skiLessonTotal = booking.SkiLessons?
-                .Sum(sl => sl.SkiLessonSession?.SkiLesson?.Price ?? 0m) ?? 0m;
+            decimal rawSkiLesson = booking.SkiLessons?
+                    .Sum(sl => sl.SkiLessonSession?.SkiLesson?.Price ?? 0m) ?? 0m;
+            decimal skiLessonTotal = corporateDiscount > 0 ? rawSkiLesson * (1m - corporateDiscount) : rawSkiLesson;
             var skiLessonVatSplit = VatRates.SplitVat(skiLessonTotal, VatRates.SkiLesson);
 
             // Meetingrooms (incl. moms)
-            decimal meetingRoomTotal = 0m;
+            decimal rawMeetingRoom = 0m;
             if (booking.MeetingRooms != null && booking.MeetingRooms.Any())
             {
                 foreach (var mr in booking.MeetingRooms)
@@ -655,9 +657,10 @@ namespace BusinessLayer
                     var priceObj = mr.meetingRoom?.SeasonPrices?
                         .FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == week);
 
-                    meetingRoomTotal += (priceObj?.Price ?? 0m) * days;
+                    rawMeetingRoom += (priceObj?.Price ?? 0m) * days;
                 }
             }
+            decimal meetingRoomTotal = corporateDiscount > 0 ? rawMeetingRoom * (1m - corporateDiscount) : rawMeetingRoom;
             var meetingRoomVatSplit = VatRates.SplitVat(meetingRoomTotal, VatRates.MeetingRoom);
 
             // Cancellation protection
@@ -705,6 +708,18 @@ namespace BusinessLayer
             var seasonPrice = room?.SeasonPrices?.FirstOrDefault(p => p.PriceType == "dygn" && p.WeekNumber == isoWeek);
             decimal calculatedPrice = (seasonPrice?.Price ?? 0m) * days;
 
+            decimal actualAddedPrice = calculatedPrice;
+
+            // CorporateCustomer discount
+            if (booking.Customer is CorporateCustomer corp && corp.DiscountRate > 0)
+            {
+                decimal discount = Math.Round(calculatedPrice * corp.DiscountRate, 2, MidpointRounding.AwayFromZero);
+                actualAddedPrice = calculatedPrice - discount;
+                booking.DiscountAmount += discount;
+            }
+
+            booking.TotalAmount += actualAddedPrice;
+
             var bookingMeetingRoom = new BookingMeetingRoom
             {
                 BookingID = bookingId,
@@ -719,8 +734,6 @@ namespace BusinessLayer
             }
 
             booking.MeetingRooms.Add(bookingMeetingRoom);
-
-            booking.TotalAmount += calculatedPrice;
 
             if (booking.BookingStatus == BookingStatus.Cancelled)
             {

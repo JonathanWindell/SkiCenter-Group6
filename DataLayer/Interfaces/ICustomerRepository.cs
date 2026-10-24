@@ -12,6 +12,6 @@ namespace DataLayer.Interfaces
 
         bool CustomerExists(string email, string phoneNumber);
 
-        IEnumerable<CorporateCustomer> GetPendingCorporateCustomer();
+        IEnumerable<CorporateCustomer> GetAllCorporateCustomers();
     }
 }

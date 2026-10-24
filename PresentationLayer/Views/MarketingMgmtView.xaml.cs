@@ -34,10 +34,14 @@ namespace PresentationLayer.Views
         {
             _customers.Clear();
 
-            var pendingCompanies = _customerController.GetPendingCorporateCustomers();
+            var corporateCustomers = _customerController.GetAllCorporateCustomers();
 
-            foreach (var c in pendingCompanies)
+            foreach (var c in corporateCustomers)
             {
+                decimal displayDiscount = c.DiscountRate <= 1m && c.DiscountRate > 0m
+                    ? c.DiscountRate * 100m
+                    : c.DiscountRate;
+
                 _customers.Add(new CorporateCustomerRow
                 {
                     CustomerId = c.CustomerID,
@@ -47,10 +51,11 @@ namespace PresentationLayer.Views
                     Phone = c.PhoneNumber,
                     Email = c.Email,
                     IsApproved = c.IsApproved,
+                    OriginalIsApproved = c.IsApproved,
                     CreditLimit = c.CreditLimit,
                     OriginalCreditLimit = c.CreditLimit,
-                    DiscountRate = c.DiscountRate,
-                    OriginalDiscountRate = c.DiscountRate
+                    DiscountRate = displayDiscount,
+                    OriginalDiscountRate = displayDiscount
                 });
             }
 
@@ -88,30 +93,30 @@ namespace PresentationLayer.Views
         private void UpdateCountText()
         {
             var view = CollectionViewSource.GetDefaultView(_customers);
-            int count = view.Cast<CorporateCustomerRow>().Count();
 
-            CorpCustomerCountTextBlock.Text = count switch
+            int pendingCount = view.Cast<CorporateCustomerRow>().Count(c => !c.IsApproved);
+
+            CorpCustomerCountTextBlock.Text = pendingCount switch
             {
                 0 => "Inga kunder väntar på godkännande.",
                 1 => "1 kund väntar på godkännande",
-                _ => $"{count} kunder väntar på godkännande"
+                _ => $"{pendingCount} kunder väntar på godkännande"
             };
         }
 
         // Saves all changes made in the page in one go
         private void SaveRowsButton_Click(object sender, RoutedEventArgs e)
         {
-            // To find rows that awaits approval
-            var rowsToApprove = _customers.Where(c => c.IsApproved).ToList();
+            var changedRows = _customers.Where(c => c.IsChanged).ToList();
 
-            if (!rowsToApprove.Any())
+            if (!changedRows.Any())
             {
-                MessageBox.Show("Inga kunder har markerats för godkännande.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Inga ändringar har gjorts.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            // Validation before saving
-            foreach (var row in rowsToApprove)
+            // Validation for each row
+            foreach (var row in changedRows)
             {
                 if (row.CreditLimit < 0)
                 {
@@ -126,47 +131,29 @@ namespace PresentationLayer.Views
                 }
             }
 
-            var confirmResult = MessageBox.Show(
-                $"Är du säker på att du vill godkänna {rowsToApprove.Count} företagskund(er) och uppdatera deras avtal i databasen?",
-                "Bekräfta godkännande",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question);
+            int savedCount = 0;
 
-            if (confirmResult != MessageBoxResult.Yes)
-                return;
-
-            int successCount = 0;
-            int confirmedBookingsTotal = 0;
-
-            foreach (var row in rowsToApprove)
+            foreach (var row in changedRows)
             {
-                bool approved = _customerController.ApproveCorporateCustomer(row.CustomerId, row.CreditLimit, row.DiscountRate);
+                bool success = _customerController.UpdateCorporateCustomer(
+                    row.CustomerId,
+                    row.IsApproved,
+                    row.CreditLimit,
+                    row.DiscountRate);
 
-                if (approved)
+                if (success)
                 {
-                    successCount++;
-
-                    // Makes preliminray booking a confirmed booking
-                    confirmedBookingsTotal += _bookingController.ConfirmPreliminaryBookingsForCustomer(row.CustomerId);
+                    savedCount++;
                 }
             }
 
-            // Feedback to user
-            if (successCount > 0)
+            if (savedCount > 0)
             {
-                string bookingMsg = confirmedBookingsTotal > 0
-                    ? $"\nDessutom gjordes {confirmedBookingsTotal} preliminära bokningar definitiva."
-                    : "";
-
-                MessageBox.Show(
-                    $"Klart! {successCount} av {rowsToApprove.Count} företagskunder är godkända och redo att boka.{bookingMsg}",
-                    "Klart",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                MessageBox.Show($"{savedCount} företagskund(er) har uppdaterats.", "Sparat", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
-                MessageBox.Show("Inga ändringar kunde sparas till databasen.", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Kunde inte spara ändringarna till databasen.", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
             LoadData();

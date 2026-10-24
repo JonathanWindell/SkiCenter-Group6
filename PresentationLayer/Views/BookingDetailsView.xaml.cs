@@ -17,7 +17,9 @@ namespace PresentationLayer.Views
             InitializeComponent();
 
             _serviceProvider = serviceProvider;
-            _booking = booking;
+
+            var controller = _serviceProvider.GetRequiredService<BookingController>();
+            _booking = controller.GetSpecificBooking(booking.BookingID) ?? booking;
             DataContext = _booking;
 
             CancelBookingButton.Click += CancelBookingButton_Click;

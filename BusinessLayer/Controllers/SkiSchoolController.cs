@@ -116,8 +116,20 @@ namespace BusinessLayer.Controllers
                 SkiLessonSessionID = sessionId
             };
 
+            // Calculate corporate discount
+            decimal rawPrice = lesson.Price;
+            decimal discount = 0m;
+
+            if (booking.Customer is CorporateCustomer corp && corp.DiscountRate > 0)
+            {
+                discount = Math.Round(rawPrice * corp.DiscountRate, 2, MidpointRounding.AwayFromZero);
+                booking.DiscountAmount += discount;
+            }
+
+            decimal finalPrice = rawPrice - discount;
+
             // Add lesson price to the booking total amount
-            booking.TotalAmount += lesson.Price;
+            booking.TotalAmount += finalPrice;
             booking.SkiLessons.Add(lessonBooking);
             _unitOfWork.Booking.Update(booking);
 
@@ -154,7 +166,13 @@ namespace BusinessLayer.Controllers
             var booking = _unitOfWork.Booking.GetByID(participantBooking.BookingID);
             if (booking != null)
             {
-                booking.TotalAmount = Math.Max(0, booking.TotalAmount - lesson.Price);
+                decimal rawPrice = lesson.Price;
+                decimal discount = (booking.Customer is CorporateCustomer corp && corp.DiscountRate > 0)
+                    ? Math.Round(rawPrice * corp.DiscountRate, 2, MidpointRounding.AwayFromZero)
+                    : 0m;
+
+                booking.TotalAmount = Math.Max(0, booking.TotalAmount - (rawPrice - discount));
+                booking.DiscountAmount = Math.Max(0, booking.DiscountAmount - discount);
                 _unitOfWork.Booking.Update(booking);
             }
 
