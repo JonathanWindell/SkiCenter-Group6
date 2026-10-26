@@ -41,9 +41,9 @@ namespace BusinessLayer.Controllers
         /// <summary>
         /// Gets all corporate customers that has not yet been approved by marketing manager.
         /// </summary>
-        public IEnumerable<CorporateCustomer> GetPendingCorporateCustomers()
+        public IEnumerable<CorporateCustomer> GetAllCorporateCustomers()
         {
-            return _unitOfWork.Customer.GetPendingCorporateCustomer();
+            return _unitOfWork.Customer.GetAllCorporateCustomers();
         }
 
         /// <summary>
@@ -128,30 +128,43 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Complete() > 0;
         }
 
-
         /// <summary>
-        /// For marketing manager. Approves CorporateCustomer and sets creditlimit and discountrate.
+        /// Updates terms and approval status för a specific CorporateCustomer.
         /// </summary>
-        public bool ApproveCorporateCustomer(int customerId, decimal creditLimit, decimal discountRate)
+        public bool UpdateCorporateCustomer(int customerId, bool isApproved, decimal creditLimit, decimal discountPercent)
         {
-            // Validation
-            if (customerId <= 0 || creditLimit < 0 || discountRate < 0 || discountRate > 100)
+            if (customerId <= 0 || creditLimit < 0 || discountPercent < 0 || discountPercent > 100)
             {
                 return false;
             }
 
-            var customer = _unitOfWork.Customer.GetByID(customerId);
-            if (customer is CorporateCustomer corpCustomer)
-            {
-                corpCustomer.IsApproved = true;
-                corpCustomer.CreditLimit = creditLimit;
-                corpCustomer.DiscountRate = discountRate;
+            var customer = _unitOfWork.Customer.GetByID(customerId) as CorporateCustomer;
+            if (customer == null) return false;
 
-                _unitOfWork.Customer.Update(corpCustomer);
-                return _unitOfWork.Complete() > 0;
+            bool wasPreviouslyApproved = customer.IsApproved;
+
+            decimal rateAsDecimal = discountPercent > 0m ? discountPercent / 100m : 0m;
+
+            customer.IsApproved = isApproved;
+            customer.CreditLimit = creditLimit;
+            customer.DiscountRate = rateAsDecimal;
+
+            _unitOfWork.Customer.Update(customer);
+
+            // Confirm preliminary bookings if Customer is approved
+            if (!wasPreviouslyApproved && isApproved)
+            {
+                var preliminaryBookings = _unitOfWork.Booking.GetBookingsByCustomer(customerId)
+                    .Where(b => b.BookingStatus == BookingStatus.Preliminary)
+                    .ToList();
+
+                foreach (var b in preliminaryBookings)
+                {
+                    b.BookingStatus = BookingStatus.Confirmed;
+                }
             }
 
-            return false;
+            return _unitOfWork.Complete() > 0;
         }
 
         /// <summary>

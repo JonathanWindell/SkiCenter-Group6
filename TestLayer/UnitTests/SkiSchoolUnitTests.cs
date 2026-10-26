@@ -37,7 +37,7 @@ namespace TestLayer.UnitTests
         public void BookParticipant_InvalidIdentifiers_ReturnsFalse(int bookingId, int sessionId)
         {
             // Act
-            bool result = _controller.BookParticipant(bookingId, sessionId);
+            var result = _controller.BookParticipant(bookingId, sessionId);
 
             // Assert
             Assert.That(result, Is.False);
@@ -54,7 +54,7 @@ namespace TestLayer.UnitTests
             _mockBookingRepo.Setup(r => r.GetByID(It.IsAny<int>())).Returns((Booking)null);
 
             // Act
-            bool result = _controller.BookParticipant(1, 10);
+            var result = _controller.BookParticipant(1, 10);
 
             // Assert
             Assert.That(result, Is.False);
@@ -80,11 +80,11 @@ namespace TestLayer.UnitTests
 
             _mockSkiLessonRepo.Setup(r => r.GetAll()).Returns(new List<SkiLesson> { lesson });
 
-            // Simulera att passet redan har 10 av 10 platser fyllda
+            // Mock that ski lesson session is full
             _mockSkiLessonRepo.Setup(r => r.GetBookedParticipantCount(sessionId)).Returns(10);
 
             // Act
-            bool result = _controller.BookParticipant(bookingId, sessionId);
+            var result = _controller.BookParticipant(bookingId, sessionId);
 
             // Assert
             Assert.That(result, Is.False, "Should refuse booking when session capacity has reached maximum.");
@@ -115,7 +115,7 @@ namespace TestLayer.UnitTests
             _mockUnitOfWork.Setup(u => u.Complete()).Returns(1);
 
             // Act
-            bool result = _controller.BookParticipant(bookingId, sessionId);
+            var result = _controller.BookParticipant(bookingId, sessionId);
 
             // Assert
             Assert.That(result, Is.True);
@@ -136,9 +136,11 @@ namespace TestLayer.UnitTests
             int lessonBookingId = 505;
             decimal lessonPrice = 500m;
 
+            // Mock repository functionality
             var booking = new Booking { BookingID = bookingId, TotalAmount = 3000m };
             _mockBookingRepo.Setup(r => r.GetByID(bookingId)).Returns(booking);
 
+            // Create ski lesson booking
             var lessonBooking = new SkiLessonBooking
             {
                 SkiLessonBookingID = lessonBookingId,

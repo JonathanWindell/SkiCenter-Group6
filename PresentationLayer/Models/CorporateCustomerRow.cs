@@ -14,7 +14,7 @@ namespace PresentationLayer.Models
         public string ContactPerson { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
-        public string Status => IsApproved ? "Godkänd" : "Pending";
+        public string Status => IsApproved ? "Godkänd" : "Väntar";
 
         // Original values to track changes
         public decimal OriginalCreditLimit { get; set; }
@@ -64,7 +64,10 @@ namespace PresentationLayer.Models
         }
 
         // Help property, to see if the row changes
-        public bool IsChanged => CreditLimit != OriginalCreditLimit || DiscountRate != OriginalDiscountRate;
+        public bool IsChanged =>
+            CreditLimit != OriginalCreditLimit ||
+            DiscountRate != OriginalDiscountRate ||
+            IsApproved != OriginalIsApproved;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string propName) =>

@@ -2,8 +2,6 @@
 using BusinessLayer;
 using EntityLayer;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Linq;
 using System.Windows;
 
 namespace PresentationLayer.Views

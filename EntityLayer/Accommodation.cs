@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    // Enum for available statuses of Accommodations
     public enum AccommodationStatus
     {
         Available = 0,

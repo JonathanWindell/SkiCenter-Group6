@@ -95,5 +95,19 @@ namespace DataLayer.Repositories
             return _context.Set<SkiLessonBooking>()
                 .Count(booking => booking.SkiLessonSessionID == sessionId);
         }
+
+        /// <summary>
+        /// Gets every booked customers information for viewing of participants for each session.
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        public SkiLessonSession? GetSessionWithParticipantDetails(int sessionId)
+        {
+            return _context.Set<SkiLessonSession>()
+                .Include(s => s.SkiLesson)
+                .Include(s => s.Participants)
+                    .ThenInclude(p => p.Booking)
+                        .ThenInclude(b => b.Customer)
+                .FirstOrDefault(s => s.SkiLessonSessionID == sessionId);
+        }
     }
 }

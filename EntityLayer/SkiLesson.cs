@@ -30,6 +30,7 @@ namespace EntityLayer
             Price = price;
         }
 
+        // Collection of available sessions that every level of Ski Lesson is offering. 
         public virtual ICollection<SkiLessonSession> Sessions { get; set; } = new List<SkiLessonSession>();
     }
 }

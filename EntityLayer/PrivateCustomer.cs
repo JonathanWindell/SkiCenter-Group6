@@ -15,7 +15,7 @@ namespace EntityLayer
         [NotMapped]
         public override string DisplayName => $"{FirstName} {LastName}";
 
-        // Parameterless constructor for EF 
+        // Parameterless constructor for EF. Sets creditlimit to 12000. 
         public PrivateCustomer()
         {
             CreditLimit = 12000;

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    // Enum for available statuses of a booking
     public enum BookingStatus
     {
         Preliminary = 0,
@@ -11,6 +12,7 @@ namespace EntityLayer
         Finished = 3
     }
 
+    // Enum for available check-in statuses of a booking
     public enum CheckInStatus
     {
         NotCheckedIn = 0,
@@ -55,12 +57,22 @@ namespace EntityLayer
 
         // Used for calculations of final price of accommodation. 
         [NotMapped]
-        public decimal FinalAccommodationPrice =>
-        AccommodationListPrice > 0
-            ? AccommodationListPrice - DiscountAmount
-            : TotalAmount
-            - (HasCancellationInsurance ? 300m : 0m)
-            - (Rentals?.Sum(r => r.TotalPrice) ?? 0m);
+        public decimal FinalAccommodationPrice
+        {
+            get
+            {
+                if (AccommodationListPrice > 0)
+                {
+                    return Math.Round(AccommodationListPrice * (1m - DiscountRate), 2, MidpointRounding.AwayFromZero);
+                }
+
+                decimal rawAccom = Accommodations?.Sum(a =>
+                    a.Accommodation?.AccommodationType != null ? a.Accommodation.AccommodationType.NumberOfBeds : 0m) ?? 0m;
+
+                return Math.Round(rawAccom * (1m - DiscountRate), 2, MidpointRounding.AwayFromZero);
+            }
+            private set { }
+        }
 
         // Parameterless constructor for EF 
         public Booking() { }

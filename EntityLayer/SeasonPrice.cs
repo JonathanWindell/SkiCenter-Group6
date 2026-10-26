@@ -13,7 +13,7 @@ namespace EntityLayer
         [Key]
         public int SeasonPriceID { get; set; }
 
-        // How the price is charged, e.g. "vecka", "dygn", "fre-sön/dygn" or "sön-fre/dygn"
+        // How the price is charged, e.g. "Week", "Day", etc.
         [Required]
         public string PriceType { get; set; }
 

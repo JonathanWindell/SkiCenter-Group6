@@ -288,20 +288,22 @@
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Rabatt: "/>
-                                                <Run Text="{Binding Booking.DiscountRate}"/>
+                                                <Run Text="{Binding DataContext.DiscountRate, 
+                                                                    RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                    StringFormat={}{0:P0}}"/>
+                                                <Run Text=" (-"/>
+                                                <Run Text="{Binding DataContext.DiscountAmount, 
+                                                                    RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                    StringFormat={}{0:N0} kr}"/>
+                                                <Run Text=")"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
-                                                <Run Text="Rabattbelopp: "/>
-                                                <Run Text="{Binding Booking.DiscountAmount,
-                                                    StringFormat={}{0:N0} kr}"/>
-                                            </TextBlock>
-
-                                            <TextBlock Margin="0,5,0,0">
-                                                <Run Text="Slutpris: "/>
-                                                <Run Text="{Binding Booking.FinalAccommodationPrice,
-                                                    Mode=OneWay,
-                                                    StringFormat={}{0:N0} kr}"/>
+                                                <Run Text="Slutpris boende: "/>
+                                                <Run Text="{Binding DataContext.FinalAccommodationPrice, 
+                                                                    RelativeSource={RelativeSource AncestorType=Window}, 
+                                                                    Mode=OneWay, 
+                                                                    StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                         </StackPanel>
@@ -380,7 +382,6 @@
                         <ItemsControl ItemsSource="{Binding Rentals}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-
                                     <Border BorderBrush="{StaticResource InputBorder}"
                                             BorderThickness="1"
                                             CornerRadius="10"
@@ -388,29 +389,19 @@
                                             Margin="0,0,0,15">
 
                                         <StackPanel>
-
                                             <TextBlock Text="UTRUSTNING"
                                                        FontSize="16"
                                                        FontWeight="Bold"
                                                        Foreground="{StaticResource PrimaryText}"
                                                        Margin="0,0,0,12"/>
-
                                             <TextBlock>
                                                 <Run Text="Startdatum: "/>
-                                                <Run Text="{Binding StartDate,
-                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                                <Run Text="{Binding StartDate, StringFormat={}{0:yyyy-MM-dd}}"/>
                                             </TextBlock>
-
+                                            
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Slutdatum: "/>
-                                                <Run Text="{Binding EndDate,
-                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
-                                            </TextBlock>
-
-                                            <TextBlock Margin="0,5,0,0">
-                                                <Run Text="Återlämningsdatum: "/>
-                                                <Run Text="{Binding ReturnDate,
-                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
+                                                <Run Text="{Binding EndDate, StringFormat={}{0:yyyy-MM-dd}}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
@@ -424,51 +415,29 @@
                                                     StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
-                                            <!-- Equipment items -->
-                                            <ItemsControl ItemsSource="{Binding RentedEquipmentList}">
+                                            <ItemsControl ItemsSource="{Binding RentalItems}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-
-                                                        <StackPanel Margin="0,5,0,15">
-
-                                                            <TextBlock Text="{Binding Equipment.Category}"
+                                                        <StackPanel Margin="0,5,0,10">
+                                                            <TextBlock Text="{Binding EquipmentItem.Equipment.DisplayName}"
                                                                        FontWeight="SemiBold"
                                                                        Foreground="{StaticResource PrimaryText}"/>
 
-                                                            <TextBlock Margin="0,5,0,0">
-                                                                <Run Text="Beskrivning: "/>
-                                                                <Run Text="{Binding Equipment.Description}"/>
-                                                            </TextBlock>
-
-                                                            <TextBlock Margin="0,5,0,0">
+                                                            <TextBlock Margin="0,3,0,0">
                                                                 <Run Text="Artikelnummer: "/>
-                                                                <Run Text="{Binding ArticleNumber}"/>
+                                                                <Run Text="{Binding EquipmentItem.ArticleNumber}"/>
                                                             </TextBlock>
 
-                                                            <TextBlock Margin="0,5,0,0">
-                                                                <Run Text="Storlek: "/>
-                                                                <Run Text="{Binding Size}"/>
+                                                            <TextBlock Margin="0,3,0,0">
+                                                                <Run Text="Kategori: "/>
+                                                                <Run Text="{Binding EquipmentItem.Equipment.Category}"/>
                                                             </TextBlock>
-
-                                                            <TextBlock Margin="0,5,0,0">
-                                                                <Run Text="Skick: "/>
-                                                                <Run Text="{Binding Condition}"/>
-                                                            </TextBlock>
-
-                                                            <TextBlock Margin="0,5,0,0">
-                                                                <Run Text="Status: "/>
-                                                                <Run Text="{Binding Status}"/>
-                                                            </TextBlock>
-
                                                         </StackPanel>
-
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>
-
                                         </StackPanel>
                                     </Border>
-
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -504,18 +473,12 @@
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Dagar: "/>
-                                                <Run Text="{Binding SkiLessonSession.Days}"/>
+                                                <Run Text="{Binding SkiLessonSession.SkiLesson.Days}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Tid: "/>
                                                 <Run Text="{Binding SkiLessonSession.TimeSlot}"/>
-                                            </TextBlock>
-
-                                            <TextBlock Margin="0,5,0,0">
-                                                <Run Text="Längd: "/>
-                                                <Run Text="{Binding SkiLessonSession.SkiLesson.DurationHours}"/>
-                                                <Run Text=" timmar"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">

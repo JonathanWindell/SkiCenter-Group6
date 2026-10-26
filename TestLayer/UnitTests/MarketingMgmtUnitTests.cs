@@ -1,5 +1,4 @@
-﻿using BusinessLayer;
-using BusinessLayer.Controllers;
+﻿using BusinessLayer.Controllers;
 using DataLayer.Interfaces;
 using EntityLayer;
 using Moq;
@@ -14,30 +13,25 @@ namespace TestLayer.UnitTests
         private Mock<ICustomerRepository> _mockCustomerRepo;
         private Mock<IBookingRepository> _mockBookingRepo;
         private CustomerController _customerController;
-        private BookingController _bookingController;
 
         [SetUp]
         public void Setup()
         {
-            // Create mocks for both Unit of Work and each of the repoitories
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockCustomerRepo = new Mock<ICustomerRepository>();
             _mockBookingRepo = new Mock<IBookingRepository>();
 
-            // Configure UnitOfWork to return the mocked repositories
             _mockUnitOfWork.Setup(u => u.Customer).Returns(_mockCustomerRepo.Object);
             _mockUnitOfWork.Setup(u => u.Booking).Returns(_mockBookingRepo.Object);
 
-            // Inject the mocked IUnitOfWork into the controllers
             _customerController = new CustomerController(_mockUnitOfWork.Object);
-            _bookingController = new BookingController(_mockUnitOfWork.Object);
         }
 
         /// <summary>
-        /// Verifies that GetPendingCorporateCustomers gets the list from repo
+        /// Verifies that GetAllCorporateCustomers fetches all corporate customer entities directly from the repository.
         /// </summary>
         [Test]
-        public void GetPendingCorporateCustomers_ReturnsPendingListFromRepository()
+        public void GetAllCorporateCustomers_ReturnsAllCorporateCustomersFromRepository()
         {
             // Arrange
             var expectedCustomers = new List<CorporateCustomer>
@@ -45,31 +39,37 @@ namespace TestLayer.UnitTests
                 new CorporateCustomer("Bikesters AB", "556111-2233", "Johan Jonshede", "Storgatan 1", "info@bikesters.se", "0701112233")
                 {
                     CustomerID = 1,
+                    IsApproved = true
+                },
+                new CorporateCustomer("Torkels Pyssel AB", "418502-7832", "Torkel Jansson", "Pysselvägen 2", "info@pyssel.se", "0704445566")
+                {
+                    CustomerID = 2,
                     IsApproved = false
                 }
             };
 
-            _mockCustomerRepo.Setup(r => r.GetPendingCorporateCustomer())
+            _mockCustomerRepo.Setup(r => r.GetAllCorporateCustomers())
                              .Returns(expectedCustomers);
 
             // Act
-            var result = _customerController.GetPendingCorporateCustomers();
+            var result = _customerController.GetAllCorporateCustomers();
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedCustomers));
-            _mockCustomerRepo.Verify(r => r.GetPendingCorporateCustomer(), Times.Once);
+            _mockCustomerRepo.Verify(r => r.GetAllCorporateCustomers(), Times.Once);
         }
 
         /// <summary>
-        /// Verifies that approving a corp. customer with valid values updates the entity and saves to Db
+        /// Verifies that transitioning an unapproved customer to approved updates agreement terms, 
+        /// normalizes the discount rate from percentage to decimal, and confirms preliminary bookings.
         /// </summary>
         [Test]
-        public void ApproveCorporateCustomer_ValidData_UpdatesCustomerAndReturnsTrue()
+        public void UpdateCorporateCustomer_WhenApprovingCustomer_UpdatesTermsConvertsDiscountAndConfirmsPreliminaryBookings()
         {
             // Arrange
             int customerId = 5;
             decimal creditLimit = 50000m;
-            decimal discountRate = 10m;
+            decimal discountPercent = 10m; // 10% should be stored as 0.10m
 
             var customer = new CorporateCustomer("Bikesters AB", "556111-2233", "Johan Jonshede", "Storgatan 1", "info@bikesters.se", "0701112233")
             {
@@ -79,115 +79,146 @@ namespace TestLayer.UnitTests
                 DiscountRate = 0m
             };
 
+            var customerBookings = new List<Booking>
+            {
+                new Booking { BookingID = 101, CustomerID = customerId, BookingStatus = BookingStatus.Preliminary },
+                new Booking { BookingID = 102, CustomerID = customerId, BookingStatus = BookingStatus.Cancelled }
+            };
+
             _mockCustomerRepo.Setup(r => r.GetByID(customerId)).Returns(customer);
+            _mockBookingRepo.Setup(r => r.GetBookingsByCustomer(customerId)).Returns(customerBookings);
             _mockUnitOfWork.Setup(u => u.Complete()).Returns(1);
 
             // Act
-            bool result = _customerController.ApproveCorporateCustomer(customerId, creditLimit, discountRate);
+            bool result = _customerController.UpdateCorporateCustomer(customerId, isApproved: true, creditLimit, discountPercent);
 
             // Assert
             Assert.That(result, Is.True);
             Assert.That(customer.IsApproved, Is.True);
             Assert.That(customer.CreditLimit, Is.EqualTo(creditLimit));
-            Assert.That(customer.DiscountRate, Is.EqualTo(discountRate));
+            Assert.That(customer.DiscountRate, Is.EqualTo(0.10m));
 
-            // Verify
+            // Verify preliminary booking changed to Confirmed, while Cancelled remained untouched
+            Assert.That(customerBookings[0].BookingStatus, Is.EqualTo(BookingStatus.Confirmed));
+            Assert.That(customerBookings[1].BookingStatus, Is.EqualTo(BookingStatus.Cancelled));
+
             _mockCustomerRepo.Verify(r => r.Update(customer), Times.Once);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
         }
 
         /// <summary>
-        /// Verifies that invalid values aborts the call and no changes are made
+        /// Verifies that modifying agreement terms for an already approved customer updates details 
+        /// without querying or modifying bookings again.
         /// </summary>
         [Test]
-        [TestCase(-1, 10000, 10)]   // Invalid ID
-        [TestCase(0, 10000, 10)]    // ID is 0
-        [TestCase(1, -500, 10)]     // Negative creditlimit
-        [TestCase(1, 10000, -1)]    // Negative discount
-        [TestCase(1, 10000, 101)]   // Discount over 100%
-        public void ApproveCorporateCustomer_InvalidInputs_ReturnsFalse(int customerId, decimal creditLimit, decimal discountRate)
+        public void UpdateCorporateCustomer_AlreadyApproved_UpdatesTermsWithoutQueryingBookings()
+        {
+            // Arrange
+            int customerId = 5;
+            decimal creditLimit = 80000m;
+            decimal discountPercent = 5m; // 5% should become 0.05m
+
+            var customer = new CorporateCustomer("Bikesters AB", "556111-2233", "Johan Jonshede", "Storgatan 1", "info@bikesters.se", "0701112233")
+            {
+                CustomerID = customerId,
+                IsApproved = true,
+                CreditLimit = 50000m,
+                DiscountRate = 0.10m
+            };
+
+            _mockCustomerRepo.Setup(r => r.GetByID(customerId)).Returns(customer);
+            _mockUnitOfWork.Setup(u => u.Complete()).Returns(1);
+
+            // Act
+            bool result = _customerController.UpdateCorporateCustomer(customerId, isApproved: true, creditLimit, discountPercent);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(customer.IsApproved, Is.True);
+            Assert.That(customer.CreditLimit, Is.EqualTo(creditLimit));
+            Assert.That(customer.DiscountRate, Is.EqualTo(0.05m));
+
+            // Booking repository must not be invoked since approval status was not newly granted
+            _mockBookingRepo.Verify(r => r.GetBookingsByCustomer(It.IsAny<int>()), Times.Never);
+            _mockCustomerRepo.Verify(r => r.Update(customer), Times.Once);
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
+        }
+
+        /// <summary>
+        /// Verifies that setting IsApproved to false revokes approval and saves the new state.
+        /// </summary>
+        [Test]
+        public void UpdateCorporateCustomer_RevokeApproval_SetsIsApprovedToFalseAndUpdatesTerms()
+        {
+            // Arrange
+            int customerId = 6;
+            decimal creditLimit = 30000m;
+            decimal discountPercent = 0m;
+
+            var customer = new CorporateCustomer("Kristna Budskapet AB", "512358-1832", "Tommy Klaesson", "Vägen 5", "tommy@budskapet.se", "0709998877")
+            {
+                CustomerID = customerId,
+                IsApproved = true,
+                CreditLimit = 30000m,
+                DiscountRate = 0.05m
+            };
+
+            _mockCustomerRepo.Setup(r => r.GetByID(customerId)).Returns(customer);
+            _mockUnitOfWork.Setup(u => u.Complete()).Returns(1);
+
+            // Act
+            bool result = _customerController.UpdateCorporateCustomer(customerId, isApproved: false, creditLimit, discountPercent);
+
+            // Assert
+            Assert.That(result, Is.True);
+            Assert.That(customer.IsApproved, Is.False);
+            Assert.That(customer.CreditLimit, Is.EqualTo(creditLimit));
+            Assert.That(customer.DiscountRate, Is.EqualTo(0m));
+
+            _mockCustomerRepo.Verify(r => r.Update(customer), Times.Once);
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
+        }
+
+        /// <summary>
+        /// Verifies that validation prevents execution and returns false when invalid arguments are provided.
+        /// </summary>
+        [Test]
+        [TestCase(-1, true, 10000, 10)]   // Negative ID
+        [TestCase(0, true, 10000, 10)]    // Zero ID
+        [TestCase(1, true, -100, 10)]     // Negative credit limit
+        [TestCase(1, true, 10000, -1)]    // Negative discount
+        [TestCase(1, true, 10000, 101)]   // Discount above 100%
+        public void UpdateCorporateCustomer_InvalidInputs_ReturnsFalseWithoutCallingDatabase(
+            int customerId, bool isApproved, decimal creditLimit, decimal discountRate)
         {
             // Act
-            bool result = _customerController.ApproveCorporateCustomer(customerId, creditLimit, discountRate);
+            bool result = _customerController.UpdateCorporateCustomer(customerId, isApproved, creditLimit, discountRate);
 
             // Assert
             Assert.That(result, Is.False);
 
-            // Verify
             _mockCustomerRepo.Verify(r => r.GetByID(It.IsAny<int>()), Times.Never);
             _mockCustomerRepo.Verify(r => r.Update(It.IsAny<CorporateCustomer>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
 
         /// <summary>
-        /// Verifies that the method returns false if the customer is not found
+        /// Verifies that the method returns false when the specified customer ID does not exist in the database.
         /// </summary>
         [Test]
-        public void ApproveCorporateCustomer_CustomerNotFound_ReturnsFalse()
+        public void UpdateCorporateCustomer_CustomerNotFound_ReturnsFalse()
         {
             // Arrange
-            int customerId = 99;
-            _mockCustomerRepo.Setup(r => r.GetByID(customerId)).Returns((Customer)null);
+            int customerId = 999;
+            _mockCustomerRepo.Setup(r => r.GetByID(customerId)).Returns((Customer)null!);
 
             // Act
-            bool result = _customerController.ApproveCorporateCustomer(customerId, 20000m, 5m);
+            bool result = _customerController.UpdateCorporateCustomer(customerId, isApproved: true, 25000m, 5m);
 
             // Assert
             Assert.That(result, Is.False);
 
-            // Verify
             _mockCustomerRepo.Verify(r => r.Update(It.IsAny<CorporateCustomer>()), Times.Never);
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
-        }
-
-        /// <summary>
-        /// Verifies that confirmation of preliminary bookings only confirms preliminary bookings, changes to Confirmed
-        /// </summary>
-        [Test]
-        public void ConfirmPreliminaryBookingsForCustomer_ValidCustomer_UpdatesOnlyPreliminaryBookings()
-        {
-            // Arrange
-            int customerId = 1;
-            var bookings = new List<Booking>
-            {
-                new Booking { BookingID = 10, CustomerID = customerId, BookingStatus = BookingStatus.Preliminary },
-                new Booking { BookingID = 11, CustomerID = customerId, BookingStatus = BookingStatus.Preliminary },
-                new Booking { BookingID = 12, CustomerID = customerId, BookingStatus = BookingStatus.Cancelled }
-            };
-
-            _mockBookingRepo.Setup(r => r.GetBookingsByCustomer(customerId)).Returns(bookings);
-            _mockUnitOfWork.Setup(u => u.Complete()).Returns(2);
-
-            // Act
-            int updatedCount = _bookingController.ConfirmPreliminaryBookingsForCustomer(customerId);
-
-            // Assert
-            Assert.That(updatedCount, Is.EqualTo(2));
-            Assert.That(bookings[0].BookingStatus, Is.EqualTo(BookingStatus.Confirmed));
-            Assert.That(bookings[1].BookingStatus, Is.EqualTo(BookingStatus.Confirmed));
-            Assert.That(bookings[2].BookingStatus, Is.EqualTo(BookingStatus.Cancelled));
-
-            // Verify
-            _mockBookingRepo.Verify(r => r.Update(It.IsAny<Booking>()), Times.Exactly(2));
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
-        }
-
-        /// <summary>
-        /// Verifies that ConfirmPreliminaryBookingsForCustomer returns 0 when faced with invalid CustomerID, without call to Db
-        /// </summary>
-        [Test]
-        [TestCase(0)]
-        [TestCase(-5)]
-        public void ConfirmPreliminaryBookingsForCustomer_InvalidCustomerId_ReturnsZero(int invalidCustomerId)
-        {
-            // Act
-            int result = _bookingController.ConfirmPreliminaryBookingsForCustomer(invalidCustomerId);
-
-            // Assert
-            Assert.That(result, Is.EqualTo(0));
-
-            // Verify
-            _mockBookingRepo.Verify(r => r.GetBookingsByCustomer(It.IsAny<int>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
     }

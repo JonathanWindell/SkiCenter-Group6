@@ -2,10 +2,7 @@
 using BusinessLayer;
 using EntityLayer;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
@@ -20,11 +17,11 @@ namespace PresentationLayer.Views
         {
             InitializeComponent();
 
-            _serviceProvider = serviceProvider
-                ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            if (booking == null) throw new ArgumentNullException(nameof(booking));
 
-            _booking = booking
-                ?? throw new ArgumentNullException(nameof(booking));
+            var controller = _serviceProvider.GetRequiredService<BookingController>();
+            _booking = controller.GetSpecificBooking(booking.BookingID) ?? booking;
 
             DataContext = _booking;
 
