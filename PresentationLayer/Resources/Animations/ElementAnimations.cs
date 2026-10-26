@@ -13,7 +13,7 @@ namespace PresentationLayer.Resources.Animations
 
             if (isLoading)
             {
-                // 1. Block user input to prevent multiple clicks
+                // Block user input to prevent multiple clicks
                 fadeOutPanel.IsHitTestVisible = false;
 
                 DoubleAnimation fadeForm = new DoubleAnimation(1, 0, duration) { EasingFunction = ease };
@@ -35,10 +35,10 @@ namespace PresentationLayer.Resources.Animations
                 DoubleAnimation fadeForm = new DoubleAnimation(0, 1, duration) { EasingFunction = ease };
                 fadeOutPanel.BeginAnimation(UIElement.OpacityProperty, fadeForm);
 
-                // 2. WAIT for the fade-out animation to actually finish 
+                // WAIT for the fade-out animation to actually finish 
                 await Task.Delay(duration);
 
-                // 3. Stop the spinning animation and allow user input again 
+                // Stop the spinning animation and allow user input again 
                 spinnerRotate.BeginAnimation(RotateTransform.AngleProperty, null);
                 fadeOutPanel.IsHitTestVisible = true;
             }
@@ -49,13 +49,13 @@ namespace PresentationLayer.Resources.Animations
             var duration = TimeSpan.FromMilliseconds(600);
             var ease = new QuadraticEase { EasingMode = EasingMode.EaseOut };
 
-            // --- 1. Animate header
+            // Animate header
             headerBar.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0, 1, duration) { EasingFunction = ease });
             headerTranslate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(-10, 0, duration) { EasingFunction = ease });
 
             await Task.Delay(150);
 
-            // 2. Animate content (The menu options)
+            // Animate content (The menu options)
             menuContentStack.BeginAnimation(UIElement.OpacityProperty, new DoubleAnimation(0, 1, duration) { EasingFunction = ease });
             contentTranslate.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(20, 0, duration) { EasingFunction = ease });
         }
