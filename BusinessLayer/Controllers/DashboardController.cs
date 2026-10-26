@@ -31,27 +31,32 @@ namespace BusinessLayer.Controllers
         // Single source of truth for role-based access. Add or remove modules for a role here.
         private static readonly Dictionary<staffRole, SystemModule[]> _moduleAccess = new()
         {
-            [staffRole.SkiShop] = new[]
-            {
-                SystemModule.EquipmentManagement,
-                SystemModule.Rentals
-            },
+            // The order here is the order of the cards on the dashboard
             [staffRole.BookingAdmin] = new[]
             {
-                SystemModule.Bookings,
-                SystemModule.GuestCheckInOut,
-                SystemModule.CustomerRegistration,
-                SystemModule.Accommodation,
-                SystemModule.SkiSchool,
-                SystemModule.EquipmentManagement
+                SystemModule.CustomerRegistration,  // Registrera kund
+                SystemModule.Rentals,               // Uthyrning
+                SystemModule.Bookings,              // Bokningar
+                SystemModule.GuestCheckInOut,       // In- och utcheckning
+                SystemModule.SkiSchool,             // Skidskola
+                SystemModule.Accommodation          // Boende
+            },
+            [staffRole.SystemAdmin] = new[]
+            {
+                SystemModule.StaffAdmin,            // Personal
+                SystemModule.SeasonPrices           // Säsongspriser
+            },
+            [staffRole.SkiShop] = new[]
+            {
+                SystemModule.EquipmentManagement,   // Utrustning
+                SystemModule.Rentals,               // Uthyrning
+                SystemModule.SkiSchool              // Skidskola
             },
             [staffRole.MarketingManager] = new[]
             {
-                SystemModule.Reports,
-                SystemModule.InvoiceExport
-            },
-            // System admins have access to every module
-            [staffRole.SystemAdmin] = Enum.GetValues<SystemModule>()
+                SystemModule.Reports,               // Rapporter (statistik)
+                SystemModule.MarketingManager       // Företagskunder, kredit och rabatt
+            }
         };
 
         /// <summary>
