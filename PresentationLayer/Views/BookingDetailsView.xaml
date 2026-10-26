@@ -647,7 +647,7 @@
                                         Height="38">
 
                                     <Grid>
-                                        <TextBlock Text="+ Lägg till tjänst  ▼"
+                                        <TextBlock Text="+ Hantera tjänster  ▼"
                                                    HorizontalAlignment="Center"
                                                    VerticalAlignment="Center"
                                                    FontSize="12"
