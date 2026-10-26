@@ -122,7 +122,7 @@ namespace TestLayer.IntegrationTests
             decimal expectedLessonPrice = session.SkiLesson.Price;
 
             // Act
-            bool result = _skiSchoolController.BookParticipant(booking.BookingID, session.SkiLessonSessionID);
+            var result = _skiSchoolController.BookParticipant(booking.BookingID, session.SkiLessonSessionID);
 
             // Assert: Verify operation result
             Assert.That(result, Is.True, "BookParticipant should return true when spots are available.");
@@ -226,7 +226,7 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges();
 
             // Act: Try to book to already full ski lesson session
-            bool result = _skiSchoolController.BookParticipant(booking.BookingID, session.SkiLessonSessionID);
+            var result = _skiSchoolController.BookParticipant(booking.BookingID, session.SkiLessonSessionID);
 
             // Assert
             Assert.That(result, Is.False, "Cannot book a participant into a session that is already at full capacity.");

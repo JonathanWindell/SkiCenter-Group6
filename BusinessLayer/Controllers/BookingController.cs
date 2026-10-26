@@ -207,7 +207,7 @@ namespace BusinessLayer
 
                 totalPrice += nightlyPrice.Price;
                 currentDate = currentDate.AddDays(1);
-            } 
+            }
 
             return totalPrice;
         }

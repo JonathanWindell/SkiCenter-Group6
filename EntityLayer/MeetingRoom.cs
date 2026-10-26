@@ -2,6 +2,7 @@
 
 namespace EntityLayer
 {
+    // Enum for available statuses for Meeting Room
     public enum MeetingRoomStatus
     {
         Available,
@@ -38,6 +39,7 @@ namespace EntityLayer
             Status = status;
         }
 
+        // Collection for all meeting rooms coupled to a booking. 
         public virtual ICollection<BookingMeetingRoom> BookingMeetingRooms { get; set; } = new List<BookingMeetingRoom>();
 
         public virtual ICollection<MeetingRoomSeasonPrice> SeasonPrices { get; set; } = new List<MeetingRoomSeasonPrice>();

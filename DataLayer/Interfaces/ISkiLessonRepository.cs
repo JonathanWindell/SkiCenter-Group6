@@ -46,5 +46,11 @@ namespace DataLayer.Interfaces
         /// </summary>
         /// <param name="sessionId">The session identifier.</param>
         int GetBookedParticipantCount(int sessionId);
+
+        /// <summary>
+        /// Gets every participant at given session with customer details. 
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        SkiLessonSession? GetSessionWithParticipantDetails(int sessionId);
     }
 }

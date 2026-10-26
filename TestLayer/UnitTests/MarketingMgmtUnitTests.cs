@@ -2,7 +2,6 @@
 using DataLayer.Interfaces;
 using EntityLayer;
 using Moq;
-using NUnit.Framework;
 
 namespace TestLayer.UnitTests
 {

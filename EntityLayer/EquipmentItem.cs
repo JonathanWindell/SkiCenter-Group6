@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    // Enum for available statuses for Equipment
     public enum EquipmentStatus
     {
         Available = 0,
@@ -11,6 +12,7 @@ namespace EntityLayer
         Maintenance = 3
     }
 
+    // Available conditions for Equipment
     public enum EquipmentCondition
     {
         New = 0,
@@ -23,21 +25,21 @@ namespace EntityLayer
         [Key]
         public int EquipmentItemID { get; set; }
 
-        // Unique number for each post in database. 
+        // Unique number for each post in database
         [Required]
         public string ArticleNumber { get; set; }
 
-        // Status for item, ex. Available, Broken, etc. 
+        // Statuses for EquipmentItems.  
         [Required]
         [AllowedValues("Available", "Rented", "Damaged", "Maintenance", ErrorMessage = "Not allowed value")]
         public EquipmentStatus Status { get; set; }
 
-        // Describes current condition of item.
+        // Conditions for EquipmentItems.
         [Required]
         [AllowedValues("New", "BarelyUsed", "Worn", ErrorMessage = "Not allowed value")]
         public EquipmentCondition Condition { get; set; }
 
-        // Size of item.
+        // Size of item. Describes length of skis, boot size etc
         [Required]
         public string Size { get; set; }
 
@@ -46,7 +48,7 @@ namespace EntityLayer
         public int EquipmentID { get; set; }
         public virtual Equipment Equipment { get; set; }
 
-        // Many to Many relation to RentalItems
+        // Collection of EquipmentItems that are coupled to a Rental for customer. 
         public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
 
         public EquipmentItem() { }

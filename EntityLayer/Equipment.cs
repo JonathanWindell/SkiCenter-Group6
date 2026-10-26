@@ -15,9 +15,10 @@ namespace EntityLayer
         [Required]
         public string Category { get; set; }
 
+        // Maps Category and Description to Displayname
         public string DisplayName => $"{Category} - {Description}";
 
-        // Many to Many relations
+        // Collections to store multiple copies of Items and Prices
         public virtual ICollection<EquipmentItem> EquipmentItems { get; set; } = new List<EquipmentItem>();
         public virtual ICollection<EquipmentPriceMatrix> Prices { get; set; } = new List<EquipmentPriceMatrix>();
 

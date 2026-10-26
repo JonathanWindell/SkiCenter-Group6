@@ -7,11 +7,18 @@ namespace EntityLayer
     {
         [Required]
         public string CompanyName { get; set; }
+
+        [Required]
         public string OrganisationNumber { get; set; }
+
         [Required]
         public string ContactPerson { get; set; }
+
+        // Value of given discount for each company
         public decimal DiscountRate { get; set; }
-        public bool IsApproved { get; set; } // Decided by marketing manager
+
+        // Decided by marketing manager.
+        public bool IsApproved { get; set; }
 
         // Maps company name to DisplayName
         [NotMapped]

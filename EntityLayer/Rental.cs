@@ -15,6 +15,7 @@ namespace EntityLayer
         [Required]
         public DateTime EndDate { get; set; }
 
+        // Actual date of RentalItems return. 
         [Required]
         public DateTime ReturnDate { get; set; }
 
@@ -36,7 +37,7 @@ namespace EntityLayer
         // Parameterless constructor for EF
         public Rental() { }
 
-        // Relation to RentalItems. Many to Many relation
+        // Collection of every EquipmentItem that is coupled to a Rental
         public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
 
         public Rental(DateTime startDate, DateTime endDate, DateTime returnDate, string status, decimal sum)

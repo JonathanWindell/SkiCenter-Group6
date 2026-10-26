@@ -7,10 +7,14 @@ namespace EntityLayer
     {
         [Key]
         public int BookingAccommodationID { get; set; }
+
+        // Start date for booked accommodation
         public DateTime StartDate { get; set; }
+
+        // End date for booked accommodation 
         public DateTime EndDate { get; set; }
 
-        // Relation to Customer. Foreign Key
+        // Relation to Customer. Foreign Key 
         [ForeignKey("Booking")]
         public int BookingID { get; set; }
         public virtual Booking Booking { get; set; }
@@ -23,7 +27,7 @@ namespace EntityLayer
         // Parameterless constructor for EF 
         public BookingAccommodation() { }
 
-        public BookingAccommodation(DateTime startDate, DateTime endDate, decimal discountRate, decimal discountAmount, decimal finalPrice)
+        public BookingAccommodation(DateTime startDate, DateTime endDate)
         {
             StartDate = startDate;
             EndDate = endDate;
