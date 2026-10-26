@@ -675,7 +675,7 @@ namespace PresentationLayer.Views
         }
         #endregion
 
-            #region Return flow
+        #region Return flow
         private void SearchReturnItemButton_Click(object sender, RoutedEventArgs e)
         {
             ReturnSearchFeedbackTextBlock.Text = string.Empty;

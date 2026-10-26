@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EntityLayer
 {
+    // Enum for available statuses of a booking
     public enum BookingStatus
     {
         Preliminary = 0,
@@ -11,6 +12,7 @@ namespace EntityLayer
         Finished = 3
     }
 
+    // Enum for available check-in statuses of a booking
     public enum CheckInStatus
     {
         NotCheckedIn = 0,

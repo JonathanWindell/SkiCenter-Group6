@@ -1,5 +1,7 @@
 ﻿using DataLayer.Interfaces;
 using EntityLayer;
+using System.Globalization;
+using System.Text;
 
 namespace BusinessLayer.Controllers
 {
@@ -78,18 +80,18 @@ namespace BusinessLayer.Controllers
         /// </summary>
         /// <param name="bookingId">The identifier of the customer booking.</param>
         /// <param name="sessionId">The identifier of the lesson session.</param>
-        public bool BookParticipant(int bookingId, int sessionId)
+        public (bool success, string message) BookParticipant(int bookingId, int sessionId)
         {
             if (bookingId <= 0 || sessionId <= 0)
             {
-                return false;
+                return (false, "Ogiltigt boknings- eller pass-ID.");
             }
 
             // Verify that the parent booking exists
             var booking = _unitOfWork.Booking.GetByID(bookingId);
             if (booking == null)
             {
-                return false;
+                return (false, "Kunde inte hitta bokningen.");
             }
 
             // Fetch session with lesson details to inspect participant limits
@@ -99,14 +101,50 @@ namespace BusinessLayer.Controllers
             var session = lesson?.Sessions.FirstOrDefault(s => s.SkiLessonSessionID == sessionId);
             if (session == null)
             {
-                return false;
+                return (false, "Kunde inte hitta skidskolepasset.");
+            }
+
+            // Verify that Ski school week mathces customers booked week. 
+            bool isCorrectWeek = false;
+
+            var accommodationBooking = booking.Accommodations?.FirstOrDefault();
+
+            if (accommodationBooking == null)
+            {
+                return (false, "Bokningen saknar ett kopplat boende. Det går inte att verifiera vilka veckor kunden är på plats.");
+            }
+
+            // Fetch date from Booking (Accommodation start- and enddate)
+            DateTime stayStart = accommodationBooking.StartDate.Date;
+            DateTime stayEnd = accommodationBooking.EndDate.Date;
+
+            for (DateTime d = stayStart; d <= stayEnd; d = d.AddDays(1))
+            {
+                int currentWeek = ISOWeek.GetWeekOfYear(d);
+                if (currentWeek == 53) currentWeek = 52; // Fallback handling for years containing 53 weeks. 
+
+                if (currentWeek == session.WeekNumber)
+                {
+                    isCorrectWeek = true;
+                    break;
+                }
+            }
+
+            if (!isCorrectWeek)
+            {
+                return (false, $"Kunden är inbokad {stayStart:yyyy-MM-dd} till {stayEnd:yyyy-MM-dd}. Skidskolan (vecka {session.WeekNumber}) måste bokas under kundens aktiva vistelse.");
+            }
+
+            if (!isCorrectWeek)
+            {
+                return (false, $"Kunden är inte inbokad under vecka {session.WeekNumber}. Skidskolan måste bokas under kundens aktiva vistelse.");
             }
 
             // Validate that the session is not already full
             int currentParticipants = _unitOfWork.SkiLesson.GetBookedParticipantCount(sessionId);
             if (currentParticipants >= lesson.MaxParticipants)
             {
-                return false;
+                return (false, "Det valda passet är tyvärr fullbokat.");
             }
 
             // Create and persist the lesson booking relation
@@ -133,11 +171,15 @@ namespace BusinessLayer.Controllers
             booking.SkiLessons.Add(lessonBooking);
             _unitOfWork.Booking.Update(booking);
 
-            // If a specific repository exists for SkiLessonBooking, add through it; otherwise via session
             session.Participants.Add(lessonBooking);
             _unitOfWork.SkiLesson.Update(lesson);
 
-            return _unitOfWork.Complete() > 0;
+            if (_unitOfWork.Complete() > 0)
+            {
+                return (true, $"Lektionen är bokad! En plats i {lesson.Level} (v. {session.WeekNumber}) är tillagd på bokning #{bookingId}.");
+            }
+
+            return (false, "Ett oväntat fel uppstod när bokningen skulle sparas i databasen.");
         }
 
         /// <summary>
@@ -203,6 +245,38 @@ namespace BusinessLayer.Controllers
 
             int count = _unitOfWork.SkiLesson.GetBookedParticipantCount(sessionId);
             return count < lesson.MaxParticipants;
+        }
+
+        /// <summary>
+        /// Gets information regarding every customer booked to a session.
+        /// </summary>
+        /// <param name="sessionId">The session identifier.</param>
+        public string GetFormattedParticipantList(int sessionId)
+        {
+            var session = _unitOfWork.SkiLesson.GetSessionWithParticipantDetails(sessionId);
+
+            if (session == null)
+            {
+                return "Kunde inte hitta skidskolepasset.";
+            }
+
+            if (session.Participants == null || !session.Participants.Any())
+            {
+                return "Det finns inga bokade elever på detta pass ännu.";
+            }
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"Bokade elever för {session.SkiLesson.Level} (V.{session.WeekNumber}, {session.TimeSlot}):\n");
+
+            foreach (var participant in session.Participants)
+            {
+                // Vi använder DisplayName som du redan har på Customer-entiteten
+                string customerName = participant.Booking?.Customer?.DisplayName ?? "Okänd kund";
+
+                sb.AppendLine($"• Bokning #{participant.BookingID} - {customerName}");
+            }
+
+            return sb.ToString();
         }
     }
 }

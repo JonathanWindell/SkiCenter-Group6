@@ -11,8 +11,9 @@ namespace EntityLayer
         [Required]
         public int WeekNumber { get; set; }
 
+        // Week, Day or Hours
         [Required]
-        public string PriceType { get; set; } // "vecka", "dygn", "tim"
+        public string PriceType { get; set; }
 
         [Required]
         public decimal Price { get; set; }

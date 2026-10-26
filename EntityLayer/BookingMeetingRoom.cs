@@ -7,8 +7,10 @@ namespace EntityLayer
     {
         public int BookingMeetingRoomID { get; set; }
 
+        // Start date for booked Meeting Room
         public DateTime StartDate { get; set; }
 
+        // End date for booked Meeting Room
         public DateTime EndDate { get; set; }
 
         // Parameterless constructor for EF 
