@@ -8,7 +8,7 @@ namespace PresentationLayer.Resources.Animations
     {
         public static async Task ExpandWindowAsync(FrameworkElement animatedBorder, double targetWidth, double targetHeight, int durationMs = 450)
         {
-            // 1. Define easing parameters
+            // Define easing parameters
             var duration = TimeSpan.FromMilliseconds(durationMs);
             var ease = new ExponentialEase { EasingMode = EasingMode.EaseInOut, Exponent = 6 };
 
@@ -33,7 +33,7 @@ namespace PresentationLayer.Resources.Animations
             int durationMs = 200,
             params UIElement[] elementsToFadeOut)
         {
-            // 1. Fade out the provided elements (if any)
+            // Fade out the provided elements (if any)
             if (elementsToFadeOut != null && elementsToFadeOut.Length > 0)
             {
                 var fadeOut = new DoubleAnimation
@@ -51,20 +51,20 @@ namespace PresentationLayer.Resources.Animations
                 await Task.Delay(durationMs);
             }
 
-            // 2. Start animation (Using your existing ExpandWindowAsync method)
+            // Start animation (Using your existing ExpandWindowAsync method)
             await ExpandWindowAsync(mainBorder, targetWidth, targetHeight, durationMs * 2);
 
-            // 3. Set manual startup location
+            // Set manual startup location
             nextWindow.WindowStartupLocation = WindowStartupLocation.Manual;
 
-            // 4. Calculate exactly like your original working logout button
+            // Calculate exactly like your original working logout button
             double centerLeft = currentWindow.Left + (currentWindow.ActualWidth / 2);
             double centerTop = currentWindow.Top + (currentWindow.ActualHeight / 2);
 
             nextWindow.Left = centerLeft - (nextWindow.Width / 2);
             nextWindow.Top = centerTop - (nextWindow.Height / 2);
 
-            // 5. Open next and close current
+            // Open next and close current
             nextWindow.Show();
             currentWindow.Close();
         }

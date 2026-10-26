@@ -56,7 +56,7 @@ namespace PresentationLayer
         /// </summary>
         private void ConfigureServices(IServiceCollection services)
         {
-            // 1. Register Views (Windows)
+            // Register Views (Windows)
             services.AddTransient<LoginView>();
             services.AddTransient<DashboardView>();
             services.AddTransient<CustomerRegistrationView>();
@@ -77,7 +77,7 @@ namespace PresentationLayer
             services.AddTransient<StaffAdminView>();
 
 
-            // 2. Register Controllers
+            // Register Controllers
             services.AddTransient<LoginController>();
             services.AddTransient<BookingController>();
             services.AddTransient<CustomerController>();
@@ -94,10 +94,10 @@ namespace PresentationLayer
             services.AddTransient<PdfReportService>();
             services.AddTransient<PropertyController>();
 
-            // 3. Register Repositories
+            // Register Repositories
             services.AddTransient<ICustomerRepository, CustomerRepository>();
 
-            // 4. Register and initialize DbContext
+            // Register and initialize DbContext
             services.AddDbContext<SkiCenterDbContext>();
 
             // Register UnitOfWork for controllers and views.

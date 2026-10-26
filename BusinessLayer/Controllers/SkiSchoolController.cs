@@ -45,7 +45,6 @@ namespace BusinessLayer.Controllers
         /// </summary>
         public IEnumerable<SkiLesson> GetAllLessonsWithSessions()
         {
-            // Vi hämtar via repositoryts specifika metod som har Include
             return _unitOfWork.SkiLesson.GetLessonsWithSessions();
         }
 
@@ -270,7 +269,6 @@ namespace BusinessLayer.Controllers
 
             foreach (var participant in session.Participants)
             {
-                // Vi använder DisplayName som du redan har på Customer-entiteten
                 string customerName = participant.Booking?.Customer?.DisplayName ?? "Okänd kund";
 
                 sb.AppendLine($"• Bokning #{participant.BookingID} - {customerName}");

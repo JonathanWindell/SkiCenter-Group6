@@ -225,14 +225,18 @@ namespace PresentationLayer.Views
             BookingStayTextBlock.Text = $"Vistelse: {stayStart:yyyy-MM-dd} – {stayEnd:yyyy-MM-dd}";
             BookingTotalTextBlock.Text = $"Totalbelopp: {booking.TotalAmount:N2} kr";
 
-            List<string> rentedItems = booking.Rentals
-                .Where(r => r.Status == "Active")
-                .SelectMany(r => r.RentalItems)
-                .Where(ri => ri.EquipmentItem != null && ri.EquipmentItem.Status == EquipmentStatus.Rented)
-                .Select(ri => $"{ri.EquipmentItem.ArticleNumber} ({ri.EquipmentItem.Equipment?.Category})")
+            var activeRentals = booking.Rentals
+                .Where(r => r.Status != "Cancelled" && r.Status != "Returned")
                 .ToList();
 
-            bool hasActiveRental = booking.Rentals.Any(r => r.Status == "Active");
+            List<string> rentedItems = activeRentals
+                    .SelectMany(r => r.RentalItems)
+                    .Where(ri => ri.EquipmentItem != null)
+                    .Select(ri => $"{ri.EquipmentItem.ArticleNumber} ({ri.EquipmentItem.Equipment?.DisplayName ?? ri.EquipmentItem.Equipment?.Category})")
+                    .Distinct()
+                    .ToList();
+
+            bool hasActiveRental = activeRentals.Any() && rentedItems.Count > 0;
             EditExistingRentalButton.Visibility = hasActiveRental ? Visibility.Visible : Visibility.Collapsed;
 
             BookingRentalsTextBlock.Text = rentedItems.Count == 0
@@ -387,7 +391,6 @@ namespace PresentationLayer.Views
             string search = ItemSearchTextBox.Text.Trim();
             HashSet<int> selectedIds = _selectedItems.Select(item => item.EquipmentItemID).ToHashSet();
 
-            // 1. Hämta datumen från UI
             DateTime start = StartDatePicker.SelectedDate ?? DateTime.Today;
             DateTime end = EndDatePicker.SelectedDate ?? DateTime.Today;
 
@@ -397,8 +400,9 @@ namespace PresentationLayer.Views
                 .Where(item => search.Length == 0
                     || item.ArticleNumber.Contains(search, StringComparison.OrdinalIgnoreCase)
                     || (item.Equipment?.Description?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false))
-                // 2. NY KOD: Filtrera bort pjäxor som är uthyrda de valda datumen
                 .Where(item => _skiShopController.IsItemAvailableForDates(item, start, end))
+                .OrderBy(item => new string(item.ArticleNumber.TakeWhile(char.IsLetter).ToArray()))
+                .ThenBy(item => int.TryParse(new string(item.ArticleNumber.SkipWhile(char.IsLetter).ToArray()), out int num) ? num : 0)
                 .ToList();
 
             AvailableItemsDataGrid.ItemsSource = filtered;

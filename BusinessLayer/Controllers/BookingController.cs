@@ -698,7 +698,6 @@ namespace BusinessLayer
                 return false;
             }
 
-            // Företagskunder faktureras i efterhand och tillåts checka in
             if (booking.Customer is CorporateCustomer)
             {
                 return true;
