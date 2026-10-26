@@ -14,6 +14,92 @@
         <local:BookingStatusSwedishConverter x:Key="BookingStatusSwedishConverter"/>
         <local:AccommodationStatusSwedishConverter x:Key="AccommodationStatusSwedishConverter"/>
         <local:BooleanSwedishConverter x:Key="BooleanSwedishConverter"/>
+
+        <!-- Blue style for service dropdown items -->
+        <Style x:Key="BlueServiceMenuItemStyle"
+               TargetType="{x:Type MenuItem}">
+
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#20518E"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="15,12"/>
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+
+                        <Border x:Name="MenuItemBorder"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="5"
+                                Margin="3,2"
+                                MinHeight="32">
+
+                            <ContentPresenter
+                                ContentSource="Header"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Left"
+                                Margin="12,0"/>
+
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="MenuItemBorder"
+                                        Property="Background"
+                                        Value="#3674B5"/>
+                            </Trigger>
+
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Blue background for the entire dropdown popup -->
+        <Style x:Key="BlueServiceMenuStyle"
+               TargetType="{x:Type MenuItem}">
+
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type MenuItem}">
+
+                        <Grid>
+                            <ContentPresenter
+                                ContentSource="Header"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"/>
+
+                            <Popup x:Name="PART_Popup"
+                                   Placement="Bottom"
+                                   AllowsTransparency="True"
+                                   Focusable="False"
+                                   PopupAnimation="Fade"
+                                   IsOpen="{Binding IsSubmenuOpen,
+                                            RelativeSource={RelativeSource TemplatedParent}}">
+
+                                <Border Background="#20518E"
+                                        BorderBrush="#20518E"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="5"
+                                        MinWidth="190">
+
+                                    <StackPanel IsItemsHost="True"/>
+
+                                </Border>
+                            </Popup>
+                        </Grid>
+
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Window.Resources>
 
     <Grid Margin="40">
@@ -46,7 +132,8 @@
                                 Style="{StaticResource DeepSeaButtonStyle}"
                                 Click="BackButton_Click"/>
 
-                        <TextBlock FontFamily="{StaticResource HeadingFont}" Text="Bokningsdetaljer"
+                        <TextBlock FontFamily="{StaticResource HeadingFont}"
+                                   Text="Bokningsdetaljer"
                                    FontSize="26"
                                    FontWeight="Bold"
                                    Foreground="{StaticResource PrimaryText}"/>
@@ -57,7 +144,7 @@
                                    Foreground="{StaticResource SecondaryText}"/>
                     </StackPanel>
 
-                    <!-- Confirmation button (Sends mail using EmailNotificationService)-->
+                    <!-- Confirmation button -->
                     <Button x:Name="BtnSendConfirmation"
                             Grid.Column="1"
                             VerticalAlignment="Top"
@@ -133,7 +220,8 @@
                                     <Run x:Name="OtherVatRun" Text="-"/>
                                 </TextBlock>
 
-                                <TextBlock Margin="0,5,0,0" FontWeight="SemiBold">
+                                <TextBlock Margin="0,5,0,0"
+                                           FontWeight="SemiBold">
                                     <Run Text="Total moms: "/>
                                     <Run x:Name="TotalVatRun" Text="-"/>
                                 </TextBlock>
@@ -229,14 +317,20 @@
                         <ItemsControl ItemsSource="{Binding MeetingRooms}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
+
                                     <Border BorderBrush="{StaticResource InputBorder}"
-                                        BorderThickness="1"
-                                        CornerRadius="10"
-                                        Padding="20"
-                                        Margin="0,0,0,15">
-                                        
+                                            BorderThickness="1"
+                                            CornerRadius="10"
+                                            Padding="20"
+                                            Margin="0,0,0,15">
+
                                         <StackPanel>
-                                            <TextBlock Text="MÖTESRUM" FontSize="16" FontWeight="Bold" Foreground="{StaticResource PrimaryText}" Margin="0,0,0,12"/>
+
+                                            <TextBlock Text="MÖTESRUM"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="{StaticResource PrimaryText}"
+                                                       Margin="0,0,0,12"/>
 
                                             <TextBlock>
                                                 <Run Text="Rumsnummer: "/>
@@ -250,12 +344,14 @@
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Startdatum: "/>
-                                                <Run Text="{Binding StartDate, StringFormat={}{0:yyyy-MM-dd}}"/>
+                                                <Run Text="{Binding StartDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Slutdatum: "/>
-                                                <Run Text="{Binding EndDate, StringFormat={}{0:yyyy-MM-dd}}"/>
+                                                <Run Text="{Binding EndDate,
+                                                    StringFormat={}{0:yyyy-MM-dd}}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
@@ -265,15 +361,19 @@
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Pris: "/>
-                                                <Run Text="{Binding TotalPrice, Mode=OneWay, StringFormat={}{0:N0} kr}"/>
+                                                <Run Text="{Binding TotalPrice,
+                                                    Mode=OneWay,
+                                                    StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <TextBlock Margin="0,5,0,0">
                                                 <Run Text="Status: "/>
                                                 <Run Text="{Binding meetingRoom.Status}"/>
                                             </TextBlock>
+
                                         </StackPanel>
                                     </Border>
+
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
@@ -311,7 +411,8 @@
 
                                             <TextBlock Margin="0,5,0,15">
                                                 <Run Text="Pris för hyresperioden: "/>
-                                                <Run Text="{Binding TotalPrice, StringFormat={}{0:N0} kr}"/>
+                                                <Run Text="{Binding TotalPrice,
+                                                    StringFormat={}{0:N0} kr}"/>
                                             </TextBlock>
 
                                             <ItemsControl ItemsSource="{Binding RentalItems}">
@@ -467,7 +568,7 @@
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Buttons (Add & Cancel booking) -->
+                <!-- Booking action buttons: all on the same bottom row -->
                 <Grid Grid.Row="2" Margin="0,20,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -475,53 +576,105 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Cancel booking -->
-                    <Button x:Name="CancelBookingButton"
-                            Grid.Column="0"
-                            Content="Avboka bokning"
-                            Width="150"
-                            Height="38">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource DeepSeaButtonStyle}">
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#DCEAF7"/>
-                                        <Setter Property="Foreground" Value="#6B7280"/>
-                                        <Setter Property="Opacity" Value="0.5"/>
-                                        <Setter Property="Cursor" Value="Arrow"/>
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
+                    <!-- Left side: Edit and cancel booking -->
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center">
 
-                    <!-- Add buttons (Equipment, Ski school, meeting room -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-
-                        <Button x:Name="BtnAddEquipment"
-                                Content="+ Lägg till Utrustning"
-                                Width="150"
+                        <Button x:Name="EditBookingButton"
+                                Content="Ändra bokning"
+                                Width="160"
                                 Height="38"
-                                Margin="0,0,10,0"
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BtnAddEquipment_Click"/>
+                                Margin="0,0,10,0">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#E5E7EB"/>
+                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                            <Setter Property="Opacity" Value="0.5"/>
+                                            <Setter Property="Cursor" Value="Arrow"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
-                        <Button x:Name="BtnAddSkiSchool"
-                                Content="+ Lägg till Skidskola"
+                        <Button x:Name="CancelBookingButton"
+                                Content="Avboka bokning"
                                 Width="150"
-                                Height="38"
-                                Margin="0,0,10,0" 
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BtnAddSkiSchool_Click"/>
+                                Height="38">
+                            <Button.Style>
+                                <Style TargetType="Button"
+                                       BasedOn="{StaticResource DeepSeaButtonStyle}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#DCEAF7"/>
+                                            <Setter Property="Foreground" Value="#6B7280"/>
+                                            <Setter Property="Opacity" Value="0.5"/>
+                                            <Setter Property="Cursor" Value="Arrow"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
 
-                        <Button x:Name="BtnAddMeetingRoom"
-                                Content="+ Lägg till Mötesrum"
-                                Width="150"
-                                Height="38"
-                                Style="{StaticResource DeepSeaButtonStyle}"
-                                Click="BtnAddMeetingRoom_Click"/>
-                        
                     </StackPanel>
+
+                    <!-- Right side: Add service dropdown -->
+                    <Menu Grid.Column="2"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          Background="Transparent"
+                          BorderThickness="0"
+                          Padding="0">
+
+                        <MenuItem x:Name="AddServiceMenu"
+                                  Width="170"
+                                  Height="38"
+                                  Background="Transparent"
+                                  BorderThickness="0"
+                                  Padding="0"
+                                  Style="{StaticResource BlueServiceMenuStyle}"
+                                  StaysOpenOnClick="False">
+
+                            <MenuItem.Header>
+                                <Border Background="#20518E"
+                                        CornerRadius="8"
+                                        Width="170"
+                                        Height="38">
+
+                                    <Grid>
+                                        <TextBlock Text="+ Lägg till tjänst  ▼"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White"/>
+                                    </Grid>
+                                </Border>
+                            </MenuItem.Header>
+
+                            <MenuItem x:Name="BtnAddEquipment"
+                                      Header="+ Lägg till Utrustning"
+                                      Style="{StaticResource BlueServiceMenuItemStyle}"
+                                      Click="BtnAddEquipment_Click"/>
+
+                            <MenuItem x:Name="BtnAddSkiSchool"
+                                      Header="+ Lägg till Skidskola"
+                                      Style="{StaticResource BlueServiceMenuItemStyle}"
+                                      Click="BtnAddSkiSchool_Click"/>
+
+                            <MenuItem x:Name="BtnAddMeetingRoom"
+                                      Header="+ Lägg till Mötesrum"
+                                      Style="{StaticResource BlueServiceMenuItemStyle}"
+                                      Click="BtnAddMeetingRoom_Click"/>
+
+                        </MenuItem>
+                    </Menu>
+
                 </Grid>
 
             </Grid>

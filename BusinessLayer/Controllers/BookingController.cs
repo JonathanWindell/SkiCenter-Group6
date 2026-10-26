@@ -114,6 +114,45 @@ namespace BusinessLayer
                 numberOfGuests);
         }
 
+        /// <summary>
+        /// Retrieves available accommodations when editing an existing booking.
+        /// Excludes the current booking from the availability check.
+        /// </summary>
+        public IEnumerable<Accommodation> GetAvailableAccommodationsForEdit(
+            DateTime startDate,
+            DateTime endDate,
+            int numberOfGuests,
+            int bookingId)
+        {
+            if (startDate.Date <= DateTime.Today ||
+                startDate >= endDate ||
+                numberOfGuests <= 0 ||
+                bookingId <= 0)
+            {
+                return Enumerable.Empty<Accommodation>();
+            }
+
+            Booking booking =
+                _unitOfWork.Booking.GetSpecificBooking(bookingId);
+
+            if (booking == null ||
+                (booking.BookingStatus != BookingStatus.Preliminary &&
+                 booking.BookingStatus != BookingStatus.Confirmed) ||
+                booking.CheckInStatus != CheckInStatus.NotCheckedIn ||
+                !booking.Accommodations.Any() ||
+                booking.Accommodations.Any(a =>
+                    a.StartDate.Date <= DateTime.Today))
+            {
+                return Enumerable.Empty<Accommodation>();
+            }
+
+            return _unitOfWork.Accommodation.GetAvailableAccommodationsForEdit(
+                startDate,
+                endDate,
+                numberOfGuests,
+                bookingId);
+        }
+
 
         /// <summary>
         /// Calculates the accommodation price using existing season prices.
@@ -401,6 +440,208 @@ namespace BusinessLayer
             _unitOfWork.Complete();
 
             return booking;
+        }
+
+        /// <summary>
+        /// Updates the accommodation on an existing booking.
+        /// Preserves the prices of additional services and insurance.
+        /// </summary>
+        public Booking UpdateBookingAccommodation(
+            int bookingId,
+            int accommodationId,
+            DateTime startDate,
+            DateTime endDate,
+            int numberOfGuests)
+        {
+            if (bookingId <= 0 || accommodationId <= 0)
+            {
+                throw new ArgumentException(
+                    "Välj en giltig bokning och ett giltigt boende.");
+            }
+
+            startDate = startDate.Date;
+            endDate = endDate.Date;
+
+            if (startDate <= DateTime.Today || endDate <= startDate)
+            {
+                throw new ArgumentException(
+                    "Incheckning måste vara efter dagens datum och utcheckning senare än incheckning.");
+            }
+
+            if (numberOfGuests <= 0)
+            {
+                throw new ArgumentException(
+                    "Antal gäster måste vara större än noll.");
+            }
+
+            Booking booking =
+                _unitOfWork.Booking.GetSpecificBooking(bookingId);
+
+            if (booking == null)
+            {
+                throw new InvalidOperationException(
+                    "Bokningen kunde inte hittas.");
+            }
+
+            // Only active, future and not checked-in bookings can be edited.
+            if ((booking.BookingStatus != BookingStatus.Preliminary &&
+                 booking.BookingStatus != BookingStatus.Confirmed) ||
+                booking.CheckInStatus != CheckInStatus.NotCheckedIn ||
+                !booking.Accommodations.Any() ||
+                booking.Accommodations.Any(a =>
+                    a.StartDate.Date <= DateTime.Today))
+            {
+                throw new InvalidOperationException(
+                    "Bokningen är påbörjad, incheckad, avslutad eller avbokad och kan inte ändras.");
+            }
+
+            if (booking.Accommodations.Count != 1)
+            {
+                throw new InvalidOperationException(
+                    "Ändring av bokningar med flera boenden stöds inte ännu.");
+            }
+
+            // Invoiced bookings require separate handling.
+            if (booking.Invoices?.Any() == true)
+            {
+                throw new InvalidOperationException(
+                    "Bokningen har fakturor. Kontakta ekonomiansvarig innan ändring.");
+            }
+
+            var stay = booking.Accommodations.Single();
+
+            // Check for additional services.
+            bool hasAdditionalServices =
+                booking.Rentals?.Any() == true ||
+                booking.SkiLessons?.Any() == true ||
+                booking.MeetingRooms?.Any() == true;
+
+            // Preserve stay dates when additional services exist.
+            if (hasAdditionalServices &&
+                (startDate != stay.StartDate.Date ||
+                 endDate != stay.EndDate.Date))
+            {
+                throw new InvalidOperationException(
+                    "Bokningen innehåller andra tjänster. " +
+                    "Du kan byta boende, men måste behålla samma datum. " +
+                    "Ändra eller avboka de andra tjänsterna separat innan du ändrar perioden.");
+            }
+
+            // Verify accommodation availability.
+            Accommodation selectedAccommodation =
+                GetAvailableAccommodationsForEdit(
+                    startDate,
+                    endDate,
+                    numberOfGuests,
+                    bookingId)
+                .FirstOrDefault(a =>
+                    a.AccommodationID == accommodationId);
+
+            if (selectedAccommodation == null)
+            {
+                throw new InvalidOperationException(
+                    "Boendet är inte längre ledigt eller har för få bäddar.");
+            }
+
+            // Check whether the accommodation and dates are unchanged.
+            bool isUnchanged =
+                stay.AccommodationID == selectedAccommodation.AccommodationID &&
+                stay.StartDate.Date == startDate &&
+                stay.EndDate.Date == endDate;
+
+            // Preserve the existing accommodation price if nothing changed.
+            decimal newListPrice = isUnchanged
+                ? booking.AccommodationListPrice
+                : CalculateAccommodationPrice(
+                    selectedAccommodation.AccommodationTypeID,
+                    startDate,
+                    endDate);
+
+            decimal rate = booking.DiscountRate;
+
+            if (rate < 0m || rate > 1m)
+            {
+                throw new InvalidOperationException(
+                    "Bokningens rabattprocent är ogiltig.");
+            }
+
+            // Preserve the original discount when nothing changed.
+            decimal newDiscount = isUnchanged
+                ? booking.DiscountAmount
+                : Math.Round(
+                    newListPrice * rate,
+                    2,
+                    MidpointRounding.AwayFromZero);
+
+            // Verify that the original accommodation price is available.
+            if (booking.AccommodationListPrice <= 0m ||
+                booking.DiscountAmount < 0m ||
+                booking.DiscountAmount > booking.AccommodationListPrice)
+            {
+                throw new InvalidOperationException(
+                    "Bokningens ursprungliga boendepris saknas eller är ogiltigt. " +
+                    "Priset måste kontrolleras innan bokningen kan ändras.");
+            }
+
+            decimal oldAccommodationPrice =
+                booking.AccommodationListPrice -
+                booking.DiscountAmount;
+
+            decimal newAccommodationPrice =
+                newListPrice - newDiscount;
+
+            // Keep existing ski lessons, rentals, meeting rooms and insurance.
+            decimal newTotal =
+                booking.TotalAmount -
+                oldAccommodationPrice +
+                newAccommodationPrice;
+
+            if (newTotal < 0m)
+            {
+                throw new InvalidOperationException(
+                    "Det nya totalpriset kunde inte beräknas.");
+            }
+
+            // Store original values for recovery if saving fails.
+            int oldAccommodationId = stay.AccommodationID;
+            Accommodation oldAccommodation = stay.Accommodation;
+            DateTime oldStart = stay.StartDate;
+            DateTime oldEnd = stay.EndDate;
+
+            decimal oldListPrice = booking.AccommodationListPrice;
+            decimal oldDiscount = booking.DiscountAmount;
+            decimal oldTotal = booking.TotalAmount;
+
+            try
+            {
+                // Update the foreign key without clearing the navigation property.
+                stay.AccommodationID = selectedAccommodation.AccommodationID;
+                stay.StartDate = startDate;
+                stay.EndDate = endDate;
+
+                // Update accommodation prices and total.
+                booking.AccommodationListPrice = newListPrice;
+                booking.DiscountAmount = newDiscount;
+                booking.TotalAmount = newTotal;
+
+                _unitOfWork.Complete();
+
+                return booking;
+            }
+            catch
+            {
+                // Restore the original tracked values.
+                stay.AccommodationID = oldAccommodationId;
+                stay.Accommodation = oldAccommodation;
+                stay.StartDate = oldStart;
+                stay.EndDate = oldEnd;
+
+                booking.AccommodationListPrice = oldListPrice;
+                booking.DiscountAmount = oldDiscount;
+                booking.TotalAmount = oldTotal;
+
+                throw;
+            }
         }
 
         /// <summary>
