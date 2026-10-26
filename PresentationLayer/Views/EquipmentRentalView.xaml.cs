@@ -401,8 +401,8 @@ namespace PresentationLayer.Views
                     || item.ArticleNumber.Contains(search, StringComparison.OrdinalIgnoreCase)
                     || (item.Equipment?.Description?.Contains(search, StringComparison.OrdinalIgnoreCase) ?? false))
                 .Where(item => _skiShopController.IsItemAvailableForDates(item, start, end))
-                .OrderBy(item => item.ArticleNumber.Length)
-                .ThenBy(item => item.ArticleNumber)
+                .OrderBy(item => new string(item.ArticleNumber.TakeWhile(char.IsLetter).ToArray()))
+                .ThenBy(item => int.TryParse(new string(item.ArticleNumber.SkipWhile(char.IsLetter).ToArray()), out int num) ? num : 0)
                 .ToList();
 
             AvailableItemsDataGrid.ItemsSource = filtered;

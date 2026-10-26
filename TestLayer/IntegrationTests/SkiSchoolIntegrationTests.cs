@@ -37,7 +37,7 @@ namespace TestLayer.IntegrationTests
                 // Clear ChangeTracker to prevent state collision
                 _context.ChangeTracker.Clear();
 
-                // 1. Remove lesson bookings (child)
+                // Remove lesson bookings (child)
                 foreach (var lb in _createdLessonBookings)
                 {
                     var existing = _context.Set<SkiLessonBooking>().Find(lb.SkiLessonBookingID);
@@ -48,7 +48,7 @@ namespace TestLayer.IntegrationTests
                 }
                 _context.SaveChanges();
 
-                // 2. Remove test bookings
+                // Remove test bookings
                 foreach (var b in _createdBookings)
                 {
                     var existing = _context.Set<Booking>().Find(b.BookingID);
@@ -59,7 +59,7 @@ namespace TestLayer.IntegrationTests
                 }
                 _context.SaveChanges();
 
-                // 3. Remove test customers (parent)
+                // Remove test customers (parent)
                 foreach (var c in _createdCustomers)
                 {
                     var existing = _context.Set<Customer>().Find(c.CustomerID);
@@ -82,7 +82,7 @@ namespace TestLayer.IntegrationTests
         [Test]
         public void AvailableLessonSession_AddStudent_ReturnsTrue()
         {
-            // Arrange: 1. Create and persist an isolated test customer
+            // Arrange: Create and persist an isolated test customer
             var customer = new PrivateCustomer
             {
                 FirstName = "Test-Joakim",
@@ -96,7 +96,7 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges();
             _createdCustomers.Add(customer);
 
-            // Arrange: 2. Create and persist an active booking for the customer
+            // Arrange: Create and persist an active booking for the customer
             var booking = new Booking
             {
                 CustomerID = customer.CustomerID,
@@ -110,7 +110,7 @@ namespace TestLayer.IntegrationTests
             _context.SaveChanges();
             _createdBookings.Add(booking);
 
-            // Arrange: 3. Retrieve a seeded session with remaining capacity
+            // Arrange: Retrieve a seeded session with remaining capacity
             var session = _context.Set<SkiLessonSession>()
                 .Include(s => s.SkiLesson)
                 .Include(s => s.Participants)
