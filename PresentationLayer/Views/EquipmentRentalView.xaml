@@ -219,7 +219,7 @@
                                     <Button x:Name="EditExistingRentalButton"
                                             Content="✏ Ändra hyrd utrustning"
                                             Height="28"
-                                            Width="160"
+                                            Width="180"
                                             HorizontalAlignment="Left"
                                             Margin="0,4,0,0"
                                             Style="{StaticResource SecondaryButtonStyle}"
