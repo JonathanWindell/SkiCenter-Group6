@@ -1,6 +1,7 @@
 ﻿using BusinessLayer.Controllers;
 using EntityLayer;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,6 +14,21 @@ namespace PresentationLayer.Views
         private readonly ObservableCollection<EquipmentItem> _previewItems = new();
         private readonly SkiShopController _skiShopController;
         private List<Equipment> _equipmentModels = new();
+
+        private static readonly Dictionary<EquipmentCondition, string> ConditionNames = new()
+        {
+            [EquipmentCondition.New] = "Ny",
+            [EquipmentCondition.BarelyUsed] = "Knappt använd",
+            [EquipmentCondition.Worn] = "Använd"
+        };
+
+        private static readonly Dictionary<EquipmentStatus, string> StatusNames = new()
+        {
+            [EquipmentStatus.Available] = "Tillgänglig",
+            [EquipmentStatus.Rented] = "Uthyrd",
+            [EquipmentStatus.Damaged] = "Skadad",
+            [EquipmentStatus.Maintenance] = "Under underhåll"
+        };
 
         // Tracks the current item being edited
         private EquipmentItem? _editingItem;
@@ -49,26 +65,20 @@ namespace PresentationLayer.Views
         // Fills ComboBoxes with data
         private void PopulateComboBoxes()
         {
-            // Conditions
             EquipmentConditionComboBox.Items.Clear();
-            foreach (var condition in Enum.GetValues(typeof(EquipmentCondition)))
+            foreach (EquipmentCondition condition in Enum.GetValues<EquipmentCondition>())
             {
-                EquipmentConditionComboBox.Items.Add(condition);
+                string name = ConditionNames.TryGetValue(condition, out string? val) ? val : condition.ToString();
+                EquipmentConditionComboBox.Items.Add(new ComboBoxItem { Content = name, Tag = condition });
             }
             EquipmentConditionComboBox.SelectedIndex = 0;
 
-
-            // Models and categories
             var result = _skiShopController.GetAllEquipmentWithStock();
             _equipmentModels.Clear();
-            foreach (var eq in result)
-            {
-                _equipmentModels.Add(eq);
-            }
+            foreach (var eq in result) _equipmentModels.Add(eq);
 
             EquipmentCategoryComboBox.Items.Clear();
             CategoryFilterComboBox.Items.Clear();
-
             CategoryFilterComboBox.Items.Add("Alla kategorier");
             CategoryFilterComboBox.SelectedIndex = 0;
 
@@ -81,18 +91,21 @@ namespace PresentationLayer.Views
                 }
             }
 
-
-            // Status in the form
-            EquipmentStatusComboBox.ItemsSource = null;
-            EquipmentStatusComboBox.ItemsSource = Enum.GetValues(typeof(EquipmentStatus));
+            EquipmentStatusComboBox.Items.Clear();
+            foreach (EquipmentStatus status in Enum.GetValues<EquipmentStatus>())
+            {
+                string name = StatusNames.TryGetValue(status, out string? val) ? val : status.ToString();
+                EquipmentStatusComboBox.Items.Add(new ComboBoxItem { Content = name, Tag = status });
+            }
             EquipmentStatusComboBox.SelectedIndex = 0;
 
-
-            // Status in the filter view
-            var filterStatuses = new List<object> { "Alla statusar" };
-            filterStatuses.AddRange(Enum.GetValues(typeof(EquipmentStatus)).Cast<object>());
-            StatusFilterComboBox.ItemsSource = null;
-            StatusFilterComboBox.ItemsSource = filterStatuses;
+            StatusFilterComboBox.Items.Clear();
+            StatusFilterComboBox.Items.Add(new ComboBoxItem { Content = "Alla statusar", Tag = null }); // null = ingen filtrering
+            foreach (EquipmentStatus status in Enum.GetValues<EquipmentStatus>())
+            {
+                string name = StatusNames.TryGetValue(status, out string? val) ? val : status.ToString();
+                StatusFilterComboBox.Items.Add(new ComboBoxItem { Content = name, Tag = status });
+            }
             StatusFilterComboBox.SelectedIndex = 0;
         }
 
@@ -164,7 +177,7 @@ namespace PresentationLayer.Views
                                         equipment.Equipment?.Category == category;
 
             bool matchesStatus = true;
-            if (StatusFilterComboBox.SelectedIndex > 0 && StatusFilterComboBox.SelectedItem is EquipmentStatus filterStatus)
+            if (StatusFilterComboBox.SelectedItem is ComboBoxItem selectedFilter && selectedFilter.Tag is EquipmentStatus filterStatus)
             {
                 matchesStatus = equipment.Status == filterStatus;
             }
@@ -249,8 +262,8 @@ namespace PresentationLayer.Views
 
             string selectedCategory = (string)EquipmentCategoryComboBox.SelectedItem;
             string selectedDescription = (string)EquipmentDescriptionComboBox.SelectedItem;
-            var status = (EquipmentStatus)EquipmentStatusComboBox.SelectedItem;
-            var condition = (EquipmentCondition)EquipmentConditionComboBox.SelectedItem;
+            var status = (EquipmentStatus)((ComboBoxItem)EquipmentStatusComboBox.SelectedItem).Tag;
+            var condition = (EquipmentCondition)((ComboBoxItem)EquipmentConditionComboBox.SelectedItem).Tag;
 
             Equipment? matchedModel = null;
             foreach (var model in _equipmentModels)
@@ -334,8 +347,18 @@ namespace PresentationLayer.Views
             EquipmentNumberTextBox.Text = selectedItem.ArticleNumber;
             EquipmentNumberTextBox.IsEnabled = false;
 
-            EquipmentCategoryComboBox.SelectedItem = selectedItem.Equipment?.Category;
-            EquipmentDescriptionComboBox.SelectedItem = selectedItem.Equipment?.Description;
+            // Leta upp rätt ComboBoxItem baserat på Tag för att visa rätt i rullistan vid ändring
+            foreach (ComboBoxItem item in EquipmentStatusComboBox.Items)
+            {
+                if ((EquipmentStatus)item.Tag == selectedItem.Status)
+                    EquipmentStatusComboBox.SelectedItem = item;
+            }
+
+            foreach (ComboBoxItem item in EquipmentConditionComboBox.Items)
+            {
+                if ((EquipmentCondition)item.Tag == selectedItem.Condition)
+                    EquipmentConditionComboBox.SelectedItem = item;
+            }
 
             EquipmentStatusComboBox.SelectedItem = selectedItem.Status;
             EquipmentConditionComboBox.SelectedItem = selectedItem.Condition;
@@ -375,6 +398,25 @@ namespace PresentationLayer.Views
             else
             {
                 ShowFeedback("Kunde inte ta bort artikeln. Kontrollera att den inte är uthyrd.", false);
+            }
+        }
+
+        public class EquipmentConditionSwedishConverter : IValueConverter
+        {
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                return value?.ToString() switch
+                {
+                    "New" => "Ny",
+                    "BarelyUsed" => "Knappt använd",
+                    "Worn" => "Använd",
+                    _ => value?.ToString() ?? ""
+                };
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                throw new NotSupportedException();
             }
         }
 
