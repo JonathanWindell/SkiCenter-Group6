@@ -7,6 +7,23 @@ namespace BusinessLayer.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
 
+        // Swedish display names for the staff roles, used everywhere a role is shown to the user
+        private static readonly Dictionary<staffRole, string> RoleDisplayNames = new()
+        {
+            [staffRole.BookingAdmin] = "Bokningsadministratör",
+            [staffRole.SkiShop] = "Skidbutik",
+            [staffRole.MarketingManager] = "Marknadschef",
+            [staffRole.SystemAdmin] = "Systemadministratör"
+        };
+
+        /// <summary>
+        /// Returns the role's Swedish name, e.g. "Bokningsadministratör" for BookingAdmin.
+        /// </summary>
+        public static string GetRoleDisplayName(staffRole role)
+        {
+            return RoleDisplayNames.TryGetValue(role, out string? name) ? name : role.ToString();
+        }
+
         public StaffController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -147,7 +164,7 @@ namespace BusinessLayer.Controllers
 
             if (_unitOfWork.Complete() > 0)
             {
-                return (true, $"{firstName} {lastName} har registrerats som {role}.");
+                return (true, $"{firstName} {lastName} har registrerats som {GetRoleDisplayName(role).ToLower()}.");
             }
 
             return (false, "Ett fel uppstod när användaren skulle sparas i databasen.");

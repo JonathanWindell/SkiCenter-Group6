@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace PresentationLayer.Views
 {
@@ -196,48 +197,53 @@ namespace PresentationLayer.Views
             EquipmentFeedbackTextBlock.Text = string.Empty;
             ClearFieldErrors();
 
-            // Collect all validation errors before saving
-            var errors = new List<string>();
+            // Collect all validation errors before saving. Each error belongs to the field it concerns.
+            var errors = new List<(Control Field, string Message)>();
             string articleNumber = EquipmentNumberTextBox.Text.Trim();
             string size = EquipmentSizeTextBox.Text.Trim();
 
             if (string.IsNullOrWhiteSpace(articleNumber))
             {
-                errors.Add("Ange artikelnummer.");
+                errors.Add((EquipmentNumberTextBox, "Ange ett artikelnummer."));
             }
             else
             {
-                foreach (var item in _previewItems)
+                EquipmentItem? existing = _previewItems.FirstOrDefault(item =>
+                    item.ArticleNumber.Equals(articleNumber, StringComparison.OrdinalIgnoreCase)
+                    && (_editingItem == null || item.EquipmentItemID != _editingItem.EquipmentItemID));
+
+                if (existing != null)
                 {
-                    if (item.ArticleNumber.Equals(articleNumber, StringComparison.OrdinalIgnoreCase)
-                    && (_editingItem == null || item.EquipmentItemID != _editingItem.EquipmentItemID))
-                    {
-                        errors.Add("Artikelnumret används redan.");
-                        break;
-                    }
+                    // Tell which item already has the number, so the user knows what to look for
+                    string existingName = existing.Equipment?.DisplayName ?? "en annan artikel";
+                    errors.Add((EquipmentNumberTextBox,
+                        $"Artikelnumret {existing.ArticleNumber} finns redan ({existingName}, storlek {existing.Size}). " +
+                        "Varje artikel behöver ett eget nummer – ange ett nytt artikelnummer."));
                 }
             }
 
             if (EquipmentCategoryComboBox.SelectedItem == null)
-                errors.Add("Välj kategori.");
+                errors.Add((EquipmentCategoryComboBox, "Välj en kategori."));
 
             if (EquipmentDescriptionComboBox.SelectedItem == null)
-                errors.Add("Välj utrustningstyp.");
+                errors.Add((EquipmentDescriptionComboBox, "Välj en utrustningstyp."));
 
             if (string.IsNullOrWhiteSpace(size))
-                errors.Add("Ange storlek eller längd.");
+                errors.Add((EquipmentSizeTextBox, "Ange storlek eller längd."));
 
             if (EquipmentConditionComboBox.SelectedItem == null)
-                errors.Add("Ange skick.");
+                errors.Add((EquipmentConditionComboBox, "Välj skick."));
 
             if (EquipmentStatusComboBox.SelectedItem == null)
-                errors.Add("Välj status.");
+                errors.Add((EquipmentStatusComboBox, "Välj status."));
 
             if (errors.Count > 0)
             {
-                // Display every error message
+                // Mark the fields in red and show what is wrong, not just that something is wrong
                 MarkInvalidFields(errors);
-                ShowFeedback("Kontrollera de markerade fälten.", false);
+                ShowFeedback(errors.Count == 1
+                    ? errors[0].Message
+                    : "Rätta följande innan du sparar:\n• " + string.Join("\n• ", errors.Select(e => e.Message)), false);
                 return;
             }
 
@@ -372,35 +378,25 @@ namespace PresentationLayer.Views
             }
         }
 
+        private static readonly Brush ErrorBrush = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
+        private static readonly Brush SuccessBrush = new SolidColorBrush(Color.FromRgb(0x1E, 0x7A, 0x4F));
+
+        // Errors in red, confirmations in green
         private void ShowFeedback(string message, bool isSuccess)
         {
             EquipmentFeedbackTextBlock.Text = message;
+            EquipmentFeedbackTextBlock.Foreground = isSuccess ? SuccessBrush : ErrorBrush;
         }
 
-        // Highlight invalid fields and show their specific errors on hover
-        private void MarkInvalidFields(List<string> errors)
+        // Give each invalid field a red border, with its error message shown on hover
+        private void MarkInvalidFields(List<(Control Field, string Message)> errors)
         {
-            SetFieldError(EquipmentNumberTextBox, errors, "Ange artikelnummer.", "Artikelnumret används redan.");
-            SetFieldError(EquipmentCategoryComboBox, errors, "Välj kategori.");
-            SetFieldError(EquipmentDescriptionComboBox, errors, "Välj utrustningstyp.");
-            SetFieldError(EquipmentSizeTextBox, errors, "Ange storlek eller längd.");
-            SetFieldError(EquipmentConditionComboBox, errors, "Ange skick.");
-            SetFieldError(EquipmentStatusComboBox, errors, "Välj status.");
-        }
-
-        private void SetFieldError(Control field, List<string> errors, params string[] messages)
-        {
-            foreach (string message in messages)
+            foreach ((Control field, string message) in errors)
             {
-                if (errors.Contains(message))
-                {
-                    field.ToolTip = message;
-                    return;
-                }
+                field.BorderBrush = ErrorBrush;
+                field.BorderThickness = new Thickness(2);
+                field.ToolTip = message;
             }
-
-            field.SetResourceReference(Control.BorderBrushProperty, "InputBorder");
-            field.ToolTip = null;
         }
 
         // Restore normal borders and remove validation tooltips
@@ -419,6 +415,7 @@ namespace PresentationLayer.Views
             foreach (Control field in fields)
             {
                 field.SetResourceReference(Control.BorderBrushProperty, "InputBorder");
+                field.BorderThickness = new Thickness(1);
                 field.ToolTip = null;
             }
         }

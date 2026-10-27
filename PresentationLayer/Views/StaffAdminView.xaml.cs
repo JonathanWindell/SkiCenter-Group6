@@ -1,6 +1,7 @@
 using BusinessLayer.Controllers;
 using EntityLayer;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace PresentationLayer.Views
 {
@@ -13,8 +14,11 @@ namespace PresentationLayer.Views
             InitializeComponent();
             _staffController = staffController;
 
-            // Populate dropdown with roles from Enum 
-            RoleComboBox.ItemsSource = Enum.GetValues(typeof(staffRole));
+            // Populate dropdown with the roles' Swedish names. The role itself is stored in Tag.
+            foreach (staffRole role in Enum.GetValues<staffRole>())
+            {
+                RoleComboBox.Items.Add(new ComboBoxItem { Content = StaffController.GetRoleDisplayName(role), Tag = role });
+            }
             RoleComboBox.SelectedIndex = 0;
         }
 
@@ -31,7 +35,11 @@ namespace PresentationLayer.Views
 
             string password = ShowPasswordCheckBox.IsChecked == true ? PasswordVisibleTextBox.Text : PasswordBox.Password;
 
-            staffRole selectedRole = (staffRole)RoleComboBox.SelectedItem;
+            if ((RoleComboBox.SelectedItem as ComboBoxItem)?.Tag is not staffRole selectedRole)
+            {
+                FeedbackTextBlock.Text = "Välj en roll.";
+                return;
+            }
 
             // Send to StaffController for hashing and saving 
             var result = _staffController.CreateStaff(firstName, lastName, email, password, selectedRole);
