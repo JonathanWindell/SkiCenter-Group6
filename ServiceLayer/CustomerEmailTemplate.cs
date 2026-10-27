@@ -53,11 +53,11 @@ namespace ServiceLayer
                     // List what equipment is rented (without price)
                     foreach (var rentalItem in rental.RentalItems)
                     {
-                        string category = rentalItem.EquipmentItem?.Equipment?.Category ?? "Utrustning";
+                        string itemName = rentalItem.EquipmentItem?.Equipment?.DisplayName ?? "Utrustning";
                         string size = string.IsNullOrWhiteSpace(rentalItem.EquipmentItem?.Size) ? "Standard" : rentalItem.EquipmentItem.Size;
-                        sb.AppendLine($"<li>{category} (Stl: {size})</li>");
+
+                        sb.AppendLine($"<li>{itemName} (Stl: {size})</li>");
                     }
-                    sb.AppendLine("</ul></li>");
                 }
                 sb.AppendLine("</ul>");
             }

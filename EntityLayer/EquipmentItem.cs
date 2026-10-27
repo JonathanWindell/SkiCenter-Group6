@@ -52,5 +52,25 @@ namespace EntityLayer
         public virtual ICollection<RentalItem> RentalItems { get; set; } = new List<RentalItem>();
 
         public EquipmentItem() { }
+
+        // Used for WPF views. 
+        [NotMapped]
+        public string ConditionSwedish => Condition switch
+        {
+            EquipmentCondition.New => "Ny",
+            EquipmentCondition.BarelyUsed => "Knappt använd",
+            EquipmentCondition.Worn => "Använd",
+            _ => Condition.ToString()
+        };
+
+        [NotMapped]
+        public string StatusSwedish => Status switch
+        {
+            EquipmentStatus.Available => "Tillgänglig",
+            EquipmentStatus.Rented => "Uthyrd",
+            EquipmentStatus.Damaged => "Skadad",
+            EquipmentStatus.Maintenance => "Under underhåll",
+            _ => Status.ToString()
+        };
     }
 }

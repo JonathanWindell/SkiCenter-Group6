@@ -1,5 +1,6 @@
 using DataLayer.Interfaces;
 using EntityLayer;
+using System.Timers;
 
 namespace BusinessLayer.Controllers
 {
@@ -235,6 +236,51 @@ namespace BusinessLayer.Controllers
             if (string.IsNullOrWhiteSpace(email)) return false;
 
             return email.Contains('@') && !email.StartsWith("@") && !email.EndsWith('@');
+        }
+
+        /// <summary>
+        /// Anonymise customers personal information. Ensures that historical and financial data is kept intact. 
+        /// </summary>
+        /// <param name="customerId"></param>
+        public (bool success, string message) AnonymizeCustomer(int customerId)
+        {
+            if (customerId <= 0)
+            {
+                return (false, "Ogiltigt kund-ID.");
+            }
+
+            var customer = _unitOfWork.Customer.GetByID(customerId);
+            if (customer == null)
+            {
+                return (false, "Kunde inte hitta kunden i systemet.");
+            }
+
+            // Overwrite the fields that both type of customers share
+            customer.Email = $"anonym_{Guid.NewGuid().ToString().Substring(0, 8)}@raderad.local";
+            customer.PhoneNumber = "000-0000000";
+            customer.Address = "Raderad";
+
+            // Overwrite the fields that create DisplayName
+            if (customer is PrivateCustomer privateCustomer)
+            {
+                privateCustomer.FirstName = "Anonymiserad";
+                privateCustomer.LastName = "Kund";
+            }
+            else if (customer is CorporateCustomer corpCustomer)
+            {
+                corpCustomer.CompanyName = "Anonymiserat Företag";
+                corpCustomer.OrganisationNumber = "000000-0000";
+                corpCustomer.ContactPerson = "Raderad";
+            }
+
+            _unitOfWork.Customer.Update(customer);
+
+            if (_unitOfWork.Complete() > 0)
+            {
+                return (true, "Kundens uppgifter har anonymiserats permanent i enlighet med GDPR.");
+            }
+
+            return (false, "Ett databasfel uppstod när kunden skulle anonymiseras.");
         }
     }
 }
