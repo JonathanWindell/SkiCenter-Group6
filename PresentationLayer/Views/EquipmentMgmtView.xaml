@@ -99,11 +99,13 @@
                         </ComboBox>
                     </StackPanel>
 
+                    <!-- Error and confirmation messages. Wraps and keeps clear of the add button on the right. -->
                     <TextBlock x:Name="EquipmentFeedbackTextBlock"
                            Grid.Column="3"
                            HorizontalAlignment="Left"
                            VerticalAlignment="Bottom"
-                           Margin="20,0,0,8"
+                           Margin="20,0,200,4"
+                           TextWrapping="Wrap"
                            FontWeight="SemiBold"
                            Foreground="{StaticResource PrimaryText}"/>
 

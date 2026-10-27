@@ -42,15 +42,6 @@ namespace PresentationLayer.Views
             [SystemModule.MarketingManager] = new("Marknad", "Besluta om rabatter och godkänn företagskunder", "Icon.Marknad", typeof(MarketingMgmtView))
         };
 
-        // Swedish display names for staff roles
-        private static readonly Dictionary<staffRole, string> _roleNames = new()
-        {
-            [staffRole.SkiShop] = "Skidbutik",
-            [staffRole.MarketingManager] = "Marknadschef",
-            [staffRole.BookingAdmin] = "Bokningsadministratör",
-            [staffRole.SystemAdmin] = "Systemadministratör"
-        };
-
         public DashboardView(DashboardController dashboardController, LoginController loginController, IServiceProvider serviceProvider)
         {
             InitializeComponent();
@@ -75,7 +66,7 @@ namespace PresentationLayer.Views
             }
 
             txtWelcome.Text = $"Välkommen, {user.FirstName}";
-            txtRole.Text = _roleNames.TryGetValue(user.Role, out string? roleName) ? roleName : user.Role.ToString();
+            txtRole.Text = StaffController.GetRoleDisplayName(user.Role);
         }
 
         /// <summary>
