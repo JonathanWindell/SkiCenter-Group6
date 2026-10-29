@@ -8,9 +8,15 @@ namespace PresentationLayer.Views
 {
     public partial class SkiSchoolView : Window
     {
+        #region Fields
+
         private readonly SkiSchoolController _skiSchoolController;
         private bool _isInitializing = true;
         private bool _isFetching = false;
+
+        #endregion
+
+        #region Display items
 
         public class BookingDropdownItem
         {
@@ -35,6 +41,10 @@ namespace PresentationLayer.Views
             public string AvailabilityDisplay => $"{BookedCount} / {MaxParticipants}";
             public string PriceDisplay => $"{Price:N0} kr";
         }
+
+        #endregion
+
+        #region Constructor and loading
 
         public SkiSchoolView(SkiSchoolController skiSchoolController)
         {
@@ -180,6 +190,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Filters and selection
+
         private async void Filter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (!_isInitializing)
@@ -266,6 +280,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Participants and booking
+
         /// <summary>
         /// Button for booking Ski lesson session to booking.
         /// </summary>
@@ -350,6 +368,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             if (this.Owner != null)
@@ -358,5 +380,7 @@ namespace PresentationLayer.Views
             }
             this.Close();
         }
+
+        #endregion
     }
 }

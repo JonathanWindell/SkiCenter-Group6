@@ -7,6 +7,8 @@ namespace PresentationLayer.Views
 {
     public partial class StaffAdminView : Window
     {
+        #region Fields and constructor
+
         private readonly StaffController _staffController;
 
         public StaffAdminView(StaffController staffController)
@@ -21,6 +23,10 @@ namespace PresentationLayer.Views
             }
             RoleComboBox.SelectedIndex = 0;
         }
+
+        #endregion
+
+        #region Create staff
 
         /// <summary>
         /// Creates, hashes password and saves new User to database. 
@@ -87,6 +93,9 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -97,5 +106,7 @@ namespace PresentationLayer.Views
         {
             Close();
         }
+
+        #endregion
     }
 }

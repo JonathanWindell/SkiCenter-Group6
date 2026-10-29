@@ -10,6 +10,8 @@ namespace PresentationLayer.Views
 {
     public partial class PropertyMgmtView : Window
     {
+        #region Fields and constructor
+
         private readonly PropertyController _propertyController;
         private readonly ObservableCollection<PropertyRow> _properties = new();
 
@@ -29,6 +31,10 @@ namespace PresentationLayer.Views
             LoadData();
             PopulateFilters();
         }
+
+        #endregion
+
+        #region Loading and filters
 
         private void LoadData()
         {
@@ -155,6 +161,9 @@ namespace PresentationLayer.Views
             };
         }
 
+        #endregion
+
+        #region Change status
 
         private void ChangePropertyStatusButton_Click(object sender, RoutedEventArgs e)
         {
@@ -195,9 +204,15 @@ namespace PresentationLayer.Views
             LoadData();
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
+
+        #endregion
     }
 }

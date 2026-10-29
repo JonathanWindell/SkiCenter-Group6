@@ -10,6 +10,8 @@ namespace PresentationLayer.Views
 {
     public partial class CreateBookingView : Window
     {
+        #region Fields and constructor
+
         private readonly CustomerController _customerController;
         private readonly BookingController _bookingController;
         private readonly IServiceProvider _serviceProvider;
@@ -44,6 +46,10 @@ namespace PresentationLayer.Views
             EndDatePicker.SelectedDateChanged += BookingDetails_Changed;
             NumberOfGuestsTextBox.TextChanged += BookingDetails_Changed;
         }
+
+        #endregion
+
+        #region Customer
 
         /// <summary>
         /// Searches for existing customer.
@@ -139,6 +145,10 @@ namespace PresentationLayer.Views
                     MessageBoxImage.Error);
             }
         }
+
+        #endregion
+
+        #region Accommodation search
 
         /// <summary>
         /// Resets accommodation search when date or number of guests is changed.
@@ -318,6 +328,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Price
+
         /// <summary>
         /// Updates price when cancellation insurance is chosen or not. 
         /// </summary>
@@ -388,6 +402,10 @@ namespace PresentationLayer.Views
                 $"Avbeställningsskydd: {insurancePrice:N2} kr\n" +
                 $"Totalt: {totalPrice:N2} kr";
         }
+
+        #endregion
+
+        #region Create booking
 
         /// <summary>
         /// Verifies information regarding booking and allows for creation of booking.
@@ -541,6 +559,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation
+
         /// <summary>
         /// Closes window without saving
         /// </summary>
@@ -548,5 +570,7 @@ namespace PresentationLayer.Views
         {
             Close();
         }
+
+        #endregion
     }
 }

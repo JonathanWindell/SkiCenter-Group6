@@ -10,6 +10,8 @@ namespace PresentationLayer.Views
     public partial class GuestCheckInOutView : Window
 
     {
+        #region Fields and constructor
+
         // Uses the existing controller to retrieve booking data.
         private readonly BookingController _bookingController;
 
@@ -36,6 +38,10 @@ namespace PresentationLayer.Views
 
             RefreshGuests();
         }
+
+        #endregion
+
+        #region Guest selection
 
         private void GuestsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -83,6 +89,10 @@ namespace PresentationLayer.Views
                 CheckOutButton.IsEnabled = true;
             }
         }
+
+        #endregion
+
+        #region Check in and check out
 
         private void CheckInButton_Click(object sender, RoutedEventArgs e)
         {
@@ -151,6 +161,10 @@ namespace PresentationLayer.Views
                 MessageBox.Show("Kunde inte genomföra utcheckningen i databasen.", "Fel", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
+
+        #endregion
+
+        #region Loading and filters
 
         private void LoadGuests()
         {
@@ -274,6 +288,10 @@ namespace PresentationLayer.Views
                 : $"{bookingCount} bokningar";
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             if (this.Owner != null)
@@ -282,5 +300,7 @@ namespace PresentationLayer.Views
             }
             this.Close();
         }
+
+        #endregion
     }
 }

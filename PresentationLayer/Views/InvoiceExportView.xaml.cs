@@ -14,6 +14,8 @@ namespace PresentationLayer.Views
     /// </summary>
     public partial class InvoiceExportView : Window
     {
+        #region Fields and constructor
+
         private readonly ReportController _reportController;
 
         private InvoiceExport? _currentExport;
@@ -34,6 +36,10 @@ namespace PresentationLayer.Views
             Loaded += InvoiceExportView_Loaded;
         }
 
+        #endregion
+
+        #region Access check
+
         /// <summary>
         /// Checks access before showing any data. Only marketing managers and system administrators may use this view.
         /// </summary>
@@ -47,6 +53,10 @@ namespace PresentationLayer.Views
                 Close();
             }
         }
+
+        #endregion
+
+        #region Export
 
         private void GenerateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -151,10 +161,16 @@ namespace PresentationLayer.Views
             ExportJsonButton.IsEnabled = false;
         }
 
+        #endregion
+
+        #region Navigation
+
         // Return to the existing dashboard.
         private void BackButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
     }
 }

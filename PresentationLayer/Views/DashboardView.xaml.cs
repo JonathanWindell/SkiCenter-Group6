@@ -15,6 +15,8 @@ namespace PresentationLayer.Views
     /// </summary>
     public partial class DashboardView : Window
     {
+        #region Fields and constructor
+
         private readonly DashboardController _dashboardController;
         private readonly LoginController _loginController;
         private readonly IServiceProvider _serviceProvider;
@@ -52,6 +54,10 @@ namespace PresentationLayer.Views
             ShowUserInfo();
             BuildMenu();
         }
+
+        #endregion
+
+        #region Menu
 
         /// <summary>
         /// Shows the logged in staff member's name and role in the header.
@@ -186,6 +192,10 @@ namespace PresentationLayer.Views
             window.Show();
         }
 
+        #endregion
+
+        #region Logout and window controls
+
         /// <summary>
         /// Logs out the current user and returns to the login window at the same position.
         /// </summary>
@@ -212,5 +222,7 @@ namespace PresentationLayer.Views
 
         private void btnMinimize_Click(object sender, RoutedEventArgs e) => this.WindowState = WindowState.Minimized;
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
+
+        #endregion
     }
 }

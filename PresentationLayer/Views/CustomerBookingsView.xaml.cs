@@ -12,6 +12,8 @@ namespace PresentationLayer.Views
     /// </summary>
     public partial class CustomerBookingsView : Window
     {
+        #region Fields and constructor
+
         private readonly BookingController _bookingController;
         private readonly CustomerController _customerController;
         private readonly IServiceProvider _serviceProvider;
@@ -29,6 +31,10 @@ namespace PresentationLayer.Views
             _customerController = customerController;
             _serviceProvider = serviceProvider;
         }
+
+        #endregion
+
+        #region Customer search and bookings
 
         /// <summary>
         /// Searches for a customer and loads the customer's bookings.
@@ -119,6 +125,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Booking actions
+
         /// <summary>
         /// Opens the form for creating a new booking.
         /// </summary>
@@ -179,6 +189,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation
+
         /// <summary>
         /// Closes the booking overview.
         /// </summary>
@@ -187,5 +201,7 @@ namespace PresentationLayer.Views
             this.DialogResult = HasCreatedAnyBooking;
             Close();
         }
+
+        #endregion
     }
 }
