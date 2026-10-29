@@ -5,12 +5,18 @@ namespace BusinessLayer.Controllers
 {
     public class SkiShopController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         public SkiShopController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Equipment register
 
         /// <summary>
         /// Gets all equipment types and models with their current stock.
@@ -152,6 +158,10 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Complete() > 0;
         }
 
+        #endregion
+
+        #region Rentals and returns
+
         /// <summary>
         /// Gets all active rentals in the skishop.
         /// </summary>
@@ -286,6 +296,10 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Complete() > 0;
         }
 
+        #endregion
+
+        #region Booking search and availability
+
         // Equipment category that requires a verified driver's license
         public const string SnowmobileCategory = "Skoter";
 
@@ -315,6 +329,10 @@ namespace BusinessLayer.Controllers
         {
             return _unitOfWork.EquipmentItem.GetAvailableItemsWithPrices(category);
         }
+
+        #endregion
+
+        #region Rental rules and pricing
 
         /// <summary>
         /// Returns true if any of the items is a snowmobile, which requires a verified driver's license.
@@ -358,6 +376,10 @@ namespace BusinessLayer.Controllers
             EquipmentPriceMatrix longest = priceList.Last();
             return longest.TotalAmount + CalculateRentalPrice(priceList, days - longest.Days);
         }
+
+        #endregion
+
+        #region Add equipment to booking
 
         /// <summary>
         /// Adds available equipment to an active room booking. The items are linked to a new rental on the booking,
@@ -497,6 +519,10 @@ namespace BusinessLayer.Controllers
                 actualAddedAmount);
         }
 
+        #endregion
+
+        #region Return equipment
+
         /// <summary>
         /// Gets the active rental for the selected item.
         /// </summary>
@@ -570,6 +596,10 @@ namespace BusinessLayer.Controllers
             return (true, $"{returnList.Count} artikel/artiklar har återlämnats.");
         }
 
+        #endregion
+
+        #region Availability checks
+
         /// Validates a specific equipment between dates.
         /// </summary>
         public bool IsItemAvailableForDates(EquipmentItem item, DateTime startDate, DateTime endDate)
@@ -605,6 +635,10 @@ namespace BusinessLayer.Controllers
                 _ => status.ToString()
             };
         }
+
+        #endregion
+
+        #region Edit booking rental
 
         /// <summary>
         /// Updates articles and dates on a existing rental.
@@ -763,6 +797,10 @@ namespace BusinessLayer.Controllers
             return (true, $"Uthyrningen uppdaterad. Nytt hyresbelopp: {newTotalPrice:N2} kr.", priceDifference);
         }
 
+        #endregion
+
+        #region Drop-in rental
+
         /// <summary>
         /// Registers a drop-in rental over the desk, paid at the register and does not connect to accommodation.
         /// </summary>
@@ -870,5 +908,7 @@ namespace BusinessLayer.Controllers
         {
             return _unitOfWork.Customer.SearchCustomer(searchText);
         }
+
+        #endregion
     }
 }

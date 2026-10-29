@@ -10,6 +10,8 @@ namespace BusinessLayer.Controllers
     /// </summary>
     public class StatisticsController
     {
+        #region Fields and constructor
+
         // Longest period that can be shown at once
         public const int MaxMonths = 24;
 
@@ -19,6 +21,10 @@ namespace BusinessLayer.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Statistics
 
         /// <summary>
         /// Gets all accommodation types that have accommodations, for the type filter.
@@ -101,6 +107,10 @@ namespace BusinessLayer.Controllers
 
             return (true, $"Statistik för {months.Count} månad(er).", report);
         }
+
+        #endregion
+
+        #region Calculation
 
         /// <summary>
         /// Calculates booked nights, number of bookings and sales (excl. VAT) per month.
@@ -211,6 +221,10 @@ namespace BusinessLayer.Controllers
             return stats.Values.OrderBy(m => m.Month).ToList();
         }
 
+        #endregion
+
+        #region Helpers
+
         private static IEnumerable<DateTime> GetNights(BookingAccommodation stay)
         {
             for (DateTime night = stay.StartDate.Date; night < stay.EndDate.Date; night = night.AddDays(1))
@@ -232,5 +246,7 @@ namespace BusinessLayer.Controllers
         }
 
         private static DateTime FirstOfMonth(DateTime date) => new DateTime(date.Year, date.Month, 1);
+
+        #endregion
     }
 }

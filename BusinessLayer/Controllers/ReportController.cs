@@ -23,6 +23,8 @@ namespace BusinessLayer.Controllers
     /// </summary>
     public class ReportController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
@@ -37,6 +39,10 @@ namespace BusinessLayer.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Invoice export
 
         /// <summary>
         /// Generates invoicing data for all completed bookings with checkout in the period.
@@ -98,6 +104,10 @@ namespace BusinessLayer.Controllers
         {
             return JsonSerializer.Serialize(export, JsonOptions);
         }
+
+        #endregion
+
+        #region Booking invoice
 
         /// <summary>
         /// Builds the invoice for one booking: one line per article, applied discounts and VAT per rate.
@@ -193,6 +203,10 @@ namespace BusinessLayer.Controllers
                 MatchesBookingTotal = totalInclVat == booking.TotalAmount
             };
         }
+
+        #endregion
+
+        #region Invoice lines per article
 
         /// <summary>
         /// One line per rented item. If the price list has changed since the rental, the saved rental total is used instead.
@@ -309,6 +323,10 @@ namespace BusinessLayer.Controllers
                 end);
         }
 
+        #endregion
+
+        #region Helpers
+
         private static InvoiceLine CreateLine(string articleType, string articleNumber, string description,
             int quantity, string unit, decimal listPriceInclVat, decimal discountInclVat, decimal vatRate,
             DateTime serviceStartDate, DateTime serviceEndDate)
@@ -377,5 +395,7 @@ namespace BusinessLayer.Controllers
 
             return invoiceCustomer;
         }
+
+        #endregion
     }
 }

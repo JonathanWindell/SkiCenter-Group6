@@ -28,6 +28,8 @@ namespace BusinessLayer.Controllers
     /// </summary>
     public class DashboardController
     {
+        #region Role access table
+
         // Single source of truth for role-based access. Add or remove modules for a role here.
         private static readonly Dictionary<staffRole, SystemModule[]> _moduleAccess = new()
         {
@@ -58,6 +60,10 @@ namespace BusinessLayer.Controllers
                 SystemModule.MarketingManager       // Företagskunder, kredit och rabatt
             }
         };
+
+        #endregion
+
+        #region Access checks
 
         /// <summary>
         /// Returns the modules the given role is allowed to access.
@@ -92,5 +98,7 @@ namespace BusinessLayer.Controllers
 
             return GetAllowedModules(user.Role);
         }
+
+        #endregion
     }
 }

@@ -9,12 +9,18 @@ namespace BusinessLayer.Controllers
     /// </summary>
     public class AdminController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         public AdminController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Season price queries
 
         /// <summary>
         /// Gets the current season prices, optionally filtered by accommodation type, price type and/or week.
@@ -47,6 +53,10 @@ namespace BusinessLayer.Controllers
 
             return _unitOfWork.SeasonPrice.GetPriceHistory(accommodationTypeId, priceType, week);
         }
+
+        #endregion
+
+        #region Change season price
 
         /// <summary>
         /// Registers a new season price for an accommodation type, price type and week.
@@ -112,9 +122,15 @@ namespace BusinessLayer.Controllers
             return (true, $"Priset för {typeName} ({type}) vecka {week} ändrades från {currentPrice.Price:N2} till {newPrice:N2} kr.");
         }
 
+        #endregion
+
+        #region Helpers
+
         private static bool IsValidWeek(int week)
         {
             return week >= 1 && week <= 53;
         }
+
+        #endregion
     }
 }

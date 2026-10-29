@@ -5,6 +5,8 @@ namespace BusinessLayer.Controllers
 {
     public class StaffController
     {
+        #region Fields and role names
+
         private readonly IUnitOfWork _unitOfWork;
 
         // Swedish display names for the staff roles, used everywhere a role is shown to the user
@@ -24,10 +26,18 @@ namespace BusinessLayer.Controllers
             return RoleDisplayNames.TryGetValue(role, out string? name) ? name : role.ToString();
         }
 
+        #endregion
+
+        #region Constructor
+
         public StaffController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Access checks
 
         /// <summary>
         /// Verifies that current user has SystemAdmin role. 
@@ -123,6 +133,10 @@ namespace BusinessLayer.Controllers
             return currentRole == staffRole.SystemAdmin;
         }
 
+        #endregion
+
+        #region Create staff
+
         /// <summary>
         /// Creates a new user and hashes password.
         /// </summary>
@@ -169,5 +183,7 @@ namespace BusinessLayer.Controllers
 
             return (false, "Ett fel uppstod när användaren skulle sparas i databasen.");
         }
+
+        #endregion
     }
 }
