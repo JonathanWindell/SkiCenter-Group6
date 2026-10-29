@@ -9,6 +9,8 @@ namespace TestLayer.UnitTests
     [Category("Unit")]
     public class PropertyUnitTests
     {
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<IAccommodationRepository> _mockAccommodationRepo;
         private PropertyController _controller;
@@ -26,6 +28,10 @@ namespace TestLayer.UnitTests
             // Inject the mocked IUnitOfWork into the controller
             _controller = new PropertyController(_mockUnitOfWork.Object);
         }
+
+        #endregion
+
+        #region Controller Business Logic Tests
 
         /// <summary>
         /// Test for UpdateAccommodationStatus. Verifies that non-existing or invalid accommodation ID returns false and does not save.
@@ -75,6 +81,10 @@ namespace TestLayer.UnitTests
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
         }
 
+        #endregion
+
+        #region Enum Tests (Low Value - Testing .NET Framework)
+
         /// <summary>
         /// Test for AccommodationStatus enum parsing and underlying values. Verifies that valid string values parse to the expected enum
         /// </summary>
@@ -107,5 +117,7 @@ namespace TestLayer.UnitTests
             // Assert
             Assert.That(parseResult, Is.False);
         }
+
+        #endregion
     }
 }

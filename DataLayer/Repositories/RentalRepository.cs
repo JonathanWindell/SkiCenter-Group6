@@ -6,12 +6,18 @@ namespace DataLayer.Repositories
 {
     public class RentalRepository : Repository<Rental>, IRentalRepository
     {
+
+        #region Constructor & Fields
         private readonly SkiCenterDbContext _context;
 
         public RentalRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Active & Coupled Rentals
 
         /// <summary>
         /// Gets the specific rental with its equipmentItems connected to it.
@@ -39,6 +45,10 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        #endregion
+
+        #region Find Rentals for Customer or Booking
 
         /// <summary>
         /// Gets all rentals for a specific customer, by their ID.
@@ -79,5 +89,7 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        #endregion
     }
 }

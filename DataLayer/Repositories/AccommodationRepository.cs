@@ -4,18 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {
-    /// <summary>
-    /// Repository responsible for handling database operations related to Bookings.
-    /// Inherits basic CRUD operations from the generic Repository.
-    /// </summary>
     public class AccommodationRepository : Repository<Accommodation>, IAccommodationRepository
     {
+        #region Constructor & Fields
+
         private readonly SkiCenterDbContext _context;
 
         public AccommodationRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Availability & Overlap Queries
 
         /// <summary>
         /// 
@@ -46,7 +48,6 @@ namespace DataLayer.Repositories
                  .AsNoTracking()
                  .ToList();
         }
-
 
         /// <summary>
         /// Gets available accommodations when editing an existing booking.
@@ -89,6 +90,9 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        #endregion
+
+        #region Read All & Category Queries
 
         /// <summary>
         /// Gets all accommodations that are registered in the system.
@@ -117,5 +121,7 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        #endregion
     }
 }

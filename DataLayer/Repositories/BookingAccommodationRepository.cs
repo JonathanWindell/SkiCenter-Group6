@@ -6,12 +6,15 @@ namespace DataLayer.Repositories
 {
     public class BookingAccommodationRepository : Repository<BookingAccommodation>, IBookingAccommodationRepository
     {
+        #region Constructor & Fields
         private readonly SkiCenterDbContext _context;
 
         public BookingAccommodationRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
 
         /// <summary>
         /// Gets all booked accommodation by the determined status.

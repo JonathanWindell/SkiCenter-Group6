@@ -9,6 +9,8 @@ namespace TestLayer.UnitTests
     [Category("Unit")]
     public class BookingUnitTests
     {
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<IBookingRepository> _mockBookingRepo;
         private BookingController _controller;
@@ -27,6 +29,9 @@ namespace TestLayer.UnitTests
             _controller = new BookingController(_mockUnitOfWork.Object);
         }
 
+        #endregion
+
+        #region Get Bookings (Queries & Validation)
 
         /// <summary>
         /// Verifies that when End date is before Start date database an empty list is returned
@@ -54,7 +59,7 @@ namespace TestLayer.UnitTests
         /// Verifies that when start date is invalid result is empty. 
         /// </summary>
         [Test]
-        public void GetBookingsInRange_NonValidData_ReturnsTrue()
+        public void GetBookingsInRange_NonValidData_ReturnsEmpty()
         {
             // Arrange
             DateTime invalidStart = DateTime.MinValue;
@@ -88,6 +93,10 @@ namespace TestLayer.UnitTests
             // Verify
             _mockBookingRepo.Verify(r => r.GetBookingsByCustomer(It.IsAny<int>()), Times.Never);
         }
+
+        #endregion
+
+        #region Cancel Booking (State Changes & Validation)
 
         /// <summary>
         /// Verifies that a valid preliminary booking is changed to Cancelled and saved to the database.
@@ -137,7 +146,7 @@ namespace TestLayer.UnitTests
         {
             // Arrange
             int bookingId = 99;
-            _mockBookingRepo.Setup(r => r.GetSpecificBooking(bookingId)).Returns((Booking)null);
+            _mockBookingRepo.Setup(r => r.GetSpecificBooking(bookingId)).Returns((Booking)null!);
 
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() => _controller.CancelBooking(bookingId));
@@ -190,6 +199,10 @@ namespace TestLayer.UnitTests
             Assert.That(ex.Message, Does.Contain("En påbörjad eller avslutad bokning kan inte avbokas."));
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
+
+        #endregion
+
+        #region Cancellation Refunds (Math & Business Rules)
 
         /// <summary>
         /// Verifies that without cancellation insurance, the refund is always 0 kr.
@@ -280,7 +293,7 @@ namespace TestLayer.UnitTests
         public void GetCancellationRefund_NullBooking_ThrowsArgumentNullException()
         {
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => _controller.GetCancellationRefund(null, DateTime.Today));
+            Assert.Throws<ArgumentNullException>(() => _controller.GetCancellationRefund(null!, DateTime.Today));
         }
 
         /// <summary>
@@ -304,5 +317,7 @@ namespace TestLayer.UnitTests
             var ex = Assert.Throws<InvalidOperationException>(() => _controller.GetCancellationRefund(booking, DateTime.Today));
             Assert.That(ex.Message, Does.Contain("Bokningsbeloppet är lägre än avgiften"));
         }
+
+        #endregion
     }
 }

@@ -12,6 +12,8 @@ namespace TestLayer.UnitTests
     [Category("Unit")]
     public class ListReportUnitTests
     {
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<IStaffRepository> _mockStaffRepo;
         private ListReportController _controller;
@@ -68,6 +70,10 @@ namespace TestLayer.UnitTests
             _loginController.Logout();
         }
 
+        #endregion
+
+        #region Helper Methods (Test Data Builders & Login)
+
         private void LogInAs(staffRole role)
         {
             var staff = new Staff("Test", "Person", "test@skicenter.se", "HashedPassword123", role) { StaffID = 7 };
@@ -97,7 +103,7 @@ namespace TestLayer.UnitTests
         }
 
         /// <summary>
-        /// Alpint: 2 available, 1 rented, 1 damaged. Skoter: 1 on maintenance.
+        /// Alpine: 2 available, 1 rented, 1 damaged. Skoter: 1 on maintenance.
         /// </summary>
         private static List<EquipmentItem> CreateEquipmentItems()
         {
@@ -130,6 +136,10 @@ namespace TestLayer.UnitTests
             };
         }
 
+        #endregion
+
+        #region Authorization Tests
+
         /// <summary>
         /// Verifies that staff without the MarketingManager or SystemAdmin role cannot create reports.
         /// </summary>
@@ -147,6 +157,10 @@ namespace TestLayer.UnitTests
             Assert.That(_controller.CreatePriceList().success, Is.False);
             Assert.That(_controller.CreateStatisticsReport(new StatisticsReport(), false).success, Is.False);
         }
+
+        #endregion
+
+        #region Data Aggregation & Logic Tests
 
         /// <summary>
         /// Verifies the customer register's counts and key messages.
@@ -220,6 +234,10 @@ namespace TestLayer.UnitTests
             Assert.That(list.Weeks.Single(w => w.WeekNumber == 8).Prices["dygn"], Is.EqualTo(700m));
         }
 
+        #endregion
+
+        #region File Generation Tests (PDF)
+
         /// <summary>
         /// Verifies that every report is generated as a real PDF file.
         /// </summary>
@@ -255,5 +273,7 @@ namespace TestLayer.UnitTests
                 Assert.That(Encoding.ASCII.GetString(pdf, 0, 4), Is.EqualTo("%PDF"));
             }
         }
+
+        #endregion
     }
 }

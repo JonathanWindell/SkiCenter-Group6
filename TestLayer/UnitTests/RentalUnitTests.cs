@@ -11,6 +11,8 @@ namespace TestLayer.UnitTests
     {
         private const int BookingId = 10;
 
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<IBookingRepository> _mockBookingRepo;
         private Mock<IEquipmentItemRepository> _mockEquipmentItemRepo;
@@ -41,6 +43,10 @@ namespace TestLayer.UnitTests
 
             _controller = new SkiShopController(_mockUnitOfWork.Object);
         }
+
+        #endregion
+
+        #region Helper Methods (Test Data Builders)
 
         private static Booking CreateBooking(DateTime stayStart, DateTime stayEnd)
         {
@@ -96,6 +102,10 @@ namespace TestLayer.UnitTests
                 .Setup(r => r.GetItemsByIds(It.IsAny<IEnumerable<int>>()))
                 .Returns(items);
         }
+
+        #endregion
+
+        #region Availability & Validation Tests
 
         /// <summary>
         /// Verifies that equipment that is already rented, damaged or on maintenance cannot be added to a booking.
@@ -165,40 +175,50 @@ namespace TestLayer.UnitTests
         }
 
         /// <summary>
-        /// Verifies that available equipment is linked to the booking, changes status to Rented
-        /// and that the price is added to the booking's total amount.
+        /// Verifies that the rental period must be within the room stay and not in the past.
         /// </summary>
         [Test]
-        public void AddEquipmentToBooking_AvailableItems_RentsItemsAndAddsPriceToBooking()
+        [TestCase(0, 7)]   // Ends after the stay
+        [TestCase(-1, 2)]  // Starts before today
+        [TestCase(3, 2)]   // Ends before it starts
+        public void AddEquipmentToBooking_InvalidPeriod_ReturnsFalse(int startOffset, int endOffset)
         {
             // Arrange
-            EquipmentItem first = CreateItem(1, EquipmentStatus.Available);
-            EquipmentItem second = CreateItem(2, EquipmentStatus.Available);
-            SetupItems(first, second);
+            SetupItems(CreateItem(1, EquipmentStatus.Available));
 
-            Rental? addedRental = null;
-            _mockRentalRepo.Setup(r => r.Add(It.IsAny<Rental>())).Callback<Rental>(rental => addedRental = rental);
-
-            // Act: three days, which costs 250 per item
-            var (success, message, addedAmount) = _controller.AddEquipmentToBooking(
-                BookingId, new[] { 1, 2 }, DateTime.Today, DateTime.Today.AddDays(2), false);
+            // Act
+            var (success, _, _) = _controller.AddEquipmentToBooking(
+                BookingId, new[] { 1 }, DateTime.Today.AddDays(startOffset), DateTime.Today.AddDays(endOffset), false);
 
             // Assert
-            Assert.That(success, Is.True, message);
-            Assert.That(addedAmount, Is.EqualTo(500m));
-            Assert.That(first.Status, Is.EqualTo(EquipmentStatus.Rented));
-            Assert.That(second.Status, Is.EqualTo(EquipmentStatus.Rented));
-            Assert.That(_trackedBooking.TotalAmount, Is.EqualTo(5500m));
-
-            Assert.That(addedRental, Is.Not.Null);
-            Assert.That(addedRental!.BookingID, Is.EqualTo(BookingId));
-            Assert.That(addedRental.TotalPrice, Is.EqualTo(500m));
-            Assert.That(addedRental.RentalItems.Select(ri => ri.EquipmentItem), Is.EquivalentTo(new[] { first, second }));
-            Assert.That(addedRental.Status, Is.EqualTo("Active"));
+            Assert.That(success, Is.False);
 
             // Verify
-            _mockRentalRepo.Verify(r => r.Add(It.IsAny<Rental>()), Times.Once);
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
+        }
+
+        #endregion
+
+        #region Domain Rules & Core Rental Logic
+
+        /// <summary>
+        /// Verifies that equipment cannot be added to a booking that is not an active room booking.
+        /// </summary>
+        [Test]
+        public void AddEquipmentToBooking_BookingNotActive_ReturnsFalse()
+        {
+            // Arrange
+            SetupItems(CreateItem(1, EquipmentStatus.Available));
+            _mockBookingRepo.Setup(r => r.FindActiveBookings(BookingId, null)).Returns(Enumerable.Empty<Booking>());
+
+            // Act
+            var (success, _, _) = _controller.AddEquipmentToBooking(BookingId, new[] { 1 }, DateTime.Today, DateTime.Today, false);
+
+            // Assert
+            Assert.That(success, Is.False);
+
+            // Verify
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
 
         /// <summary>
@@ -245,47 +265,45 @@ namespace TestLayer.UnitTests
         }
 
         /// <summary>
-        /// Verifies that equipment cannot be added to a booking that is not an active room booking.
+        /// Verifies that available equipment is linked to the booking, changes status to Rented
+        /// and that the price is added to the booking's total amount.
         /// </summary>
         [Test]
-        public void AddEquipmentToBooking_BookingNotActive_ReturnsFalse()
+        public void AddEquipmentToBooking_AvailableItems_RentsItemsAndAddsPriceToBooking()
         {
             // Arrange
-            SetupItems(CreateItem(1, EquipmentStatus.Available));
-            _mockBookingRepo.Setup(r => r.FindActiveBookings(BookingId, null)).Returns(Enumerable.Empty<Booking>());
+            EquipmentItem first = CreateItem(1, EquipmentStatus.Available);
+            EquipmentItem second = CreateItem(2, EquipmentStatus.Available);
+            SetupItems(first, second);
 
-            // Act
-            var (success, _, _) = _controller.AddEquipmentToBooking(BookingId, new[] { 1 }, DateTime.Today, DateTime.Today, false);
+            Rental? addedRental = null;
+            _mockRentalRepo.Setup(r => r.Add(It.IsAny<Rental>())).Callback<Rental>(rental => addedRental = rental);
 
-            // Assert
-            Assert.That(success, Is.False);
-
-            // Verify
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
-        }
-
-        /// <summary>
-        /// Verifies that the rental period must be within the room stay and not in the past.
-        /// </summary>
-        [Test]
-        [TestCase(0, 7)]   // Ends after the stay
-        [TestCase(-1, 2)]  // Starts before today
-        [TestCase(3, 2)]   // Ends before it starts
-        public void AddEquipmentToBooking_InvalidPeriod_ReturnsFalse(int startOffset, int endOffset)
-        {
-            // Arrange
-            SetupItems(CreateItem(1, EquipmentStatus.Available));
-
-            // Act
-            var (success, _, _) = _controller.AddEquipmentToBooking(
-                BookingId, new[] { 1 }, DateTime.Today.AddDays(startOffset), DateTime.Today.AddDays(endOffset), false);
+            // Act: three days, which costs 250 per item
+            var (success, message, addedAmount) = _controller.AddEquipmentToBooking(
+                BookingId, new[] { 1, 2 }, DateTime.Today, DateTime.Today.AddDays(2), false);
 
             // Assert
-            Assert.That(success, Is.False);
+            Assert.That(success, Is.True, message);
+            Assert.That(addedAmount, Is.EqualTo(500m));
+            Assert.That(first.Status, Is.EqualTo(EquipmentStatus.Rented));
+            Assert.That(second.Status, Is.EqualTo(EquipmentStatus.Rented));
+            Assert.That(_trackedBooking.TotalAmount, Is.EqualTo(5500m));
+
+            Assert.That(addedRental, Is.Not.Null);
+            Assert.That(addedRental!.BookingID, Is.EqualTo(BookingId));
+            Assert.That(addedRental.TotalPrice, Is.EqualTo(500m));
+            Assert.That(addedRental.RentalItems.Select(ri => ri.EquipmentItem), Is.EquivalentTo(new[] { first, second }));
+            Assert.That(addedRental.Status, Is.EqualTo("Active"));
 
             // Verify
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
+            _mockRentalRepo.Verify(r => r.Add(It.IsAny<Rental>()), Times.Once);
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
         }
+
+        #endregion
+
+        #region Price Calculation Algorithm
 
         /// <summary>
         /// Verifies the rental price for different lengths, including rentals longer than the price list.
@@ -307,5 +325,7 @@ namespace TestLayer.UnitTests
             // Assert
             Assert.That(price, Is.EqualTo((decimal)expectedPrice));
         }
+
+        #endregion
     }
 }

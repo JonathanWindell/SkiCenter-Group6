@@ -6,12 +6,17 @@ namespace DataLayer.Repositories
 {
     public class BookingRepository : Repository<Booking>, IBookingRepository
     {
+        #region Constructor & Fields
         private readonly SkiCenterDbContext _context;
 
         public BookingRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Multiple Items Queries
 
         /// <summary>
         /// Gets all bookings with all its associated data.
@@ -33,6 +38,10 @@ namespace DataLayer.Repositories
                 .AsSplitQuery()
                 .ToList();
         }
+
+        #endregion
+
+        #region Single Items Queries
 
         /// <summary>
         /// Gets a specific booking with all its associated data.
@@ -105,6 +114,73 @@ namespace DataLayer.Repositories
         }
 
         /// <summary>
+        /// Finds active room bookings by booking ID or accommodation (room) number.
+        /// A booking is active when it is preliminary or confirmed, the guest has not checked out,
+        /// and it has an accommodation stay that has not ended yet.
+        /// </summary>
+        /// <param name="bookingID">Optional booking ID to search for.</param>
+        /// <param name="accommodationNumber">Optional room number to search for, e.g. "LI1".</param>
+        public IEnumerable<Booking> FindActiveBookings(int? bookingID, string? accommodationNumber)
+        {
+            string? roomNumber = string.IsNullOrWhiteSpace(accommodationNumber) ? null : accommodationNumber.Trim();
+
+            if (!bookingID.HasValue && roomNumber == null)
+            {
+                return Enumerable.Empty<Booking>();
+            }
+
+            DateTime today = DateTime.Today;
+
+            var query = _context.Set<Booking>()
+                .Include(b => b.Customer)
+                .Include(b => b.Accommodations)
+                    .ThenInclude(ba => ba.Accommodation)
+                        .ThenInclude(a => a.AccommodationType)
+                .Include(b => b.Rentals)
+                    .ThenInclude(r => r.RentalItems)
+                        .ThenInclude(r => r.EquipmentItem)
+                            .ThenInclude(ei => ei.Equipment)
+                                .ThenInclude(e => e.Prices)
+                .Where(b => b.BookingStatus != BookingStatus.Cancelled
+                         && b.BookingStatus != BookingStatus.Finished
+                         && b.CheckInStatus != CheckInStatus.CheckedOut);
+
+            if (bookingID.HasValue)
+            {
+                query = query.Where(b => b.BookingID == bookingID.Value);
+            }
+            else if (roomNumber != null)
+            {
+                query = query.Where(b => b.Accommodations.Any(ba =>
+                    ba.Accommodation.AccommodationNumber == roomNumber && ba.EndDate >= today));
+            }
+
+            return query
+                .AsSplitQuery()
+                .AsNoTracking()
+                .ToList();
+        }
+
+        /// <summary>
+        /// Updates a specific booking with a new status.
+        /// </summary>
+        /// <param name="bookingID"></param>
+        /// <param name="status"></param>
+        public void UpdateBookingStatus(int bookingID, BookingStatus status)
+        {
+            var booking = _context.Set<Booking>().Find(bookingID);
+
+            if (booking != null)
+            {
+                booking.BookingStatus = status;
+                _context.SaveChanges();
+            }
+        }
+
+        #endregion
+
+        #region Statistics & Invoices
+        /// <summary>
         /// Gets all bookings that are not cancelled and whose stay overlaps the period,
         /// with everything needed for occupancy and sales statistics.
         /// </summary>
@@ -175,68 +251,6 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
-        /// <summary>
-        /// Finds active room bookings by booking ID or accommodation (room) number.
-        /// A booking is active when it is preliminary or confirmed, the guest has not checked out,
-        /// and it has an accommodation stay that has not ended yet.
-        /// </summary>
-        /// <param name="bookingID">Optional booking ID to search for.</param>
-        /// <param name="accommodationNumber">Optional room number to search for, e.g. "LI1".</param>
-        public IEnumerable<Booking> FindActiveBookings(int? bookingID, string? accommodationNumber)
-        {
-            string? roomNumber = string.IsNullOrWhiteSpace(accommodationNumber) ? null : accommodationNumber.Trim();
-
-            if (!bookingID.HasValue && roomNumber == null)
-            {
-                return Enumerable.Empty<Booking>();
-            }
-
-            DateTime today = DateTime.Today;
-
-            var query = _context.Set<Booking>()
-                .Include(b => b.Customer)
-                .Include(b => b.Accommodations)
-                    .ThenInclude(ba => ba.Accommodation)
-                        .ThenInclude(a => a.AccommodationType)
-                .Include(b => b.Rentals)
-                    .ThenInclude(r => r.RentalItems)
-                        .ThenInclude(r => r.EquipmentItem)
-                            .ThenInclude(ei => ei.Equipment)
-                                .ThenInclude(e => e.Prices)
-                .Where(b => b.BookingStatus != BookingStatus.Cancelled
-                         && b.BookingStatus != BookingStatus.Finished
-                         && b.CheckInStatus != CheckInStatus.CheckedOut);
-
-            if (bookingID.HasValue)
-            {
-                query = query.Where(b => b.BookingID == bookingID.Value);
-            }
-            else if (roomNumber != null)
-            {
-                query = query.Where(b => b.Accommodations.Any(ba =>
-                    ba.Accommodation.AccommodationNumber == roomNumber && ba.EndDate >= today));
-            }
-
-            return query
-                .AsSplitQuery()
-                .AsNoTracking()
-                .ToList();
-        }
-
-        /// <summary>
-        /// Updates a specific booking with a new status.
-        /// </summary>
-        /// <param name="bookingID"></param>
-        /// <param name="status"></param>
-        public void UpdateBookingStatus(int bookingID, BookingStatus status)
-        {
-            var booking = _context.Set<Booking>().Find(bookingID);
-
-            if (booking != null)
-            {
-                booking.BookingStatus = status;
-                _context.SaveChanges();
-            }
-        }
+        #endregion
     }
 }
