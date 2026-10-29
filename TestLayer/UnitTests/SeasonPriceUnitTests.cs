@@ -13,6 +13,8 @@ namespace TestLayer.UnitTests
         private const string PriceType = "vecka";
         private const int Week = 8;
 
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<ISeasonPriceRepository> _mockSeasonPriceRepo;
         private Mock<IStaffRepository> _mockStaffRepo;
@@ -41,6 +43,10 @@ namespace TestLayer.UnitTests
             // The logged in user is static, so reset it between tests
             _loginController.Logout();
         }
+
+        #endregion
+
+        #region Helper Methods (Login & Mock Setup)
 
         /// <summary>
         /// Logs in a staff member with the given role through the LoginController using the mocked staff repository.
@@ -71,70 +77,9 @@ namespace TestLayer.UnitTests
             return existing;
         }
 
-        /// <summary>
-        /// Verifies that saving a new price adds a new row and never overwrites the historical price.
-        /// </summary>
-        [Test]
-        public void ChangeSeasonPrice_ValidNewPrice_AddsNewPriceAndKeepsHistoricalPrice()
-        {
-            // Arrange
-            Staff admin = LogInAs(staffRole.SystemAdmin);
-            SeasonPrice existing = CreateExistingPrice();
-            DateTime originalValidFrom = existing.ValidFrom;
+        #endregion
 
-            SeasonPrice? addedPrice = null;
-            _mockSeasonPriceRepo
-                .Setup(r => r.Add(It.IsAny<SeasonPrice>()))
-                .Callback<SeasonPrice>(price => addedPrice = price);
-
-            // Act
-            var (success, message) = _controller.ChangeSeasonPrice(AccommodationTypeId, PriceType, Week, 5000m);
-
-            // Assert
-            Assert.That(success, Is.True, message);
-
-            Assert.That(existing.Price, Is.EqualTo(4500m), "The historical price must not be changed.");
-            Assert.That(existing.ValidFrom, Is.EqualTo(originalValidFrom), "The historical date must not be changed.");
-
-            Assert.That(addedPrice, Is.Not.Null, "A new price row should be added.");
-            Assert.That(addedPrice!.Price, Is.EqualTo(5000m));
-            Assert.That(addedPrice.AccommodationTypeID, Is.EqualTo(AccommodationTypeId));
-            Assert.That(addedPrice.PriceType, Is.EqualTo(PriceType));
-            Assert.That(addedPrice.WeekNumber, Is.EqualTo(Week));
-            Assert.That(addedPrice.ValidFrom, Is.GreaterThan(originalValidFrom));
-            Assert.That(addedPrice.ChangedByStaffID, Is.EqualTo(admin.StaffID));
-            Assert.That(addedPrice, Is.Not.SameAs(existing));
-
-            // Verify
-            _mockSeasonPriceRepo.Verify(r => r.Add(It.IsAny<SeasonPrice>()), Times.Once);
-            _mockSeasonPriceRepo.Verify(r => r.Update(It.IsAny<SeasonPrice>()), Times.Never);
-            _mockSeasonPriceRepo.Verify(r => r.UpdatePrice(It.IsAny<SeasonPrice>()), Times.Never);
-            _mockSeasonPriceRepo.Verify(r => r.Delete(It.IsAny<SeasonPrice>()), Times.Never);
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
-        }
-
-        /// <summary>
-        /// Verifies that negative and zero prices are rejected and nothing is saved.
-        /// </summary>
-        [Test]
-        [TestCase(-100)]
-        [TestCase(0)]
-        public void ChangeSeasonPrice_NegativeOrZeroPrice_ReturnsFalse(decimal invalidPrice)
-        {
-            // Arrange
-            LogInAs(staffRole.SystemAdmin);
-            CreateExistingPrice();
-
-            // Act
-            var (success, _) = _controller.ChangeSeasonPrice(AccommodationTypeId, PriceType, Week, invalidPrice);
-
-            // Assert
-            Assert.That(success, Is.False, "Expected negative or zero price to be rejected.");
-
-            // Verify
-            _mockSeasonPriceRepo.Verify(r => r.Add(It.IsAny<SeasonPrice>()), Times.Never);
-            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
-        }
+        #region Authorization Tests
 
         /// <summary>
         /// Verifies that staff without the SystemAdmin role cannot change season prices.
@@ -177,6 +122,33 @@ namespace TestLayer.UnitTests
 
             // Verify
             _mockSeasonPriceRepo.Verify(r => r.Add(It.IsAny<SeasonPrice>()), Times.Never);
+        }
+
+        #endregion
+
+        #region Validation Tests (Sad Paths)
+
+        /// <summary>
+        /// Verifies that negative and zero prices are rejected and nothing is saved.
+        /// </summary>
+        [Test]
+        [TestCase(-100)]
+        [TestCase(0)]
+        public void ChangeSeasonPrice_NegativeOrZeroPrice_ReturnsFalse(decimal invalidPrice)
+        {
+            // Arrange
+            LogInAs(staffRole.SystemAdmin);
+            CreateExistingPrice();
+
+            // Act
+            var (success, _) = _controller.ChangeSeasonPrice(AccommodationTypeId, PriceType, Week, invalidPrice);
+
+            // Assert
+            Assert.That(success, Is.False, "Expected negative or zero price to be rejected.");
+
+            // Verify
+            _mockSeasonPriceRepo.Verify(r => r.Add(It.IsAny<SeasonPrice>()), Times.Never);
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
 
         /// <summary>
@@ -223,5 +195,53 @@ namespace TestLayer.UnitTests
             _mockSeasonPriceRepo.Verify(r => r.GetSeasonPrice(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<int>()), Times.Never);
             _mockSeasonPriceRepo.Verify(r => r.Add(It.IsAny<SeasonPrice>()), Times.Never);
         }
+
+        #endregion
+
+        #region Core Logic & Database Save
+
+        /// <summary>
+        /// Verifies that saving a new price adds a new row and never overwrites the historical price.
+        /// </summary>
+        [Test]
+        public void ChangeSeasonPrice_ValidNewPrice_AddsNewPriceAndKeepsHistoricalPrice()
+        {
+            // Arrange
+            Staff admin = LogInAs(staffRole.SystemAdmin);
+            SeasonPrice existing = CreateExistingPrice();
+            DateTime originalValidFrom = existing.ValidFrom;
+
+            SeasonPrice? addedPrice = null;
+            _mockSeasonPriceRepo
+                .Setup(r => r.Add(It.IsAny<SeasonPrice>()))
+                .Callback<SeasonPrice>(price => addedPrice = price);
+
+            // Act
+            var (success, message) = _controller.ChangeSeasonPrice(AccommodationTypeId, PriceType, Week, 5000m);
+
+            // Assert
+            Assert.That(success, Is.True, message);
+
+            Assert.That(existing.Price, Is.EqualTo(4500m), "The historical price must not be changed.");
+            Assert.That(existing.ValidFrom, Is.EqualTo(originalValidFrom), "The historical date must not be changed.");
+
+            Assert.That(addedPrice, Is.Not.Null, "A new price row should be added.");
+            Assert.That(addedPrice!.Price, Is.EqualTo(5000m));
+            Assert.That(addedPrice.AccommodationTypeID, Is.EqualTo(AccommodationTypeId));
+            Assert.That(addedPrice.PriceType, Is.EqualTo(PriceType));
+            Assert.That(addedPrice.WeekNumber, Is.EqualTo(Week));
+            Assert.That(addedPrice.ValidFrom, Is.GreaterThan(originalValidFrom));
+            Assert.That(addedPrice.ChangedByStaffID, Is.EqualTo(admin.StaffID));
+            Assert.That(addedPrice, Is.Not.SameAs(existing));
+
+            // Verify
+            _mockSeasonPriceRepo.Verify(r => r.Add(It.IsAny<SeasonPrice>()), Times.Once);
+            _mockSeasonPriceRepo.Verify(r => r.Update(It.IsAny<SeasonPrice>()), Times.Never);
+            _mockSeasonPriceRepo.Verify(r => r.UpdatePrice(It.IsAny<SeasonPrice>()), Times.Never);
+            _mockSeasonPriceRepo.Verify(r => r.Delete(It.IsAny<SeasonPrice>()), Times.Never);
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
+        }
+
+        #endregion
     }
 }

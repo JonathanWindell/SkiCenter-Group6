@@ -6,12 +6,17 @@ namespace DataLayer.Repositories
 {
     public class SkiLessonRepository : Repository<SkiLesson>, ISkiLessonRepository
     {
+        #region Constructor & Fields
         private readonly SkiCenterDbContext _context;
 
         public SkiLessonRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Mulitple Queries
 
         /// <summary>
         /// Gets all ski lessons matching a specific difficulty level.
@@ -46,17 +51,7 @@ namespace DataLayer.Repositories
                 .FirstOrDefault(lesson => lesson.Level == level && lesson.Days == days);
         }
 
-        /// <summary>
-        /// Gets a ski lesson by its identifier including all associated sessions and participants.
-        /// </summary>
-        /// <param name="skiLessonId">The ski lesson identifier.</param>
-        public SkiLesson? GetLessonWithSessionsAndBookings(int skiLessonId)
-        {
-            return _context.Set<SkiLesson>()
-                .Include(lesson => lesson.Sessions)
-                    .ThenInclude(session => session.Participants)
-                .FirstOrDefault(lesson => lesson.SkiLessonID == skiLessonId);
-        }
+
 
         /// <summary>
         /// Gets all ski lessons with their sessions and bookings for a specific calendar week.
@@ -86,6 +81,10 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        #endregion
+
+        #region Ski Lessons with Participants & Bookings
+
         /// <summary>
         /// Gets the current number of booked participants for a specific session.
         /// </summary>
@@ -109,5 +108,19 @@ namespace DataLayer.Repositories
                         .ThenInclude(b => b.Customer)
                 .FirstOrDefault(s => s.SkiLessonSessionID == sessionId);
         }
+
+        /// <summary>
+        /// Gets a ski lesson by its identifier including all associated sessions and participants.
+        /// </summary>
+        /// <param name="skiLessonId">The ski lesson identifier.</param>
+        public SkiLesson? GetLessonWithSessionsAndBookings(int skiLessonId)
+        {
+            return _context.Set<SkiLesson>()
+                .Include(lesson => lesson.Sessions)
+                    .ThenInclude(session => session.Participants)
+                .FirstOrDefault(lesson => lesson.SkiLessonID == skiLessonId);
+        }
+
+        #endregion
     }
 }

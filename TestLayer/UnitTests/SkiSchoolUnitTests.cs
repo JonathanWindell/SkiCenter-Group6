@@ -9,6 +9,8 @@ namespace TestLayer.UnitTests
     [Category("Unit")]
     public class SkiSchoolUnitTests
     {
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<ISkiLessonRepository> _mockSkiLessonRepo;
         private Mock<IBookingRepository> _mockBookingRepo;
@@ -27,6 +29,10 @@ namespace TestLayer.UnitTests
             _controller = new SkiSchoolController(_mockUnitOfWork.Object);
         }
 
+        #endregion
+
+        #region Book Participant
+
         /// <summary>
         /// Verifies that booking with invalid IDs immediately returns false without repository queries.
         /// </summary>
@@ -37,10 +43,11 @@ namespace TestLayer.UnitTests
         public void BookParticipant_InvalidIdentifiers_ReturnsFalse(int bookingId, int sessionId)
         {
             // Act
-            var result = _controller.BookParticipant(bookingId, sessionId);
+            var (success, message) = _controller.BookParticipant(bookingId, sessionId);
 
             // Assert
-            Assert.That(result, Is.False);
+            Assert.That(success, Is.False);
+            Assert.That(message, Does.Contain("Ogiltigt"));
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
 
@@ -51,13 +58,13 @@ namespace TestLayer.UnitTests
         public void BookParticipant_NonExistentBooking_ReturnsFalse()
         {
             // Arrange
-            _mockBookingRepo.Setup(r => r.GetByID(It.IsAny<int>())).Returns((Booking)null);
+            _mockBookingRepo.Setup(r => r.GetByID(It.IsAny<int>())).Returns((Booking)null!);
 
             // Act
-            var result = _controller.BookParticipant(1, 10);
+            var (success, _) = _controller.BookParticipant(1, 10);
 
             // Assert
-            Assert.That(result, Is.False);
+            Assert.That(success, Is.False);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
 
@@ -71,7 +78,16 @@ namespace TestLayer.UnitTests
             int bookingId = 100;
             int sessionId = 200;
 
-            var booking = new Booking { BookingID = bookingId, TotalAmount = 1000m };
+            // Måste ha ett boende kopplat för att passera kontrollerns validering "kunden är på plats"
+            var booking = new Booking
+            {
+                BookingID = bookingId,
+                TotalAmount = 1000m,
+                Accommodations = new List<BookingAccommodation>
+                {
+                    new BookingAccommodation { StartDate = DateTime.Today, EndDate = DateTime.Today.AddDays(7) }
+                }
+            };
             _mockBookingRepo.Setup(r => r.GetByID(bookingId)).Returns(booking);
 
             var lesson = new SkiLesson("Grön", "mån-ons", 10, 400m);
@@ -79,15 +95,13 @@ namespace TestLayer.UnitTests
             lesson.Sessions.Add(session);
 
             _mockSkiLessonRepo.Setup(r => r.GetAll()).Returns(new List<SkiLesson> { lesson });
-
-            // Mock that ski lesson session is full
-            _mockSkiLessonRepo.Setup(r => r.GetBookedParticipantCount(sessionId)).Returns(10);
+            _mockSkiLessonRepo.Setup(r => r.GetBookedParticipantCount(sessionId)).Returns(10); // Session is full
 
             // Act
-            var result = _controller.BookParticipant(bookingId, sessionId);
+            var (success, _) = _controller.BookParticipant(bookingId, sessionId);
 
             // Assert
-            Assert.That(result, Is.False, "Should refuse booking when session capacity has reached maximum.");
+            Assert.That(success, Is.False, "Should refuse booking when session capacity has reached maximum.");
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
 
@@ -103,7 +117,15 @@ namespace TestLayer.UnitTests
             decimal initialAmount = 2500m;
             decimal lessonPrice = 455m;
 
-            var booking = new Booking { BookingID = bookingId, TotalAmount = initialAmount };
+            var booking = new Booking
+            {
+                BookingID = bookingId,
+                TotalAmount = initialAmount,
+                Accommodations = new List<BookingAccommodation>
+                {
+                    new BookingAccommodation { StartDate = new DateTime(2026, 1, 5), EndDate = new DateTime(2026, 1, 11) }
+                }
+            };
             _mockBookingRepo.Setup(r => r.GetByID(bookingId)).Returns(booking);
 
             var lesson = new SkiLesson("Svart", "mån-ons", 10, lessonPrice);
@@ -111,18 +133,22 @@ namespace TestLayer.UnitTests
             lesson.Sessions.Add(session);
 
             _mockSkiLessonRepo.Setup(r => r.GetAll()).Returns(new List<SkiLesson> { lesson });
-            _mockSkiLessonRepo.Setup(r => r.GetBookedParticipantCount(sessionId)).Returns(3); // 3 av 10 platser tagna
+            _mockSkiLessonRepo.Setup(r => r.GetBookedParticipantCount(sessionId)).Returns(3);
             _mockUnitOfWork.Setup(u => u.Complete()).Returns(1);
 
             // Act
-            var result = _controller.BookParticipant(bookingId, sessionId);
+            var (success, message) = _controller.BookParticipant(bookingId, sessionId);
 
             // Assert
-            Assert.That(result, Is.True);
-            Assert.That(booking.TotalAmount, Is.EqualTo(initialAmount + lessonPrice), "The lesson price must be added to the booking.");
+            Assert.That(success, Is.True, $"Misslyckades med fel: {message}");
+            Assert.That(booking.TotalAmount, Is.EqualTo(initialAmount + lessonPrice));
             Assert.That(booking.SkiLessons.Any(sl => sl.SkiLessonSessionID == sessionId), Is.True);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
         }
+
+        #endregion
+
+        #region Cancel Participant
 
         /// <summary>
         /// Verifies that canceling a participant deducts the course fee and removes the participant.
@@ -168,6 +194,27 @@ namespace TestLayer.UnitTests
         }
 
         /// <summary>
+        /// Verifies that attempting to cancel a non-existent participant returns false safely.
+        /// </summary>
+        [Test]
+        public void CancelParticipant_NonExistentParticipant_ReturnsFalse()
+        {
+            // Arrange
+            _mockSkiLessonRepo.Setup(r => r.GetAll()).Returns(new List<SkiLesson>());
+
+            // Act
+            bool result = _controller.CancelParticipant(999);
+
+            // Assert
+            Assert.That(result, Is.False, "Should safely return false if the participant is not found.");
+            _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
+        }
+
+        #endregion
+
+        #region Capacity & Availability
+
+        /// <summary>
         /// Verifies that IsSessionAvailable properly checks against the maximum participant threshold.
         /// </summary>
         [TestCase(9, 10, true)]
@@ -191,5 +238,7 @@ namespace TestLayer.UnitTests
             // Assert
             Assert.That(result, Is.EqualTo(expectedAvailable));
         }
+
+        #endregion
     }
 }

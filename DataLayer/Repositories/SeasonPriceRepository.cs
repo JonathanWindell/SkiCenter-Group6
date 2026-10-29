@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {
-    /// <summary>
-    /// Season prices are stored as history. Every price change is a new row, and the row with
-    /// the latest ValidFrom for an accommodation type, price type and week is the current price.
-    /// </summary>
     public class SeasonPriceRepository : Repository<SeasonPrice>, ISeasonPriceRepository
     {
+        #region Constructor & Fields
+
         private readonly SkiCenterDbContext _context;
 
         public SeasonPriceRepository(SkiCenterDbContext context) : base(context)
@@ -17,13 +15,17 @@ namespace DataLayer.Repositories
             _context = context;
         }
 
+        #endregion
+
+        #region Current Price Queries
+
         /// <summary>
         /// Gets the current season price for a specific accommodation type, price type and week.
         /// </summary>
         /// <param name="accommodationTypeId"></param>
         /// <param name="priceType"></param>
         /// <param name="week"></param>
-        public SeasonPrice GetSeasonPrice(int accommodationTypeId, string priceType, int week)
+        public SeasonPrice? GetSeasonPrice(int accommodationTypeId, string priceType, int week)
         {
             if (accommodationTypeId <= 0 || string.IsNullOrWhiteSpace(priceType) || week <= 0)
             {
@@ -39,16 +41,6 @@ namespace DataLayer.Repositories
                 .ThenByDescending(sp => sp.SeasonPriceID)
                 .AsNoTracking()
                 .FirstOrDefault();
-        }
-
-        /// <summary>
-        /// Updates a specific season price.
-        /// Note: overwrites the price history. Use Add with a new SeasonPrice to register a price change.
-        /// </summary>
-        /// <param name="seasonPrice"></param>
-        public void UpdatePrice(SeasonPrice seasonPrice)
-        {
-            _context.Set<SeasonPrice>().Update(seasonPrice);
         }
 
         /// <summary>
@@ -122,6 +114,10 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        #endregion
+
+        #region Price History Queries
+
         /// <summary>
         /// Gets every registered price for an accommodation type, price type and week, newest first.
         /// </summary>
@@ -144,5 +140,21 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        #endregion
+
+        #region Update Operations
+
+        /// <summary>
+        /// Updates a specific season price.
+        /// Note: overwrites the price history. Use Add with a new SeasonPrice to register a price change.
+        /// </summary>
+        /// <param name="seasonPrice"></param>
+        public void UpdatePrice(SeasonPrice seasonPrice)
+        {
+            _context.Set<SeasonPrice>().Update(seasonPrice);
+        }
+
+        #endregion
     }
 }

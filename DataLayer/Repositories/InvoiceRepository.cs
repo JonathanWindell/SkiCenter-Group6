@@ -5,12 +5,15 @@ namespace DataLayer.Repositories
 {
     public class InvoiceRepository : Repository<Invoice>, IInvoiceRepository
     {
+        #region Constructor & Fields
         private readonly SkiCenterDbContext _context;
 
         public InvoiceRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
 
         /// <summary>
         /// Gets a specific booking with all its associated data and calculates total price using AmountExcl and Moms

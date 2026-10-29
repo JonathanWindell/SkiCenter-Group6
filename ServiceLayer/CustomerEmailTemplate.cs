@@ -80,7 +80,7 @@ namespace ServiceLayer
                 sb.AppendLine("</ul>");
             }
 
-            // Create- Meeting Rooms
+            // Create - Meeting Rooms
             if (booking.MeetingRooms != null && booking.MeetingRooms.Any())
             {
                 sb.AppendLine("<h3>Bokat mötesrum</h3>");
