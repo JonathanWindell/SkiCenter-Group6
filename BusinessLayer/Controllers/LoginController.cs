@@ -37,6 +37,12 @@ namespace BusinessLayer.Controllers
 
             Staff? foundStaff = AuthenticateUser(email, plainTextPassword);
 
+            // Deactivated accounts (quit, dismissed or on leave) may not log in
+            if (foundStaff != null && !foundStaff.IsActive)
+            {
+                return (null, "Kontot är inaktiverat. Kontakta systemadministratören.");
+            }
+
             if (foundStaff != null)
             {
                 CurrentLoggedInUser = foundStaff;

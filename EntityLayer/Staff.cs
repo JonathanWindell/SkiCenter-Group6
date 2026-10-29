@@ -31,6 +31,11 @@ namespace EntityLayer
 
         public staffRole Role { get; set; }
 
+        // False when the account is deactivated, e.g. the person has quit, been dismissed or is on leave.
+        // Deactivated accounts cannot log in, but stay in the database so their history is kept.
+        [Required]
+        public bool IsActive { get; set; } = true;
+
         public virtual ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 
         // Parameterless constructor for EF

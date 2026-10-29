@@ -9,5 +9,8 @@ namespace DataLayer.Interfaces
 
         // Defines method EmailExists
         bool EmailExists(string email);
+
+        // Gets every staff account, active and deactivated
+        IEnumerable<Staff> GetAllStaff();
     }
 }
