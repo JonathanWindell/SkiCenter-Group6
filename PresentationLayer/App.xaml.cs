@@ -18,6 +18,8 @@ namespace PresentationLayer
     /// </summary>
     public partial class App : Application
     {
+        #region Dependency injection
+
         private readonly ServiceProvider _serviceProvider;
 
         /// <summary>
@@ -104,6 +106,10 @@ namespace PresentationLayer
             services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
 
+        #endregion
+
+        #region Startup
+
         /// <summary>
         /// Opens the login window when the application starts.
         /// </summary>
@@ -115,5 +121,7 @@ namespace PresentationLayer
             var loginWindow = Services.GetRequiredService<LoginView>();
             loginWindow.Show();
         }
+
+        #endregion
     }
 }

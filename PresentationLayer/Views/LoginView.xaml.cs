@@ -14,6 +14,8 @@ namespace PresentationLayer.Views
     /// 
     public partial class LoginView : Window
     {
+        #region Fields and constructor
+
         private readonly LoginController _loginController;
         private readonly IServiceProvider _serviceProvider;
 
@@ -32,6 +34,10 @@ namespace PresentationLayer.Views
             _serviceProvider = serviceProvider;
         }
 
+        #endregion
+
+        #region Window dragging
+
         /// <summary>
         /// Allows the user to move the window by clicking and dragging the background.
         /// </summary>
@@ -46,6 +52,10 @@ namespace PresentationLayer.Views
             StartSignUpTransition();
         }
         */
+
+        #endregion
+
+        #region Login and transitions
 
         /// <summary>
         /// Validates credentials against the controller and transitions to the main menu on success,
@@ -124,6 +134,10 @@ namespace PresentationLayer.Views
             OpenDashboard();
         }
 
+        #endregion
+
+        #region Quick login (TEMP)
+
         /// <summary>
         /// TEMP: Test button. Logs in as the system admin test account and opens the dashboard
         /// directly, without the loading and window animations. Remove before release.
@@ -140,6 +154,10 @@ namespace PresentationLayer.Views
 
             OpenDashboard();
         }
+
+        #endregion
+
+        #region Dashboard and window controls
 
         /// <summary>
         /// Opens the dashboard at the same screen position and closes the login window.
@@ -159,5 +177,7 @@ namespace PresentationLayer.Views
 
         private void btnMinimize_Click(object sender, RoutedEventArgs e) => this.WindowState = WindowState.Minimized;
         private void btnClose_Click(object sender, RoutedEventArgs e) => Application.Current.Shutdown();
+
+        #endregion
     }
 }

@@ -12,6 +12,8 @@ namespace PresentationLayer.Views
 {
     public partial class BookingStatusView : Window
     {
+        #region Fields and constructor
+
         private readonly ObservableCollection<BookingStatusRow> _bookings = new();
         private readonly BookingController _bookingController;
 
@@ -36,6 +38,10 @@ namespace PresentationLayer.Views
             PopulateFilters();
             UpdateBookingCount();
         }
+
+        #endregion
+
+        #region Loading and filters
 
         private void LoadBookingData()
         {
@@ -150,6 +156,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Booking selection
+
         private void BookingsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ShowBookingDetailsButton.IsEnabled = BookingsDataGrid.SelectedItem is BookingStatusRow;
@@ -188,10 +198,18 @@ namespace PresentationLayer.Views
             OpenSelectedBookingDetails();
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
+
+        #region Helpers
 
         private void ResetFiltersButton_Click(object sender, RoutedEventArgs e)
         {
@@ -243,5 +261,7 @@ namespace PresentationLayer.Views
                 _ => $"{count} bokningar"
             };
         }
+
+        #endregion
     }
 }

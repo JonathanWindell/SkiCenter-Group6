@@ -7,6 +7,8 @@ namespace BusinessLayer
 {
     public class BookingController
     {
+        #region Fields and constructor
+
         // Price for cancellation insurance on a booking
         public const decimal CancellationInsurancePrice = 300m;
 
@@ -16,6 +18,10 @@ namespace BusinessLayer
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Booking queries
 
         /// <summary>
         /// Retrieves all bookings with their navigation properties.
@@ -88,6 +94,10 @@ namespace BusinessLayer
             return _unitOfWork.Booking.GetBookingsByCustomer(customerId);
         }
 
+        #endregion
+
+        #region Availability
+
         /// <summary>
         /// Retrieves available accommodations for the selected dates
         /// and number of guests.
@@ -153,6 +163,9 @@ namespace BusinessLayer
                 bookingId);
         }
 
+        #endregion
+
+        #region Pricing and discounts
 
         /// <summary>
         /// Calculates the accommodation price using existing season prices.
@@ -321,6 +334,10 @@ namespace BusinessLayer
 
             return 0m;
         }
+
+        #endregion
+
+        #region Create and edit booking
 
         /// <summary>
         /// Creates a new accommodation booking and saves it to the database.
@@ -644,6 +661,10 @@ namespace BusinessLayer
             }
         }
 
+        #endregion
+
+        #region Check-in and payment
+
         /// <summary>
         /// Updates the check-in status of a specific booking.
         /// </summary>
@@ -712,6 +733,9 @@ namespace BusinessLayer
         }
         */
 
+        #endregion
+
+        #region Cancellation
 
         /// <summary>
         /// Cancels a booking while keeping it in the customer's history.
@@ -814,6 +838,10 @@ namespace BusinessLayer
                 MidpointRounding.AwayFromZero);
         }
 
+        #endregion
+
+        #region Booking confirmation
+
         /// <summary>
         /// Confirms all preliminary bookings for an approved corporate customer.
         /// </summary>
@@ -840,6 +868,10 @@ namespace BusinessLayer
 
             return confirmedCount;
         }
+
+        #endregion
+
+        #region Price summary
 
         /// <summary>
         /// Calulates total price for each service with VatRates.
@@ -921,6 +953,10 @@ namespace BusinessLayer
 
             return (totalInclVat, totalExclVat, totalVat, accomVat, otherVat);
         }
+
+        #endregion
+
+        #region Meeting rooms
 
         /// <summary>
         /// Adds a meeting room to an existing booking.
@@ -1011,5 +1047,7 @@ namespace BusinessLayer
                 _unitOfWork.Complete();
             }
         }
+
+        #endregion
     }
 }

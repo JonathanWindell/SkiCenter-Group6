@@ -8,6 +8,8 @@ namespace PresentationLayer.Views
 {
     public partial class CustomerRegistrationView : Window
     {
+        #region Fields and constructor
+
         private readonly CustomerController _customerController;
 
         public CustomerRegistrationView(CustomerController customerController)
@@ -15,6 +17,10 @@ namespace PresentationLayer.Views
             InitializeComponent();
             _customerController = customerController;
         }
+
+        #endregion
+
+        #region Validation helpers
 
         private void ShowFieldError(TextBlock errorBlock, string message)
         {
@@ -43,6 +49,10 @@ namespace PresentationLayer.Views
             ValidationMessage.Foreground = Brushes.Red;
             ValidationMessage.Visibility = Visibility.Visible;
         }
+
+        #endregion
+
+        #region Customer type
 
         private void CustomerTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -75,6 +85,10 @@ namespace PresentationLayer.Views
                 ? Visibility.Collapsed
                 : Visibility.Visible;
         }
+
+        #endregion
+
+        #region Form actions
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
@@ -213,5 +227,7 @@ namespace PresentationLayer.Views
                 ShowValidationError("Kunde inte spara kunden. Kontrollera om e-post/telefon redan finns registrerat.");
             }
         }
+
+        #endregion
     }
 }

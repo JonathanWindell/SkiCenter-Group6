@@ -11,6 +11,8 @@ namespace PresentationLayer.Views
     public partial class BookingDetailsView : Window
     {
         private Booking _booking;
+        #region Fields and constructor
+
         private readonly IServiceProvider _serviceProvider;
 
         public BookingDetailsView(IServiceProvider serviceProvider, Booking booking)
@@ -31,6 +33,10 @@ namespace PresentationLayer.Views
             UpdateButtonStates();
             UpdateVatDisplay();
         }
+
+        #endregion
+
+        #region Booking display
 
         /// <summary>
         /// Updates cancellation and editing button availability.
@@ -116,6 +122,10 @@ namespace PresentationLayer.Views
             UpdateButtonStates();
         }
 
+        #endregion
+
+        #region Add to booking
+
         /// <summary>
         /// Opens the ski school window.
         /// </summary>
@@ -199,6 +209,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Booking confirmation
+
         /// <summary>
         /// Sends the booking confirmation by email.
         /// </summary>
@@ -261,6 +275,10 @@ namespace PresentationLayer.Views
                 btn.IsEnabled = true;
             }
         }
+
+        #endregion
+
+        #region Cancel and edit booking
 
         /// <summary>
         /// Cancels a booking and updates its displayed status.
@@ -405,6 +423,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation
+
         /// <summary>
         /// Closes the booking details window.
         /// </summary>
@@ -414,6 +436,8 @@ namespace PresentationLayer.Views
         {
             Close();
         }
+
+        #endregion
     }
 
     // Converts booking statuses to Swedish display text.

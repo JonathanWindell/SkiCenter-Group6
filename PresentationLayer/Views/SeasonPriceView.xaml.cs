@@ -13,6 +13,8 @@ namespace PresentationLayer.Views
     /// </summary>
     public partial class SeasonPriceView : Window
     {
+        #region Fields and constructor
+
         private static readonly Brush ErrorBrush = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
         private static readonly Brush SuccessBrush = new SolidColorBrush(Color.FromRgb(0x16, 0xA3, 0x4A));
 
@@ -30,6 +32,10 @@ namespace PresentationLayer.Views
 
             Loaded += SeasonPriceView_Loaded;
         }
+
+        #endregion
+
+        #region Access and loading
 
         /// <summary>
         /// Checks access before showing any data. Only system administrators may use this view.
@@ -145,6 +151,10 @@ namespace PresentationLayer.Views
             LoadPrices();
         }
 
+        #endregion
+
+        #region Selection and history
+
         /// <summary>
         /// Shows the selected price in the edit panel together with its history.
         /// </summary>
@@ -193,6 +203,10 @@ namespace PresentationLayer.Views
             SavePriceButton.IsEnabled = false;
             HistoryDataGrid.ItemsSource = null;
         }
+
+        #endregion
+
+        #region Save price
 
         /// <summary>
         /// Validates the entered price and registers it as a new price for the selected row.
@@ -292,10 +306,16 @@ namespace PresentationLayer.Views
             PriceFeedbackTextBlock.Foreground = isError ? ErrorBrush : SuccessBrush;
         }
 
+        #endregion
+
+        #region Navigation
+
         // Close this window and return to the dashboard.
         private void BackButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
     }
 }

@@ -14,6 +14,8 @@ namespace PresentationLayer.Controls
     /// </summary>
     public partial class BarChart : UserControl
     {
+        #region Fields and constructor
+
         private static readonly Brush PreviousBrush = new SolidColorBrush(Color.FromRgb(0x52, 0xB7, 0x88));
 
         public BarChart()
@@ -26,6 +28,10 @@ namespace PresentationLayer.Controls
             get => TitleTextBlock.Text;
             set => TitleTextBlock.Text = value;
         }
+
+        #endregion
+
+        #region Drawing
 
         /// <summary>
         /// Draws the chart.
@@ -136,5 +142,7 @@ namespace PresentationLayer.Controls
             Grid.SetColumn(holder, column);
             return holder;
         }
+
+        #endregion
     }
 }

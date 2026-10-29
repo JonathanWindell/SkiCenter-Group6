@@ -19,6 +19,8 @@ namespace PresentationLayer.Views
     /// </summary>
     public partial class StatisticsView : Window
     {
+        #region Fields and constructor
+
         private static readonly CultureInfo Swedish = CultureInfo.GetCultureInfo("sv-SE");
 
         private readonly StatisticsController _statisticsController;
@@ -48,6 +50,10 @@ namespace PresentationLayer.Views
 
             Loaded += StatisticsView_Loaded;
         }
+
+        #endregion
+
+        #region Filters
 
         /// <summary>
         /// Checks access, fills the filters and shows the default period.
@@ -112,6 +118,10 @@ namespace PresentationLayer.Views
 
             AccommodationTypeComboBox.SelectedIndex = 0;
         }
+
+        #endregion
+
+        #region Statistics display
 
         /// <summary>
         /// Loads the statistics for the selected filters and updates tiles, charts and table.
@@ -231,6 +241,10 @@ namespace PresentationLayer.Views
                 .ToList();
         }
 
+        #endregion
+
+        #region PDF reports
+
         /// <summary>
         /// Saves the statistics currently shown, with the same filters, as a PDF.
         /// </summary>
@@ -307,6 +321,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Formatting helpers
+
         private static string MonthLabel(DateTime month) => Swedish.TextInfo.ToTitleCase(month.ToString("MMMM yyyy", Swedish));
 
         private static string ShortMonthLabel(DateTime month) => month.ToString("MMM yy", Swedish);
@@ -336,10 +354,16 @@ namespace PresentationLayer.Views
             return value.ToString("0", Swedish);
         }
 
+        #endregion
+
+        #region Navigation
+
         // Close this window and return to the dashboard.
         private void BackButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
     }
 }

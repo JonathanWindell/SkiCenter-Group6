@@ -7,6 +7,8 @@ namespace PresentationLayer.Views
 {
     public partial class MeetingRoomBookingView : Window
     {
+        #region Fields and constructor
+
         private readonly IServiceProvider _serviceProvider;
         private Booking _booking;
 
@@ -31,6 +33,10 @@ namespace PresentationLayer.Views
             // Load roms that are coupled to booking.
             LoadBookedRooms();
         }
+
+        #endregion
+
+        #region Meeting rooms
 
         /// <summary>
         /// Gets all meeting rooms coupled to booking. 
@@ -125,9 +131,15 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
     }
 }

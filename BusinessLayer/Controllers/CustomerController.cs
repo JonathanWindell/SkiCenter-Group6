@@ -5,12 +5,18 @@ namespace BusinessLayer.Controllers
 {
     public class CustomerController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         public CustomerController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Customer queries
 
         /// <summary>
         /// Get all registered customers with all associated booking data.
@@ -45,6 +51,10 @@ namespace BusinessLayer.Controllers
         {
             return _unitOfWork.Customer.GetAllCorporateCustomers();
         }
+
+        #endregion
+
+        #region Registration
 
         /// <summary>
         /// Validates and creates a new PrivateCustomer with a default credit limit of 12000 kr.
@@ -128,6 +138,10 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Complete() > 0;
         }
 
+        #endregion
+
+        #region Updates and deletion
+
         /// <summary>
         /// Updates terms and approval status för a specific CorporateCustomer.
         /// </summary>
@@ -206,6 +220,10 @@ namespace BusinessLayer.Controllers
             return _unitOfWork.Complete() > 0;
         }
 
+        #endregion
+
+        #region Discounts and validation
+
         /// <summary>
         /// Checks if customer qualifies for recurring booking discount (8%).
         /// Eligble for PrivateCustomers that has made a booking the last 365 days.
@@ -236,6 +254,10 @@ namespace BusinessLayer.Controllers
 
             return email.Contains('@') && !email.StartsWith("@") && !email.EndsWith('@');
         }
+
+        #endregion
+
+        #region GDPR
 
         /// <summary>
         /// Anonymise customers personal information. Ensures that historical and financial data is kept intact. 
@@ -281,5 +303,7 @@ namespace BusinessLayer.Controllers
 
             return (false, "Ett databasfel uppstod när kunden skulle anonymiseras.");
         }
+
+        #endregion
     }
 }

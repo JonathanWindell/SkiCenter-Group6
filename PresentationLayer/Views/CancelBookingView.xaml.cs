@@ -4,6 +4,8 @@ namespace PresentationLayer.Views
 {
     public partial class CancelBookingView : Window
     {
+        #region Constructor
+
         public CancelBookingView(
         string bookingSummary,
         string refundInformation)
@@ -21,6 +23,10 @@ namespace PresentationLayer.Views
             Loaded += (_, _) => KeepBookingButton.Focus();
         }
 
+        #endregion
+
+        #region Actions
+
         private void KeepBookingButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
@@ -31,5 +37,7 @@ namespace PresentationLayer.Views
             // Return confirmation to the booking view.
             DialogResult = true;
         }
+
+        #endregion
     }
 }
