@@ -10,6 +10,8 @@ namespace PresentationLayer.Views
 {
     public partial class MarketingMgmtView : Window
     {
+        #region Fields and constructor
+
         private readonly CustomerController _customerController;
         private readonly BookingController _bookingController;
         private readonly ObservableCollection<CorporateCustomerRow> _customers = new();
@@ -29,6 +31,10 @@ namespace PresentationLayer.Views
 
             LoadData();
         }
+
+        #endregion
+
+        #region Loading and filters
 
         private void LoadData()
         {
@@ -104,6 +110,10 @@ namespace PresentationLayer.Views
             };
         }
 
+        #endregion
+
+        #region Approve corporate customers
+
         // Saves all changes made in the page in one go
         private void SaveRowsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -159,9 +169,15 @@ namespace PresentationLayer.Views
             LoadData();
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
     }
 }

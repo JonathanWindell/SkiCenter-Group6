@@ -8,6 +8,8 @@ namespace PresentationLayer.Views
 {
     public partial class EditBookingView : Window
     {
+        #region Fields and constructor
+
         private readonly Booking _booking;
         private readonly BookingController _bookingController;
 
@@ -71,6 +73,10 @@ namespace PresentationLayer.Views
 
             SaveChangesButton.IsEnabled = false;
         }
+
+        #endregion
+
+        #region Validation
 
         private void ClearSearch()
         {
@@ -193,6 +199,10 @@ namespace PresentationLayer.Views
             return true;
         }
 
+        #endregion
+
+        #region Accommodation search
+
         private void SearchAccommodationButton_Click(
             object sender,
             RoutedEventArgs e)
@@ -252,6 +262,10 @@ namespace PresentationLayer.Views
                     MessageBoxImage.Error);
             }
         }
+
+        #endregion
+
+        #region Save changes
 
         private void SaveChangesButton_Click(
             object sender,
@@ -448,6 +462,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Navigation and helpers
+
         private void CancelButton_Click(
             object sender,
             RoutedEventArgs e)
@@ -463,5 +481,7 @@ namespace PresentationLayer.Views
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
         }
+
+        #endregion
     }
 }

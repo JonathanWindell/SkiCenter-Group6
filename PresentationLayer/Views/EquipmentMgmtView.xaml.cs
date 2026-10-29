@@ -11,6 +11,8 @@ namespace PresentationLayer.Views
 {
     public partial class EquipmentMgmtView : Window
     {
+        #region Fields and constructor
+
         private readonly ObservableCollection<EquipmentItem> _previewItems = new();
         private readonly SkiShopController _skiShopController;
         private List<Equipment> _equipmentModels = new();
@@ -61,6 +63,10 @@ namespace PresentationLayer.Views
             EditEquipmentButton.IsEnabled = false;
             DeleteEquipmentButton.IsEnabled = false;
         }
+
+        #endregion
+
+        #region Loading and filters
 
         // Fills ComboBoxes with data
         private void PopulateComboBoxes()
@@ -185,10 +191,18 @@ namespace PresentationLayer.Views
             return matchesCategory && matchesStatus;
         }
 
+        #endregion
+
+        #region Navigation
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
+        #endregion
+
+        #region Equipment form
 
         private void AddEquipmentButton_Click(object sender, RoutedEventArgs e)
         {
@@ -401,6 +415,10 @@ namespace PresentationLayer.Views
             }
         }
 
+        #endregion
+
+        #region Converters
+
         public class EquipmentConditionSwedishConverter : IValueConverter
         {
             public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
@@ -419,6 +437,10 @@ namespace PresentationLayer.Views
                 throw new NotSupportedException();
             }
         }
+
+        #endregion
+
+        #region Form feedback and validation
 
         private static readonly Brush ErrorBrush = new SolidColorBrush(Color.FromRgb(0xDC, 0x26, 0x26));
         private static readonly Brush SuccessBrush = new SolidColorBrush(Color.FromRgb(0x1E, 0x7A, 0x4F));
@@ -485,5 +507,7 @@ namespace PresentationLayer.Views
 
             EquipmentFeedbackTextBlock.Text = string.Empty;
         }
+
+        #endregion
     }
 }
