@@ -5,12 +5,18 @@ namespace BusinessLayer.Controllers
 {
     public class PropertyController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         public PropertyController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Accommodation and meeting room queries
 
         public IEnumerable<Accommodation> GetAllAccommodations()
         {
@@ -21,6 +27,10 @@ namespace BusinessLayer.Controllers
         {
             return _unitOfWork.MeetingRoom.GetAllMeetingRooms();
         }
+
+        #endregion
+
+        #region Status updates
 
         public bool UpdateAccommodationStatus(int accommodationId, AccommodationStatus newStatus)
         {
@@ -41,5 +51,7 @@ namespace BusinessLayer.Controllers
             _unitOfWork.Complete();
             return true;
         }
+
+        #endregion
     }
 }

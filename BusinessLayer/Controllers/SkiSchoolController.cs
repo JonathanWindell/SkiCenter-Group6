@@ -7,6 +7,8 @@ namespace BusinessLayer.Controllers
 {
     public class SkiSchoolController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         /// <summary>
@@ -17,6 +19,10 @@ namespace BusinessLayer.Controllers
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
+
+        #endregion
+
+        #region Lessons and sessions
 
         /// <summary>
         /// Gets all ski lesson course types available in the system.
@@ -73,6 +79,10 @@ namespace BusinessLayer.Controllers
 
             return _unitOfWork.SkiLesson.GetAvailableSessions(weekNumber, level);
         }
+
+        #endregion
+
+        #region Participant booking
 
         /// <summary>
         /// Books a participant to a ski lesson session under an existing booking order.
@@ -246,6 +256,10 @@ namespace BusinessLayer.Controllers
             return count < lesson.MaxParticipants;
         }
 
+        #endregion
+
+        #region Participant lists
+
         /// <summary>
         /// Gets information regarding every customer booked to a session.
         /// </summary>
@@ -276,5 +290,7 @@ namespace BusinessLayer.Controllers
 
             return sb.ToString();
         }
+
+        #endregion
     }
 }

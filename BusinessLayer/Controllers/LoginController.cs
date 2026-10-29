@@ -10,6 +10,8 @@ namespace BusinessLayer.Controllers
     /// </summary>
     public class LoginController
     {
+        #region Fields and constructor
+
         private readonly IUnitOfWork _unitOfWork;
 
         // Keeps track of current logged in staff. 
@@ -19,6 +21,10 @@ namespace BusinessLayer.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Login
 
         /// <summary>
         /// Verifies the user's credentials against the specific repository based on the user type.
@@ -60,10 +66,16 @@ namespace BusinessLayer.Controllers
 
             return (true, "");
         }
+
+        #endregion
+        #region Logout
+
         // Sets current user to null to remove session
         public void Logout()
         {
             CurrentLoggedInUser = null;
         }
+
+        #endregion
     }
 }

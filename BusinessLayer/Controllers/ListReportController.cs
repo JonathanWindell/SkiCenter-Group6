@@ -12,6 +12,8 @@ namespace BusinessLayer.Controllers
     /// </summary>
     public class ListReportController
     {
+        #region Fields and constructor
+
         private static readonly CultureInfo Swedish = CultureInfo.GetCultureInfo("sv-SE");
 
         private readonly IUnitOfWork _unitOfWork;
@@ -20,6 +22,10 @@ namespace BusinessLayer.Controllers
         {
             _unitOfWork = unitOfWork;
         }
+
+        #endregion
+
+        #region Reports
 
         /// <summary>
         /// Creates the statistics report from statistics already shown in the statistics view.
@@ -180,6 +186,10 @@ namespace BusinessLayer.Controllers
             return (true, "Prislistorna är skapade.", report);
         }
 
+        #endregion
+
+        #region Price list building
+
         /// <summary>
         /// Groups current season prices into one price list per accommodation type, with one row per week.
         /// The weekly price ("vecka") is used to find the lowest price and the high season weeks.
@@ -223,6 +233,10 @@ namespace BusinessLayer.Controllers
         /// Orders weeks in season order: the winter season runs from week 44 over new year to the spring.
         /// </summary>
         private static int SeasonOrder(int week) => week >= 40 ? week - 40 : week + 13;
+
+        #endregion
+
+        #region Key messages
 
         public static List<string> BuildStatisticsMessages(StatisticsReport statistics, bool compareWithPreviousYear)
         {
@@ -325,6 +339,10 @@ namespace BusinessLayer.Controllers
             return messages;
         }
 
+        #endregion
+
+        #region Helpers
+
         private static CustomerRegisterRow CreateCustomerRow(Customer customer)
         {
             var row = new CustomerRegisterRow
@@ -388,5 +406,7 @@ namespace BusinessLayer.Controllers
             EquipmentCondition.Worn => "Sliten",
             _ => condition.ToString()
         };
+
+        #endregion
     }
 }
