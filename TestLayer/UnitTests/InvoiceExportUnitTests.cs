@@ -12,6 +12,8 @@ namespace TestLayer.UnitTests
     [Category("Unit")]
     public class InvoiceExportUnitTests
     {
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<IBookingRepository> _mockBookingRepo;
         private Mock<IStaffRepository> _mockStaffRepo;
@@ -43,6 +45,10 @@ namespace TestLayer.UnitTests
             // The logged in user is static, so reset it between tests
             _loginController.Logout();
         }
+
+        #endregion
+
+        #region Helper Methods (Test Data Builders & Login)
 
         private void LogInAs(staffRole role)
         {
@@ -154,6 +160,10 @@ namespace TestLayer.UnitTests
             return booking;
         }
 
+        #endregion
+
+        #region Authorization & Validation Tests
+
         /// <summary>
         /// Verifies that staff without the MarketingManager or SystemAdmin role cannot generate exports.
         /// </summary>
@@ -190,6 +200,26 @@ namespace TestLayer.UnitTests
         }
 
         /// <summary>
+        /// Verifies that an end date before the start date is rejected.
+        /// </summary>
+        [Test]
+        public void GenerateInvoiceExport_EndBeforeStart_ReturnsFalse()
+        {
+            // Arrange
+            LogInAs(staffRole.MarketingManager);
+
+            // Act
+            var (success, _, _) = _controller.GenerateInvoiceExport(DateTime.Today, DateTime.Today.AddDays(-1));
+
+            // Assert
+            Assert.That(success, Is.False);
+        }
+
+        #endregion
+
+        #region Data Retrieval & Filtering Tests
+
+        /// <summary>
         /// Verifies that marketing managers and system admins can generate exports for completed bookings.
         /// </summary>
         [Test]
@@ -210,22 +240,6 @@ namespace TestLayer.UnitTests
         }
 
         /// <summary>
-        /// Verifies that an end date before the start date is rejected.
-        /// </summary>
-        [Test]
-        public void GenerateInvoiceExport_EndBeforeStart_ReturnsFalse()
-        {
-            // Arrange
-            LogInAs(staffRole.MarketingManager);
-
-            // Act
-            var (success, _, _) = _controller.GenerateInvoiceExport(DateTime.Today, DateTime.Today.AddDays(-1));
-
-            // Assert
-            Assert.That(success, Is.False);
-        }
-
-        /// <summary>
         /// Verifies that the customer filter only includes the selected customer type.
         /// </summary>
         [Test]
@@ -240,8 +254,12 @@ namespace TestLayer.UnitTests
             var (_, _, export) = _controller.GenerateInvoiceExport(DateTime.Today.AddDays(-30), DateTime.Today, filter);
 
             // Assert
-            Assert.That(export!.Bookings.Select(b => b.BookingID), Is.EqualTo(new[] { expectedBookingId }));
+            Assert.That(export!.Bookings.Select(b => b.BookingID), Is.EquivalentTo(new[] { expectedBookingId }));
         }
+
+        #endregion
+
+        #region Building Invoice (VAT & Discounts) Tests
 
         /// <summary>
         /// Verifies that every article becomes its own line with the correct VAT rate and VAT amount.
@@ -318,6 +336,10 @@ namespace TestLayer.UnitTests
             Assert.That(invoice.MatchesBookingTotal, Is.True);
         }
 
+        #endregion
+
+        #region JSON Serialization Tests
+
         /// <summary>
         /// Verifies that the JSON export can be read back and contains the lines, discounts and VAT.
         /// </summary>
@@ -341,5 +363,7 @@ namespace TestLayer.UnitTests
             Assert.That(firstBooking.GetProperty("vatSummary").GetArrayLength(), Is.EqualTo(4));
             Assert.That(json, Does.Contain("Företagskund"), "Swedish characters should not be escaped.");
         }
+
+        #endregion
     }
 }

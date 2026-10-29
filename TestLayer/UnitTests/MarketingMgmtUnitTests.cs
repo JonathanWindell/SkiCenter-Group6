@@ -9,6 +9,8 @@ namespace TestLayer.UnitTests
     [Category("Unit")]
     public class MarketingMgmtUnitTests
     {
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<ICustomerRepository> _mockCustomerRepo;
         private Mock<IBookingRepository> _mockBookingRepo;
@@ -26,6 +28,10 @@ namespace TestLayer.UnitTests
 
             _customerController = new CustomerController(_mockUnitOfWork.Object);
         }
+
+        #endregion
+
+        #region Query Tests (Read)
 
         /// <summary>
         /// Verifies that GetAllCorporateCustomers fetches all corporate customer entities directly from the repository.
@@ -58,6 +64,10 @@ namespace TestLayer.UnitTests
             Assert.That(result, Is.EqualTo(expectedCustomers));
             _mockCustomerRepo.Verify(r => r.GetAllCorporateCustomers(), Times.Once);
         }
+
+        #endregion
+
+        #region Business Logic & State Transitions
 
         /// <summary>
         /// Verifies that transitioning an unapproved customer to approved updates agreement terms, 
@@ -179,6 +189,10 @@ namespace TestLayer.UnitTests
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Once);
         }
 
+        #endregion
+
+        #region Validation & Edge Cases (Sad Paths)
+
         /// <summary>
         /// Verifies that validation prevents execution and returns false when invalid arguments are provided.
         /// </summary>
@@ -221,5 +235,7 @@ namespace TestLayer.UnitTests
             _mockCustomerRepo.Verify(r => r.Update(It.IsAny<CorporateCustomer>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.Complete(), Times.Never);
         }
+
+        #endregion
     }
 }

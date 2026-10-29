@@ -6,12 +6,18 @@ namespace DataLayer.Repositories
 {
     public class EquipmentItemRepository : Repository<EquipmentItem>, IEquipmentItemRepository
     {
+        #region Constructor & Fields
+
         private readonly SkiCenterDbContext _context;
 
         public EquipmentItemRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Single Item Queries
 
         /// <summary>
         /// Gets a specific ItemId 
@@ -26,6 +32,10 @@ namespace DataLayer.Repositories
                     .ThenInclude(e => e.Prices)
                 .FirstOrDefault(ei => ei.ArticleNumber == articleNumber.Trim());
         }
+
+        #endregion
+
+        #region Multiple Items Queries
 
         /// <summary>
         /// Gets a list of all individual items in the system.
@@ -105,6 +115,10 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        #endregion
+
+        #region Update Operations
+
         /// <summary>
         /// Updates an item with new properties.
         /// </summary>
@@ -151,5 +165,7 @@ namespace DataLayer.Repositories
                 _context.Set<EquipmentItem>().Update(item);
             }
         }
+
+        #endregion
     }
 }

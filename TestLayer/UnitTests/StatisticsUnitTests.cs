@@ -16,6 +16,8 @@ namespace TestLayer.UnitTests
         private static readonly DateTime October = new DateTime(2026, 10, 1);
         private static readonly DateTime November = new DateTime(2026, 11, 1);
 
+        #region Setup & Mocks
+
         private Mock<IUnitOfWork> _mockUnitOfWork;
         private Mock<IBookingRepository> _mockBookingRepo;
         private Mock<IAccommodationRepository> _mockAccommodationRepo;
@@ -62,6 +64,10 @@ namespace TestLayer.UnitTests
             _loginController.Logout();
         }
 
+        #endregion
+
+        #region Helper Methods
+
         private void LogInAs(staffRole role)
         {
             var staff = new Staff("Test", "Person", "test@skicenter.se", "HashedPassword123", role) { StaffID = 7 };
@@ -102,6 +108,10 @@ namespace TestLayer.UnitTests
         {
             return StatisticsController.CalculateMonthlyStatistics(bookings, new[] { October, November }, units, typeId);
         }
+
+        #endregion
+
+        #region Monthly Statistics Calculation
 
         /// <summary>
         /// Verifies that a stay over a month boundary is split into the right number of nights per month.
@@ -229,6 +239,10 @@ namespace TestLayer.UnitTests
             Assert.That(result[1].EquipmentSales, Is.EqualTo(200m));
         }
 
+        #endregion
+
+        #region Authorization & Validation
+
         /// <summary>
         /// Verifies that staff without the MarketingManager or SystemAdmin role cannot view statistics.
         /// </summary>
@@ -293,6 +307,10 @@ namespace TestLayer.UnitTests
             Assert.That(tooLong, Is.False);
         }
 
+        #endregion
+
+        #region Math & Presentation Logic
+
         /// <summary>
         /// Verifies the change against the previous period, and that no change is shown without previous data.
         /// </summary>
@@ -309,5 +327,7 @@ namespace TestLayer.UnitTests
         {
             Assert.That(StatisticsReport.PercentChange(100, 0), Is.Null);
         }
+
+        #endregion
     }
 }

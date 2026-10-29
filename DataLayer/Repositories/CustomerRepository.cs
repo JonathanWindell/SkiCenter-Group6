@@ -6,12 +6,17 @@ namespace DataLayer.Repositories
 {
     public class CustomerRepository : Repository<Customer>, ICustomerRepository
     {
+        #region Constructor & Fields
         private readonly SkiCenterDbContext _context;
 
         public CustomerRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Multiple Bookings
 
         /// <summary>
         /// Gets all customers with all associated booking data.
@@ -24,11 +29,15 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        #endregion
+
+        #region Specific Information for Customer
+
         /// <summary>
         /// Gets a single customer with all bookinghistory and accommodation data. 
         /// </summary>
         /// <param name="customerID"></param>
-        public Customer GetCustomerHistory(int customerID)
+        public Customer? GetCustomerHistory(int customerID)
         {
             return _context.Set<Customer>()
                 .Include(c => c.Bookings)
@@ -44,7 +53,7 @@ namespace DataLayer.Repositories
         /// Searches for a specific customer. 
         /// </summary>
         /// <param name="searchItem"></param>
-        public Customer SearchCustomer(string searchItem)
+        public Customer? SearchCustomer(string searchItem)
         {
             if (string.IsNullOrWhiteSpace(searchItem))
             {
@@ -79,6 +88,7 @@ namespace DataLayer.Repositories
                 (!string.IsNullOrEmpty(email) && c.Email == email) ||
                 (!string.IsNullOrEmpty(phoneNumber) && c.PhoneNumber == phoneNumber));
         }
+
         /// <summary>
         /// Gets all corporate customers that has not yet been approved by marketing manager. 
         /// </summary>
@@ -86,5 +96,6 @@ namespace DataLayer.Repositories
         {
             return _context.Set<CorporateCustomer>().ToList();
         }
+        #endregion
     }
 }

@@ -6,12 +6,18 @@ namespace DataLayer.Repositories
 {
     public class EquipmentRepository : Repository<Equipment>, IEquipmentRepository
     {
+        #region Constructor & Fields
+
         private readonly SkiCenterDbContext _context;
 
         public EquipmentRepository(SkiCenterDbContext context) : base(context)
         {
             _context = context;
         }
+
+        #endregion
+
+        #region Category Filtered Queries
 
         /// <summary>
         /// Get all equipment by category. 
@@ -47,6 +53,10 @@ namespace DataLayer.Repositories
                 .ToList();
         }
 
+        #endregion
+
+        #region All Equipment Queries
+
         /// <summary>
         /// Gets all equipment with its price list, for the printable price list.
         /// </summary>
@@ -70,5 +80,7 @@ namespace DataLayer.Repositories
                 .AsNoTracking()
                 .ToList();
         }
+
+        #endregion
     }
 }
