@@ -1,5 +1,6 @@
 ﻿using DataLayer.Interfaces;
 using EntityLayer;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataLayer.Repositories
 {
@@ -35,6 +36,16 @@ namespace DataLayer.Repositories
             return _context.StaffMembers.Any(s => s.Email.ToLower() == email.ToLower());
         }
 
-        #endregion
+        /// <summary>
+        /// Gets every staff account, active and deactivated, ordered by name.
+        /// </summary>
+        public IEnumerable<Staff> GetAllStaff()
+        {
+            return _context.StaffMembers
+                .OrderBy(s => s.FirstName)
+                .ThenBy(s => s.LastName)
+                .AsNoTracking()
+                .ToList();
+        }
     }
 }

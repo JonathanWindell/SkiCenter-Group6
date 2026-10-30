@@ -185,5 +185,78 @@ namespace BusinessLayer.Controllers
         }
 
         #endregion
+
+        #region Staff list and deactivation
+
+        /// <summary>
+        /// Gets every staff account, active and deactivated.
+        /// </summary>
+        public IEnumerable<Staff> GetAllStaff()
+        {
+            return _unitOfWork.Staff.GetAllStaff();
+        }
+
+        /// <summary>
+        /// Deactivates or reactivates a staff account. A deactivated account cannot log in, but is kept
+        /// in the database so bookings and the price change log still show who did what.
+        /// You cannot deactivate yourself, and there must always be at least one active system admin.
+        /// </summary>
+        /// <param name="staffId">The account to change.</param>
+        /// <param name="isActive">True to reactivate, false to deactivate.</param>
+        /// <returns>Whether it succeeded and a message for the user.</returns>
+        public (bool success, string message) SetStaffActive(int staffId, bool isActive)
+        {
+            Staff? currentUser = LoginController.CurrentLoggedInUser;
+
+            if (currentUser == null || !CanManageStaff(currentUser.Role))
+            {
+                return (false, "Endast systemadministratörer kan hantera personalkonton.");
+            }
+
+            Staff? staff = _unitOfWork.Staff.GetByID(staffId);
+            if (staff == null)
+            {
+                return (false, "Personalkontot kunde inte hittas.");
+            }
+
+            string name = $"{staff.FirstName} {staff.LastName}";
+
+            if (staff.IsActive == isActive)
+            {
+                return (false, isActive ? $"{name} är redan aktiv." : $"{name} är redan inaktiverad.");
+            }
+
+            if (!isActive)
+            {
+                // Prevents admins from locking themselves out
+                if (staff.StaffID == currentUser.StaffID)
+                {
+                    return (false, "Du kan inte inaktivera ditt eget konto.");
+                }
+
+                // Someone must always be able to manage staff
+                bool otherActiveAdminExists = _unitOfWork.Staff.GetAllStaff()
+                    .Any(s => s.IsActive && s.Role == staffRole.SystemAdmin && s.StaffID != staff.StaffID);
+
+                if (staff.Role == staffRole.SystemAdmin && !otherActiveAdminExists)
+                {
+                    return (false, "Det måste finnas minst en aktiv systemadministratör.");
+                }
+            }
+
+            staff.IsActive = isActive;
+            _unitOfWork.Staff.Update(staff);
+
+            if (_unitOfWork.Complete() <= 0)
+            {
+                return (false, "Ändringen kunde inte sparas.");
+            }
+
+            return (true, isActive
+                ? $"{name} är aktiverad igen och kan logga in."
+                : $"{name} är inaktiverad och kan inte längre logga in. Historiken finns kvar.");
+        }
+
+        #endregion
     }
 }
